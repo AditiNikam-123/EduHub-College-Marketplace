@@ -1,25 +1,68 @@
+<script>
+
 document.getElementById("loginForm").addEventListener("submit", async function(e) {
+
     e.preventDefault();
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    const email =
+        document.getElementById("email").value.trim();
 
-    const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: email,
-            password: password
-        })
-    });
+    const password =
+        document.getElementById("password").value;
 
-    const data = await response.json();
+    if (!email || !password) {
 
-    alert(data.message);
+        alert("Please enter email and password.");
 
-    if (data.success) {
-        window.location.href = "index.html";
+        return;
     }
+
+    try {
+
+        const response = await fetch(
+            "https://eduhub-backend-llwi.onrender.com/login",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        alert(data.message);
+
+        if (data.success) {
+
+            // Save logged-in user's email
+            localStorage.setItem(
+                "userEmail",
+                email
+            );
+
+            window.location.href =
+                "index.html";
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Login error:",
+            error
+        );
+
+        alert(
+            "❌ Unable to connect to EduHub server."
+        );
+    }
+
 });
+
+</script>
