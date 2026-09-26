@@ -1,109 +1,51 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduHub - College Marketplace</title>
-
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
-
-<!-- ================= SIDEBAR ================= -->
-
 <div class="sidebar">
 
-    <div class="logo">
-        🎓 EduHub
-    </div>
+    <div class="logo">🎓 EduHub</div>
 
     <div class="sidebar-subtitle">
         College Marketplace
     </div>
 
-
     <nav>
 
-        <!-- HOME -->
-
-        <button class="nav-btn active"
-                onclick="showSection('home')">
-
+        <button class="nav-btn active" onclick="showSection('home')">
             🏠 Home
-
         </button>
 
-
-        <!-- PRODUCTS -->
-
-        <button class="nav-btn"
-                onclick="showSection('products')">
-
+        <button class="nav-btn" onclick="showSection('products')">
             🛍️ Available Products
-
         </button>
 
-
-        <!-- MESSAGES -->
-
-        <a href="messages.html"
-           class="nav-btn"
-           style="text-decoration: none;">
-
+        <a href="messages.html" class="nav-btn">
             💬 Messages
-
         </a>
 
-
-        <!-- SELL -->
-
-        <button class="nav-btn"
-                onclick="showSection('sell')">
-
+        <button class="nav-btn" onclick="showSection('sell')">
             ➕ Sell Your Product
-
         </button>
 
-
-        <!-- TRANSACTION HISTORY -->
-
-        <a href="history.html"
-           class="nav-btn"
-           style="text-decoration: none;">
-
+        <a href="history.html" class="nav-btn">
             🧾 Transaction History
-
         </a>
 
-
-        <!-- PROFILE -->
-
-        <a href="profile.html"
-           class="nav-btn"
-           style="text-decoration: none;">
-
+        <a href="profile.html" class="nav-btn">
             👤 My Profile
-
         </a>
 
-
-        <!-- LOGIN -->
-
-        <a href="login.html"
-           class="nav-btn"
-           style="text-decoration: none;">
-
+        <a href="login.html" class="nav-btn">
             🔐 Login
-
         </a>
 
     </nav>
@@ -111,16 +53,9 @@
 </div>
 
 
-
-<!-- ================= MAIN CONTENT ================= -->
-
 <div class="main-content">
 
-
-    <!-- ================= HOME ================= -->
-
-    <section id="home"
-             class="section active">
+    <section id="home" class="section active">
 
         <div class="page-section">
 
@@ -130,9 +65,7 @@
                     Welcome to EduHub 🎓
                 </div>
 
-                <h1>
-                    Your College Marketplace
-                </h1>
+                <h1>Your College Marketplace</h1>
 
                 <p>
                     Buy and sell useful college products
@@ -141,77 +74,39 @@
 
                 <button class="primary-btn"
                         onclick="showSection('products')">
-
                     🛍️ Explore Products
-
                 </button>
 
             </div>
 
-
             <div class="feature-grid">
 
-
-                <!-- BUY -->
-
                 <div class="feature-card">
-
-                    <div class="feature-icon">
-                        🛍️
-                    </div>
-
-                    <h3>
-                        Buy
-                    </h3>
-
+                    <div class="feature-icon">🛍️</div>
+                    <h3>Buy</h3>
                     <p>
                         Find affordable books, notes,
-                        calculators and other college
-                        products.
+                        calculators and other college products.
                     </p>
-
                 </div>
 
-
-                <!-- SELL -->
-
                 <div class="feature-card">
-
-                    <div class="feature-icon">
-                        💰
-                    </div>
-
-                    <h3>
-                        Sell
-                    </h3>
-
+                    <div class="feature-icon">💰</div>
+                    <h3>Sell</h3>
                     <p>
                         Sell your unused college products
                         to other students.
                     </p>
-
                 </div>
 
-
-                <!-- CONNECT -->
-
                 <div class="feature-card">
-
-                    <div class="feature-icon">
-                        💬
-                    </div>
-
-                    <h3>
-                        Connect
-                    </h3>
-
+                    <div class="feature-icon">💬</div>
+                    <h3>Connect</h3>
                     <p>
                         Contact sellers directly through
                         EduHub messaging.
                     </p>
-
                 </div>
-
 
             </div>
 
@@ -220,29 +115,19 @@
     </section>
 
 
-
-    <!-- ================= PRODUCTS ================= -->
-
-    <section id="products"
-             class="section">
+    <section id="products" class="section">
 
         <div class="page-section">
 
             <div class="section-heading">
 
-                <h2>
-                    🛍️ Available Products
-                </h2>
+                <h2>🛍️ Available Products</h2>
 
                 <p>
-                    Find useful products from other
-                    college students.
+                    Find useful products from other college students.
                 </p>
 
             </div>
-
-
-            <!-- SEARCH -->
 
             <div class="search-area">
 
@@ -250,49 +135,24 @@
                     type="text"
                     id="searchInput"
                     placeholder="🔎 Search products..."
-                    onkeyup="searchProducts()"
-                >
-
-
-                <!-- CATEGORY -->
+                    onkeyup="searchProducts()">
 
                 <select
                     id="categoryFilter"
-                    onchange="filterCategory()"
-                >
+                    onchange="filterCategory()">
 
-                    <option value="all">
-                        All Categories
-                    </option>
-
-                    <option value="Books">
-                        Books
-                    </option>
-
-                    <option value="Notes">
-                        Notes
-                    </option>
-
-                    <option value="Electronics">
-                        Electronics
-                    </option>
-
-                    <option value="Stationery">
-                        Stationery
-                    </option>
+                    <option value="all">All Categories</option>
+                    <option value="Books">Books</option>
+                    <option value="Notes">Notes</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Stationery">Stationery</option>
 
                 </select>
 
             </div>
 
-
-            <!-- PRODUCT LIST -->
-
-            <div id="productContainer"
-                 class="product-grid">
-
+            <div id="productContainer" class="product-grid">
                 Loading products...
-
             </div>
 
         </div>
@@ -300,109 +160,41 @@
     </section>
 
 
-
-    <!-- ================= MESSAGES ================= -->
-
-    <!--
-        Messages are now handled on messages.html.
-        The sidebar Messages button opens that page.
-    -->
-
-    <section id="messages"
-             class="section">
-
-        <div class="page-section">
-
-            <div class="section-heading">
-
-                <h2>
-                    💬 My Messages
-                </h2>
-
-                <p>
-                    Open the Messages page to view
-                    your conversations.
-                </p>
-
-
-                <a href="messages.html"
-                   class="primary-btn"
-                   style="
-                       display:inline-block;
-                       text-decoration:none;
-                       margin-top:15px;
-                   ">
-
-                    💬 Open My Messages
-
-                </a>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- ================= SELL ================= -->
-
-    <section id="sell"
-             class="section">
+    <section id="sell" class="section">
 
         <div class="page-section">
 
             <div class="sell-card">
 
-                <h2>
-                    ➕ Sell Your Product
-                </h2>
+                <h2>➕ Sell Your Product</h2>
 
                 <p>
-                    List your college product for
-                    other students.
+                    List your college product for other students.
                 </p>
 
-
                 <form id="productForm">
-
-
-                    <!-- PRODUCT NAME -->
 
                     <input
                         type="text"
                         id="productName"
                         placeholder="Product Name"
-                        required
-                    >
-
-
-                    <!-- MARKET PRICE -->
+                        required>
 
                     <input
                         type="number"
                         id="marketPrice"
                         placeholder="Original Market Price"
                         min="1"
-                        required
-                    >
-
-
-                    <!-- SELLING PRICE -->
+                        required>
 
                     <input
                         type="number"
                         id="sellingPrice"
                         placeholder="Your Selling Price"
                         min="1"
-                        required
-                    >
+                        required>
 
-
-                    <!-- CATEGORY -->
-
-                    <select id="category"
-                            required>
+                    <select id="category" required>
 
                         <option value="">
                             Select Category
@@ -426,21 +218,21 @@
 
                     </select>
 
-
-                    <!-- SELLER -->
-
                     <input
                         type="text"
                         id="sellerName"
-                        placeholder="Your Name / Email"
-                        required
-                    >
+                        placeholder="Your Name"
+                        required>
 
+                    <input
+                        type="email"
+                        id="sellerEmail"
+                        placeholder="Your College Email"
+                        required>
 
-                    <!-- SUBMIT -->
-
-                    <button type="submit"
-                            class="sell-btn">
+                    <button
+                        type="submit"
+                        class="sell-btn">
 
                         ➕ List Product
 
@@ -457,90 +249,61 @@
 </div>
 
 
-
-<!-- ================================================= -->
-<!-- PRODUCT DETAILS MODAL -->
-<!-- ================================================= -->
-
-<div id="detailsModal"
-     class="modal hidden">
+<div id="detailsModal" class="modal hidden">
 
     <div class="modal-box">
 
-        <button class="close-modal"
-                onclick="closeDetailsModal()">
-
+        <button
+            class="close-modal"
+            onclick="closeDetailsModal()">
             ✕
-
         </button>
 
-
-        <div class="modal-icon">
-            🛍️
-        </div>
-
+        <div class="modal-icon">🛍️</div>
 
         <h2 id="detailsProductName">
             Product Name
         </h2>
 
-
         <p id="detailsCategory">
             Category
         </p>
-
 
         <p id="detailsSeller">
             Seller
         </p>
 
-
-        <!-- PRICE -->
-
         <div class="price-box">
 
             <p id="detailsMarketPrice"
                class="old-price">
-
                 Original Price
-
             </p>
 
             <p id="detailsSellingPrice"
                class="big-price">
-
                 Selling Price
-
             </p>
 
             <p id="detailsSaving"
                class="saving-text">
-
                 You Save
-
             </p>
 
         </div>
 
-
-        <!-- BUTTONS -->
-
         <div class="modal-buttons">
 
-            <button id="detailsBuyButton"
-                    class="buy-btn large-btn">
-
+            <button
+                id="detailsBuyButton"
+                class="buy-btn large-btn">
                 🛒 Buy Now
-
             </button>
-
 
             <button
                 onclick="closeDetailsModal()"
                 class="cancel-btn">
-
                 Close
-
             </button>
 
         </div>
@@ -550,30 +313,17 @@
 </div>
 
 
-
-<!-- ================================================= -->
-<!-- BUY CONFIRMATION MODAL -->
-<!-- ================================================= -->
-
-<div id="buyModal"
-     class="modal hidden">
+<div id="buyModal" class="modal hidden">
 
     <div class="modal-box buy-confirm-box">
 
-        <div class="success-icon">
-            🛒
-        </div>
+        <div class="success-icon">🛒</div>
 
-
-        <h2>
-            Confirm Purchase
-        </h2>
-
+        <h2>Confirm Purchase</h2>
 
         <p>
             Are you sure you want to buy this product?
         </p>
-
 
         <div class="purchase-summary">
 
@@ -591,22 +341,18 @@
 
         </div>
 
-
         <div class="modal-buttons">
 
-            <button id="confirmBuyButton"
-                    class="buy-btn large-btn">
-
+            <button
+                id="confirmBuyButton"
+                class="buy-btn large-btn">
                 ✅ Confirm Purchase
-
             </button>
 
-
-            <button onclick="closeBuyModal()"
-                    class="cancel-btn">
-
+            <button
+                onclick="closeBuyModal()"
+                class="cancel-btn">
                 Cancel
-
             </button>
 
         </div>
@@ -616,84 +362,46 @@
 </div>
 
 
-
-<!-- ================================================= -->
-<!-- PURCHASE SUCCESS MODAL -->
-<!-- ================================================= -->
-
-<div id="successModal"
-     class="modal hidden">
+<div id="successModal" class="modal hidden">
 
     <div class="modal-box success-box">
 
-        <div class="success-big">
-            🎉
-        </div>
+        <div class="success-big">🎉</div>
 
-
-        <h2>
-            Purchase Successful!
-        </h2>
-
+        <h2>Purchase Successful!</h2>
 
         <p class="success-message">
             Your transaction has been completed successfully.
         </p>
 
-
         <div class="transaction-summary">
 
             <p>
-
-                <strong>
-                    Product:
-                </strong>
-
+                <strong>Product:</strong>
                 <span id="successProduct"></span>
-
             </p>
 
-
             <p>
-
-                <strong>
-                    Amount:
-                </strong>
-
+                <strong>Amount:</strong>
                 ₹<span id="successAmount"></span>
-
             </p>
 
-
             <p>
-
-                <strong>
-                    Seller:
-                </strong>
-
+                <strong>Seller:</strong>
                 <span id="successSeller"></span>
-
             </p>
 
-
             <p>
-
-                <strong>
-                    Transaction ID:
-                </strong>
-
+                <strong>Transaction ID:</strong>
                 <span id="successTransactionId"></span>
-
             </p>
 
         </div>
 
-
-        <button onclick="closeSuccessModal()"
-                class="buy-btn large-btn">
-
+        <button
+            onclick="closeSuccessModal()"
+            class="buy-btn large-btn">
             Done
-
         </button>
 
     </div>
@@ -701,65 +409,45 @@
 </div>
 
 
-
-<!-- ================================================= -->
-<!-- CONTACT SELLER MODAL -->
-<!-- ================================================= -->
-
-<div id="messageModal"
-     class="modal hidden">
+<div id="messageModal" class="modal hidden">
 
     <div class="modal-box">
 
-        <button class="close-modal"
-                onclick="closeMessageBox()">
-
+        <button
+            class="close-modal"
+            onclick="closeMessageBox()">
             ✕
-
         </button>
 
+        <div class="modal-icon">💬</div>
 
-        <div class="modal-icon">
-            💬
-        </div>
-
-
-        <h2>
-            Contact Seller
-        </h2>
-
+        <h2>Contact Seller</h2>
 
         <p id="messageSeller">
             Seller:
         </p>
 
-
         <p id="messageProduct">
             Product:
         </p>
 
-
         <textarea
             id="sellerMessage"
-            placeholder="Write your message to the seller..."
-        ></textarea>
-
+            placeholder="Write your message to the seller...">
+        </textarea>
 
         <div class="modal-buttons">
 
-            <button onclick="sendMessage()"
-                    class="send-message-btn">
-
+            <button
+                onclick="sendMessage()"
+                class="send-message-btn">
                 📤 Send Message
-
             </button>
 
-
-            <button onclick="closeMessageBox()"
-                    class="cancel-btn">
-
+            <button
+                onclick="closeMessageBox()"
+                class="cancel-btn">
                 Cancel
-
             </button>
 
         </div>
@@ -769,13 +457,7 @@
 </div>
 
 
-
-<!-- ================= SCRIPT ================= -->
-
 <script src="script.js"></script>
 
-
 </body>
-
 </html>
-```
