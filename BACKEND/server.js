@@ -1,3 +1,4 @@
+```js
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -5,8 +6,11 @@ const path = require("path");
 
 const app = express();
 
-// Render ke liye PORT automatically milega
-const PORT = process.env.PORT || 5000;
+// ========================================
+// PORT
+// ========================================
+
+const PORT = process.env.PORT || 10000;
 
 // ========================================
 // MIDDLEWARE
@@ -42,6 +46,7 @@ function readData(file) {
         }
 
         return JSON.parse(data);
+
     } catch (error) {
         console.log("File read error:", file);
         console.log(error.message);
@@ -57,6 +62,7 @@ function writeData(file, data) {
         );
 
         return true;
+
     } catch (error) {
         console.log("File write error:", error.message);
         return false;
@@ -210,10 +216,7 @@ app.delete("/api/products/:id", (req, res) => {
             Number(product.id) !== id
     );
 
-    if (
-        newProducts.length ===
-        products.length
-    ) {
+    if (newProducts.length === products.length) {
         return res.status(404).json({
             success: false,
             message: "Product not found"
@@ -311,16 +314,14 @@ app.get("/api/messages", (req, res) => {
 
 app.post("/api/messages", (req, res) => {
     try {
-        const messages =
-            readData(messagesFile);
+        const messages = readData(messagesFile);
 
         const newMessage = {
             id:
                 messages.length > 0
                     ? Math.max(
                         ...messages.map(
-                            m =>
-                                Number(m.id) || 0
+                            m => Number(m.id) || 0
                         )
                     ) + 1
                     : 1,
@@ -353,9 +354,7 @@ app.post("/api/messages", (req, res) => {
                 null,
 
             date:
-                new Date().toLocaleString(
-                    "en-IN"
-                )
+                new Date().toLocaleString("en-IN")
         };
 
         if (!newMessage.sender) {
@@ -381,17 +380,15 @@ app.post("/api/messages", (req, res) => {
 
         messages.push(newMessage);
 
-        const saved =
-            writeData(
-                messagesFile,
-                messages
-            );
+        const saved = writeData(
+            messagesFile,
+            messages
+        );
 
         if (!saved) {
             return res.status(500).json({
                 success: false,
-                message:
-                    "Could not save message"
+                message: "Could not save message"
             });
         }
 
@@ -402,8 +399,7 @@ app.post("/api/messages", (req, res) => {
 
         return res.status(201).json({
             success: true,
-            message:
-                "Message sent successfully",
+            message: "Message sent successfully",
             data: newMessage
         });
 
@@ -415,8 +411,7 @@ app.post("/api/messages", (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message:
-                "Message could not be saved"
+            message: "Message could not be saved"
         });
     }
 });
@@ -427,127 +422,102 @@ app.post("/api/messages", (req, res) => {
 
 // GET TRANSACTIONS
 
-app.get(
-    "/api/transactions",
-    (req, res) => {
+app.get("/api/transactions", (req, res) => {
+    const transactions =
+        readData(transactionsFile);
 
-        const transactions =
-            readData(
-                transactionsFile
-            );
-
-        return res.status(200).json(
-            transactions
-        );
-    }
-);
+    return res.status(200).json(
+        transactions
+    );
+});
 
 // ADD TRANSACTION
 
-app.post(
-    "/api/transactions",
-    (req, res) => {
+app.post("/api/transactions", (req, res) => {
+    try {
+        const transactions =
+            readData(transactionsFile);
 
-        try {
+        const newTransaction = {
+            id:
+                transactions.length > 0
+                    ? Math.max(
+                        ...transactions.map(
+                            t =>
+                                Number(t.id) || 0
+                        )
+                    ) + 1
+                    : 1,
 
-            const transactions =
-                readData(
-                    transactionsFile
-                );
+            productName:
+                req.body.productName ||
+                "Unknown Product",
 
-            const newTransaction = {
+            amount:
+                Number(req.body.amount) || 0,
 
-                id:
-                    transactions.length > 0
-                        ? Math.max(
-                            ...transactions.map(
-                                t =>
-                                    Number(
-                                        t.id
-                                    ) || 0
-                            )
-                        ) + 1
-                        : 1,
+            buyer:
+                req.body.buyer || "",
 
-                productName:
-                    req.body.productName ||
-                    "Unknown Product",
+            seller:
+                req.body.seller || "",
 
-                amount:
-                    Number(
-                        req.body.amount
-                    ) || 0,
+            productId:
+                req.body.productId ||
+                null,
 
-                buyer:
-                    req.body.buyer || "",
+            status:
+                req.body.status ||
+                "Completed",
 
-                seller:
-                    req.body.seller || "",
+            date:
+                req.body.date ||
+                new Date().toISOString()
+        };
 
-                productId:
-                    req.body.productId ||
-                    null,
+        transactions.push(
+            newTransaction
+        );
 
-                status:
-                    req.body.status ||
-                    "Completed",
+        const saved = writeData(
+            transactionsFile,
+            transactions
+        );
 
-                date:
-                    req.body.date ||
-                    new Date().toISOString()
-            };
-
-            transactions.push(
-                newTransaction
-            );
-
-            const saved =
-                writeData(
-                    transactionsFile,
-                    transactions
-                );
-
-            if (!saved) {
-                return res.status(500).json({
-                    success: false,
-                    message:
-                        "Could not save transaction"
-                });
-            }
-
-            console.log(
-                "Transaction saved:",
-                newTransaction
-            );
-
-            return res.status(201).json({
-
-                success: true,
-
-                message:
-                    "Transaction saved successfully",
-
-                transaction:
-                    newTransaction
-            });
-
-        } catch (error) {
-
-            console.log(
-                "Transaction error:",
-                error.message
-            );
-
+        if (!saved) {
             return res.status(500).json({
-
                 success: false,
-
                 message:
-                    "Transaction could not be saved"
+                    "Could not save transaction"
             });
         }
+
+        console.log(
+            "Transaction saved:",
+            newTransaction
+        );
+
+        return res.status(201).json({
+            success: true,
+            message:
+                "Transaction saved successfully",
+            transaction:
+                newTransaction
+        });
+
+    } catch (error) {
+        console.log(
+            "Transaction error:",
+            error.message
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Transaction could not be saved"
+        });
     }
-);
+});
 
 // ========================================
 // SERVER
@@ -568,7 +538,7 @@ app.listen(
         );
 
         console.log(
-            `🌐 Server running on port ${PORT}`
+            `🌐 Server running on 0.0.0.0:${PORT}`
         );
 
         console.log(
@@ -590,3 +560,4 @@ app.listen(
         console.log("");
     }
 );
+```
