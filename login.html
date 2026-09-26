@@ -1,199 +1,365 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduHub - Login</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
+```
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
+    body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
 
-        .login-container {
-            width: 380px;
-            background: white;
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
+    .login-container {
+        width: 380px;
+        background: white;
+        padding: 35px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-        }
+    h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 10px;
+    }
 
-        .subtitle {
-            text-align: center;
-            color: #777;
-            margin-bottom: 25px;
-        }
+    .subtitle {
+        text-align: center;
+        color: #777;
+        margin-bottom: 25px;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 7px;
-            color: #333;
-            font-weight: bold;
-        }
+    label {
+        display: block;
+        margin-bottom: 7px;
+        color: #333;
+        font-weight: bold;
+    }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 18px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 15px;
-        }
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 18px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+    }
 
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+    input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
 
-        button {
-            width: 100%;
-            padding: 13px;
-            border: none;
-            border-radius: 8px;
-            background: #667eea;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    button {
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 8px;
+        background: #667eea;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
 
-        button:hover {
-            background: #5568d8;
-        }
+    button:hover {
+        background: #5568d8;
+    }
 
-        .signup-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #555;
-        }
+    button:disabled {
+        background: #999;
+        cursor: not-allowed;
+    }
 
-        .signup-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-        }
+    .signup-link {
+        text-align: center;
+        margin-top: 20px;
+        color: #555;
+    }
 
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: #555;
-            text-decoration: none;
-        }
-    </style>
+    .signup-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: #555;
+        text-decoration: none;
+    }
+
+    .message {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .success {
+        color: #15803d;
+    }
+
+    .error {
+        color: #dc2626;
+    }
+</style>
+```
+
 </head>
 
 <body>
 
-    <div class="login-container">
+```
+<div class="login-container">
 
-        <h1>EduHub</h1>
+    <h1>🎓 EduHub</h1>
 
-        <p class="subtitle">Login to College Marketplace</p>
+    <p class="subtitle">
+        Login to College Marketplace
+    </p>
 
-        <form id="loginForm">
+    <form id="loginForm">
 
-            <label for="email">Email</label>
-            <input
-                type="email"
-                id="email"
-                placeholder="Enter your email"
-                required
-            >
+        <label for="email">
+            Email
+        </label>
 
-            <label for="password">Password</label>
-            <input
-                type="password"
-                id="password"
-                placeholder="Enter your password"
-                required
-            >
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            required
+        >
 
-            <button type="submit">Login</button>
+        <label for="password">
+            Password
+        </label>
 
-        </form>
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            required
+        >
 
-        <p class="signup-link">
-            Don't have an account?
-            <a href="signup.html">Sign Up</a>
-        </p>
+        <button
+            type="submit"
+            id="loginButton"
+        >
+            Login
+        </button>
 
-        <a href="index.html" class="back-link">
-            ← Back to Marketplace
+    </form>
+
+    <div
+        id="message"
+        class="message"
+    ></div>
+
+    <p class="signup-link">
+        Don't have an account?
+        <a href="signup.html">
+            Sign Up
         </a>
+    </p>
 
-    </div>
+    <a
+        href="index.html"
+        class="back-link"
+    >
+        ← Back to Marketplace
+    </a>
 
-    <script>
+</div>
 
-        document.getElementById("loginForm").addEventListener("submit", async function(event) {
 
-            event.preventDefault();
+<script>
 
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value;
+    // =========================================
+    // LIVE BACKEND
+    // =========================================
 
-            try {
+    const API =
+        "https://eduhub-backend-llwi.onrender.com";
 
-                const response = await fetch("http://localhost:5000/login", {
-                    method: "POST",
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+    // =========================================
+    // LOGIN
+    // =========================================
 
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
-                });
+    document
+        .getElementById("loginForm")
+        .addEventListener(
+            "submit",
+            async function(event) {
 
-                const data = await response.json();
+                event.preventDefault();
 
-                if (response.ok) {
 
-                    // Save logged-in user's email
-                    localStorage.setItem("userEmail", email);
+                const email =
+                    document
+                        .getElementById("email")
+                        .value
+                        .trim();
 
-                    alert("Login successful!");
 
-                    // Go to marketplace
-                    window.location.href = "index.html";
+                const password =
+                    document
+                        .getElementById("password")
+                        .value;
 
-                } else {
 
-                    alert(data.message || "Invalid email or password.");
+                const button =
+                    document
+                        .getElementById("loginButton");
+
+
+                const message =
+                    document
+                        .getElementById("message");
+
+
+                message.textContent = "";
+                message.className =
+                    "message";
+
+
+                button.disabled = true;
+
+                button.textContent =
+                    "Logging in...";
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            `${API}/api/users`
+                        );
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Backend connection failed"
+                        );
+
+                    }
+
+
+                    const users =
+                        await response.json();
+
+
+                    const user =
+                        users.find(
+                            u =>
+                                String(
+                                    u.email
+                                ).toLowerCase()
+                                ===
+                                email.toLowerCase()
+                                &&
+                                u.password ===
+                                password
+                        );
+
+
+                    if (!user) {
+
+                        message.textContent =
+                            "❌ Invalid email or password.";
+
+                        message.className =
+                            "message error";
+
+                        return;
+
+                    }
+
+
+                    // =================================
+                    // SAVE USER LOGIN
+                    // =================================
+
+                    localStorage.setItem(
+                        "userEmail",
+                        user.email
+                    );
+
+
+                    localStorage.setItem(
+                        "userName",
+                        user.name || ""
+                    );
+
+
+                    message.textContent =
+                        "✅ Login successful!";
+
+
+                    message.className =
+                        "message success";
+
+
+                    setTimeout(
+                        function() {
+
+                            window.location.href =
+                                "index.html";
+
+                        },
+                        700
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Login error:",
+                        error
+                    );
+
+
+                    message.textContent =
+                        "❌ Unable to connect to EduHub backend.";
+
+                    message.className =
+                        "message error";
+
+
+                } finally {
+
+                    button.disabled =
+                        false;
+
+                    button.textContent =
+                        "Login";
 
                 }
 
-            } catch (error) {
-
-                console.error(error);
-
-                alert("Unable to connect to the server. Please make sure the backend is running.");
-
             }
+        );
 
-        });
-
-    </script>
+</script>
+```
 
 </body>
 </html>
