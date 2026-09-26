@@ -1,3 +1,4 @@
+```js
 const buyer = localStorage.getItem("userEmail");
 
 const transactionList =
@@ -16,13 +17,29 @@ if (!buyer) {
 
 } else {
 
-    fetch(`http://localhost:5000/transactions/${buyer}`)
+    fetch("https://eduhub-backend-llwi.onrender.com/api/transactions")
 
-        .then(response => response.json())
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Failed to load transactions");
+            }
+
+            return response.json();
+
+        })
 
         .then(transactions => {
 
-            if (transactions.length === 0) {
+            // Show only transactions of the current buyer
+            const myTransactions =
+                transactions.filter(transaction =>
+                    String(transaction.buyer || "").toLowerCase() ===
+                    String(buyer).toLowerCase()
+                );
+
+
+            if (myTransactions.length === 0) {
 
                 transactionList.innerHTML = `
                     <div class="empty-message">
@@ -43,7 +60,7 @@ if (!buyer) {
             transactionList.innerHTML = "";
 
 
-            transactions.reverse().forEach(transaction => {
+            myTransactions.reverse().forEach(transaction => {
 
                 const card =
                     document.createElement("div");
@@ -55,28 +72,36 @@ if (!buyer) {
                 card.innerHTML = `
 
                     <h3>
-                        📦 ${transaction.product}
+                        📦
+                        ${transaction.productName || "Product"}
                     </h3>
 
                     <p class="transaction-info">
                         <strong>💰 Amount:</strong>
-                        ₹${transaction.amount}
+                        ₹${transaction.amount || 0}
                     </p>
 
                     <p class="transaction-info">
                         <strong>📅 Date:</strong>
-                        ${transaction.date}
+                        ${transaction.date || ""}
+                    </p>
+
+                    <p class="transaction-info">
+                        <strong>👤 Seller:</strong>
+                        ${transaction.seller || "N/A"}
                     </p>
 
                     <p class="transaction-info">
                         <strong>📌 Status:</strong>
+
                         <span class="status">
-                            ✓ ${transaction.status}
+                            ✓ ${transaction.status || "Completed"}
                         </span>
                     </p>
 
                     <p class="transaction-id">
-                        Transaction ID: ${transaction.id}
+                        Transaction ID:
+                        ${transaction.id}
                     </p>
 
                 `;
@@ -90,17 +115,29 @@ if (!buyer) {
 
         .catch(error => {
 
-            console.error(error);
+            console.error(
+                "Transaction history error:",
+                error
+            );
+
 
             transactionList.innerHTML = `
                 <div class="empty-message">
+
                     <h2>⚠️ Unable to Load</h2>
+
                     <p>
                         We couldn't load your transaction history.
                     </p>
+
+                    <p>
+                        Please try again in a few seconds.
+                    </p>
+
                 </div>
             `;
 
         });
 
 }
+```
