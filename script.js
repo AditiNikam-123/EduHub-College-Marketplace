@@ -1,4 +1,3 @@
-
 const API = "https://eduhub-backend-llwi.onrender.com";
 
 let allProducts = [];
@@ -25,12 +24,12 @@ function showSection(sectionId) {
         section.classList.add("active");
     }
 
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
     if (sectionId === "products") {
         loadProducts();
-    }
-
-    if (sectionId === "messages") {
-        loadMessages();
     }
 }
 
@@ -45,18 +44,14 @@ async function loadProducts() {
 
     if (!container) return;
 
-    container.innerHTML = `
-        <div style="padding:20px;text-align:center;">
-            ⏳ Loading products...
-        </div>
-    `;
+    container.innerHTML = "⏳ Loading products...";
 
     try {
 
         const response = await fetch(`${API}/api/products`);
 
         if (!response.ok) {
-            throw new Error("Products could not be loaded");
+            throw new Error("Failed to load products");
         }
 
         allProducts = await response.json();
@@ -68,22 +63,8 @@ async function loadProducts() {
         console.error(error);
 
         container.innerHTML = `
-            <div style="
-                padding:30px;
-                text-align:center;
-                color:red;
-            ">
-                ❌ Backend connection failed.
-                <br><br>
-
-                Make sure:
-                <br>
-
-                <strong>node server.js</strong>
-
-                <br><br>
-
-                is running.
+            <div style="padding:30px;text-align:center;color:red;">
+                ❌ Unable to connect to EduHub backend.
             </div>
         `;
     }
@@ -96,19 +77,15 @@ async function loadProducts() {
 
 function displayProducts(products) {
 
-    const container =
-        document.getElementById("productContainer");
+    const container = document.getElementById("productContainer");
 
     if (!container) return;
 
     if (!products.length) {
 
         container.innerHTML = `
-            <div style="
-                padding:30px;
-                text-align:center;
-            ">
-                🛍️ No products found.
+            <div style="padding:30px;text-align:center;">
+                🛍️ No products available.
             </div>
         `;
 
@@ -117,52 +94,51 @@ function displayProducts(products) {
 
     container.innerHTML = products.map(product => {
 
-        const isSold =
-            product.available === false;
+        const isSold = product.available === false;
+
+        const marketPrice =
+            Number(product.marketPrice || 0);
+
+        const sellingPrice =
+            Number(
+                product.sellingPrice ??
+                product.price ??
+                0
+            );
 
         const saving =
-            Number(product.marketPrice || 0) -
-            Number(product.sellingPrice || 0);
+            marketPrice - sellingPrice;
 
         return `
 
-            <div
-                class="product-card"
-                style="
-                    position:relative;
-                    ${isSold ? "opacity:0.72;" : ""}
-                "
-            >
+        <div class="product-card"
+             style="position:relative;">
 
-                ${
-                    isSold
-                    ?
-                    `
+            ${
+                isSold
+                ? `
                     <div style="
                         position:absolute;
                         top:12px;
                         right:12px;
                         background:#dc2626;
                         color:white;
-                        padding:7px 13px;
+                        padding:6px 12px;
                         border-radius:20px;
                         font-weight:bold;
-                        z-index:5;
                     ">
                         🔴 SOLD
                     </div>
-                    `
-                    :
-                    ""
-                }
+                `
+                : ""
+            }
 
 
-                <div class="product-image">
+            <div class="product-image">
 
-                    ${
-                        product.image
-                        ?
-                        `
+                ${
+                    product.image
+                    ? `
                         <img
                             src="${escapeHTML(product.image)}"
                             style="
@@ -172,147 +148,193 @@ function displayProducts(products) {
                                 border-radius:10px;
                             "
                         >
-                        `
-                        :
-                        `
-                        📚
-                        `
-                    }
+                    `
+                    : "📚"
+                }
 
-                </div>
+            </div>
 
 
-                <h3>
-                    ${escapeHTML(product.name)}
-                </h3>
+            <h3>
+                ${escapeHTML(product.name)}
+            </h3>
 
 
-                <p>
-                    📂 ${escapeHTML(product.category)}
-                </p>
+            <p>
+                📂 ${escapeHTML(product.category)}
+            </p>
 
 
-                <p>
-                    👤 Seller:
-                    ${escapeHTML(product.seller)}
-                </p>
+            <p>
+                👤 Seller:
+                ${escapeHTML(product.seller)}
+            </p>
 
 
-                <p>
-                    Market Price:
-                    ₹${product.marketPrice}
-                </p>
+            <p class="market-price">
+                Market Price:
+                ₹${marketPrice}
+            </p>
 
 
-                <p
-                    style="
-                        font-size:20px;
-                        font-weight:bold;
-                        color:#4f46e5;
-                    "
-                >
-                    ₹${product.sellingPrice}
-                </p>
+            <p class="selling-price">
+                Selling Price:
+                ₹${sellingPrice}
+            </p>
 
+
+            ${
+                !isSold
+                ? `
+                    <p class="saving-text">
+                        💰 Save ₹${saving}
+                    </p>
+                `
+                : `
+                    <p class="sold-label">
+                        This product has been sold.
+                    </p>
+                `
+            }
+
+
+            <div class="product-buttons">
 
                 ${
                     !isSold
-                    ?
+                    ? `
+                        <button
+                            class="buy-btn"
+                            onclick="buyProduct(${product.id})"
+                        >
+                            🛒 Buy Now
+                        </button>
                     `
-                    <p style="color:#15803d;">
-                        💰 Save ₹${saving}
-                    </p>
-                    `
-                    :
-                    `
-                    <p style="
-                        color:#dc2626;
-                        font-weight:bold;
-                    ">
-                        This product has been sold.
-                    </p>
-                    `
-                }
-
-
-                <div
-                    style="
-                        display:flex;
-                        gap:10px;
-                        flex-wrap:wrap;
-                        margin-top:15px;
-                    "
-                >
-
-                    ${
-                        isSold
-                        ?
-                        `
+                    : `
                         <button
                             disabled
                             style="
-                                flex:1;
-                                padding:11px;
-                                border:none;
-                                border-radius:8px;
                                 background:#9ca3af;
                                 color:white;
-                                cursor:not-allowed;
+                                border:none;
+                                padding:10px;
+                                border-radius:8px;
                             "
                         >
                             🔴 Sold Out
                         </button>
-                        `
-                        :
-                        `
-                        <button
-                            onclick="buyProduct(${product.id})"
-                            style="
-                                flex:1;
-                                padding:11px;
-                                border:none;
-                                border-radius:8px;
-                                background:#4f46e5;
-                                color:white;
-                                font-weight:bold;
-                                cursor:pointer;
-                            "
-                        >
-                            🛒 Buy Now
-                        </button>
-                        `
-                    }
+                    `
+                }
 
 
-                    <button
-                        onclick="
-                            openMessageBox(
-                                '${escapeJS(product.seller)}',
-                                '${escapeJS(product.name)}',
-                                ${product.id}
-                            )
-                        "
-                        style="
-                            flex:1;
-                            padding:11px;
-                            border:none;
-                            border-radius:8px;
-                            background:#111827;
-                            color:white;
-                            font-weight:bold;
-                            cursor:pointer;
-                        "
-                    >
-                        💬 Message
-                    </button>
+                <button
+                    class="contact-btn"
+                    onclick="
+                        openMessageBox(
+                            '${escapeJS(product.sellerEmail || product.seller)}',
+                            '${escapeJS(product.name)}',
+                            ${product.id}
+                        )
+                    "
+                >
+                    💬 Message
+                </button>
 
-                </div>
+
+                <button
+                    class="details-btn"
+                    onclick="showProductDetails(${product.id})"
+                >
+                    👁️ Details
+                </button>
 
             </div>
+
+        </div>
 
         `;
 
     }).join("");
+}
+
+
+// ==================================================
+// PRODUCT DETAILS
+// ==================================================
+
+function showProductDetails(productId) {
+
+    const product =
+        allProducts.find(
+            p => Number(p.id) === Number(productId)
+        );
+
+    if (!product) return;
+
+    selectedProduct = product;
+
+    const modal =
+        document.getElementById("detailsModal");
+
+    if (!modal) return;
+
+    document.getElementById("detailsProductName").innerText =
+        product.name;
+
+    document.getElementById("detailsCategory").innerText =
+        "📂 Category: " + product.category;
+
+    document.getElementById("detailsSeller").innerText =
+        "👤 Seller: " + product.seller;
+
+    document.getElementById("detailsMarketPrice").innerText =
+        "Original Price: ₹" +
+        (product.marketPrice || 0);
+
+    document.getElementById("detailsSellingPrice").innerText =
+        "Selling Price: ₹" +
+        (product.sellingPrice ?? product.price ?? 0);
+
+    const saving =
+        Number(product.marketPrice || 0) -
+        Number(product.sellingPrice ?? product.price ?? 0);
+
+    document.getElementById("detailsSaving").innerText =
+        saving > 0
+        ? "💰 You Save ₹" + saving
+        : "";
+
+    const buyButton =
+        document.getElementById("detailsBuyButton");
+
+    if (product.available === false) {
+
+        buyButton.disabled = true;
+        buyButton.innerText = "🔴 Sold Out";
+
+    } else {
+
+        buyButton.disabled = false;
+        buyButton.innerText = "🛒 Buy Now";
+
+        buyButton.onclick = function () {
+            closeDetailsModal();
+            buyProduct(product.id);
+        };
+    }
+
+    modal.classList.remove("hidden");
+}
+
+
+function closeDetailsModal() {
+
+    const modal =
+        document.getElementById("detailsModal");
+
+    if (modal) {
+        modal.classList.add("hidden");
+    }
 }
 
 
@@ -324,9 +346,7 @@ function buyProduct(productId) {
 
     selectedProduct =
         allProducts.find(
-            product =>
-                Number(product.id) ===
-                Number(productId)
+            p => Number(p.id) === Number(productId)
         );
 
     if (!selectedProduct) {
@@ -338,157 +358,34 @@ function buyProduct(productId) {
 
     if (selectedProduct.available === false) {
 
-        alert(
-            "❌ Sorry! This product is already sold."
-        );
+        alert("❌ This product is already sold.");
 
         return;
     }
 
-    showPurchaseModal();
+    document.getElementById("buyProductName").innerText =
+        selectedProduct.name;
+
+    document.getElementById("buyProductSeller").innerText =
+        "👤 Seller: " + selectedProduct.seller;
+
+    document.getElementById("buyProductPrice").innerText =
+        "₹" +
+        (selectedProduct.sellingPrice ??
+         selectedProduct.price ??
+         0);
+
+    document
+        .getElementById("buyModal")
+        .classList.remove("hidden");
 }
 
 
-// ==================================================
-// PURCHASE MODAL
-// ==================================================
+function closeBuyModal() {
 
-function showPurchaseModal() {
-
-    const old =
-        document.getElementById("purchaseModal");
-
-    if (old) {
-        old.remove();
-    }
-
-
-    const modal =
-        document.createElement("div");
-
-    modal.id = "purchaseModal";
-
-
-    modal.style.cssText = `
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,0.65);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        z-index:9999;
-        padding:20px;
-    `;
-
-
-    modal.innerHTML = `
-
-        <div style="
-            background:white;
-            width:100%;
-            max-width:450px;
-            border-radius:18px;
-            padding:30px;
-            box-shadow:0 20px 50px rgba(0,0,0,0.25);
-        ">
-
-            <h2 style="
-                color:#312e81;
-                margin-top:0;
-            ">
-                🛒 Confirm Purchase
-            </h2>
-
-
-            <p>
-                <strong>Product:</strong>
-                ${escapeHTML(selectedProduct.name)}
-            </p>
-
-
-            <p>
-                <strong>Seller:</strong>
-                ${escapeHTML(selectedProduct.seller)}
-            </p>
-
-
-            <p style="
-                font-size:24px;
-                font-weight:bold;
-                color:#4f46e5;
-            ">
-                ₹${selectedProduct.sellingPrice}
-            </p>
-
-
-            <hr>
-
-
-            <p>
-                Enter your email to complete purchase.
-            </p>
-
-
-            <input
-                id="buyerEmail"
-                type="email"
-                placeholder="Your email"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ddd;
-                    border-radius:8px;
-                    margin:10px 0;
-                "
-            >
-
-
-            <div style="
-                display:flex;
-                gap:10px;
-                margin-top:20px;
-            ">
-
-                <button
-                    onclick="confirmPurchase()"
-                    style="
-                        flex:1;
-                        padding:12px;
-                        border:none;
-                        border-radius:8px;
-                        background:#16a34a;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-                    ✅ Confirm Purchase
-                </button>
-
-
-                <button
-                    onclick="closePurchaseModal()"
-                    style="
-                        flex:1;
-                        padding:12px;
-                        border:none;
-                        border-radius:8px;
-                        background:#e5e7eb;
-                        cursor:pointer;
-                    "
-                >
-                    Cancel
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(modal);
+    document
+        .getElementById("buyModal")
+        .classList.add("hidden");
 }
 
 
@@ -500,26 +397,20 @@ async function confirmPurchase() {
 
     if (!selectedProduct) {
 
-        alert("No product selected.");
+        alert("❌ No product selected.");
 
         return;
     }
 
+    let buyer =
+        localStorage.getItem("userEmail");
 
-    const emailInput =
-        document.getElementById("buyerEmail");
+    if (!buyer) {
 
-    if (!emailInput) {
+        buyer =
+            prompt("Enter your email:");
 
-        alert("Email field not found.");
-
-        return;
     }
-
-
-    const buyer =
-        emailInput.value.trim();
-
 
     if (!buyer) {
 
@@ -527,15 +418,6 @@ async function confirmPurchase() {
 
         return;
     }
-
-
-    if (!buyer.includes("@")) {
-
-        alert("Please enter a valid email.");
-
-        return;
-    }
-
 
     try {
 
@@ -556,6 +438,7 @@ async function confirmPurchase() {
 
                         productId:
                             selectedProduct.id
+
                     })
                 }
             );
@@ -579,27 +462,19 @@ async function confirmPurchase() {
         }
 
 
-        closePurchaseModal();
-
+        closeBuyModal();
 
         selectedProduct.available = false;
 
-
         displayProducts(allProducts);
 
-
-        showPurchaseSuccess(
-            data.transaction
-        );
-
+        showPurchaseSuccess(data.transaction);
 
     } catch (error) {
 
         console.error(error);
 
-        alert(
-            "❌ Cannot connect to backend."
-        );
+        alert("❌ Backend connection failed.");
     }
 }
 
@@ -610,141 +485,162 @@ async function confirmPurchase() {
 
 function showPurchaseSuccess(transaction) {
 
-    const modal =
-        document.createElement("div");
+    document.getElementById("successProduct").innerText =
+        transaction.productName;
 
-    modal.id = "successModal";
+    document.getElementById("successAmount").innerText =
+        transaction.amount;
 
+    document.getElementById("successSeller").innerText =
+        transaction.seller;
 
-    modal.style.cssText = `
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,0.65);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        z-index:10000;
-        padding:20px;
-    `;
+    document.getElementById("successTransactionId").innerText =
+        transaction.id;
 
-
-    modal.innerHTML = `
-
-        <div style="
-            background:white;
-            width:100%;
-            max-width:480px;
-            border-radius:18px;
-            padding:30px;
-        ">
-
-            <div style="
-                text-align:center;
-                font-size:55px;
-            ">
-                🎉
-            </div>
-
-
-            <h2 style="
-                text-align:center;
-                color:#15803d;
-            ">
-                Purchase Successful!
-            </h2>
-
-
-            <hr>
-
-
-            <p>
-                🛍️
-                <strong>Product:</strong>
-                ${escapeHTML(transaction.productName)}
-            </p>
-
-
-            <p>
-                💰
-                <strong>Amount:</strong>
-                ₹${transaction.amount}
-            </p>
-
-
-            <p>
-                👤
-                <strong>Seller:</strong>
-                ${escapeHTML(transaction.seller)}
-            </p>
-
-
-            <p>
-                🆔
-                <strong>Transaction ID:</strong>
-                #${transaction.id}
-            </p>
-
-
-            <p>
-                📌
-                <strong>Status:</strong>
-
-                <span style="color:#15803d;">
-                    ✓ Completed
-                </span>
-            </p>
-
-
-            <button
-                onclick="closeSuccess()"
-                style="
-                    width:100%;
-                    padding:12px;
-                    border:none;
-                    border-radius:8px;
-                    background:#4f46e5;
-                    color:white;
-                    font-weight:bold;
-                    cursor:pointer;
-                    margin-top:15px;
-                "
-            >
-                Done
-            </button>
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(modal);
+    document
+        .getElementById("successModal")
+        .classList.remove("hidden");
 }
 
 
-function closePurchaseModal() {
+function closeSuccessModal() {
 
-    const modal =
-        document.getElementById(
-            "purchaseModal"
-        );
-
-    if (modal) {
-        modal.remove();
-    }
+    document
+        .getElementById("successModal")
+        .classList.add("hidden");
 }
 
 
-function closeSuccess() {
+// ==================================================
+// SELL PRODUCT
+// ==================================================
 
-    const modal =
-        document.getElementById(
-            "successModal"
-        );
+document.addEventListener("DOMContentLoaded", function () {
 
-    if (modal) {
-        modal.remove();
-    }
-}
+    const form =
+        document.getElementById("productForm");
+
+    if (!form) return;
+
+    form.addEventListener("submit", async function (e) {
+
+        e.preventDefault();
+
+        const name =
+            document.getElementById("productName").value.trim();
+
+        const marketPrice =
+            Number(
+                document.getElementById("marketPrice").value
+            );
+
+        const sellingPrice =
+            Number(
+                document.getElementById("sellingPrice").value
+            );
+
+        const category =
+            document.getElementById("category").value;
+
+        const seller =
+            document.getElementById("sellerName").value.trim();
+
+        const sellerEmail =
+            localStorage.getItem("userEmail") || seller;
+
+
+        if (sellingPrice > marketPrice) {
+
+            alert(
+                "Selling price should not be greater than market price."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API}/api/products`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            name: name,
+
+                            marketPrice:
+                                marketPrice,
+
+                            sellingPrice:
+                                sellingPrice,
+
+                            price:
+                                sellingPrice,
+
+                            category:
+                                category,
+
+                            seller:
+                                seller,
+
+                            sellerEmail:
+                                sellerEmail,
+
+                            available:
+                                true
+
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                alert(
+                    "❌ " +
+                    (
+                        data.message ||
+                        "Product could not be added."
+                    )
+                );
+
+                return;
+            }
+
+
+            alert(
+                "✅ Product listed successfully!"
+            );
+
+
+            form.reset();
+
+            loadProducts();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "❌ Cannot connect to EduHub backend."
+            );
+        }
+
+    });
+
+});
 
 
 // ==================================================
@@ -763,142 +659,31 @@ function openMessageBox(
 
     selectedProductId = productId;
 
+    const modal =
+        document.getElementById("messageModal");
 
-    const old =
-        document.getElementById(
-            "messageModal"
-        );
+    if (!modal) return;
 
-    if (old) {
-        old.remove();
-    }
+    document.getElementById("messageSeller").innerText =
+        "Seller: " + seller;
 
+    document.getElementById("messageProduct").innerText =
+        "Product: " + productName;
+
+    document.getElementById("sellerMessage").value = "";
+
+    modal.classList.remove("hidden");
+}
+
+
+function closeMessageBox() {
 
     const modal =
-        document.createElement("div");
+        document.getElementById("messageModal");
 
-    modal.id = "messageModal";
-
-
-    modal.style.cssText = `
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,0.65);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        z-index:9999;
-        padding:20px;
-    `;
-
-
-    modal.innerHTML = `
-
-        <div style="
-            background:white;
-            width:100%;
-            max-width:500px;
-            border-radius:18px;
-            padding:30px;
-        ">
-
-            <h2 style="
-                color:#312e81;
-                margin-top:0;
-            ">
-                💬 Message Seller
-            </h2>
-
-
-            <p>
-                📚
-                <strong>
-                    ${escapeHTML(productName)}
-                </strong>
-            </p>
-
-
-            <p>
-                👤 Seller:
-                ${escapeHTML(seller)}
-            </p>
-
-
-            <input
-                id="senderEmail"
-                type="email"
-                placeholder="Your email"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ddd;
-                    border-radius:8px;
-                    margin:10px 0;
-                "
-            >
-
-
-            <textarea
-                id="messageText"
-                placeholder="Write your message..."
-                rows="5"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ddd;
-                    border-radius:8px;
-                    resize:none;
-                "
-            ></textarea>
-
-
-            <div style="
-                display:flex;
-                gap:10px;
-                margin-top:15px;
-            ">
-
-                <button
-                    onclick="sendMessage()"
-                    style="
-                        flex:1;
-                        padding:12px;
-                        border:none;
-                        border-radius:8px;
-                        background:#4f46e5;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-                    📤 Send Message
-                </button>
-
-
-                <button
-                    onclick="closeMessageModal()"
-                    style="
-                        flex:1;
-                        padding:12px;
-                        border:none;
-                        border-radius:8px;
-                        background:#e5e7eb;
-                        cursor:pointer;
-                    "
-                >
-                    Cancel
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(modal);
+    if (modal) {
+        modal.classList.add("hidden");
+    }
 }
 
 
@@ -908,61 +693,28 @@ function openMessageBox(
 
 async function sendMessage() {
 
-    const senderInput =
-        document.getElementById(
-            "senderEmail"
-        );
-
     const messageInput =
-        document.getElementById(
-            "messageText"
-        );
+        document.getElementById("sellerMessage");
 
+    if (!messageInput) return;
 
-    if (!senderInput || !messageInput) {
+    const message =
+        messageInput.value.trim();
 
-        alert("Message box not found.");
+    if (!message) {
+
+        alert("Please write a message.");
 
         return;
     }
 
 
     const sender =
-        senderInput.value.trim();
+        localStorage.getItem("userEmail") ||
+        prompt("Enter your email:");
 
 
-    const message =
-        messageInput.value.trim();
-
-
-    if (!sender) {
-
-        alert(
-            "Please enter your email."
-        );
-
-        return;
-    }
-
-
-    if (!sender.includes("@")) {
-
-        alert(
-            "Please enter a valid email."
-        );
-
-        return;
-    }
-
-
-    if (!message) {
-
-        alert(
-            "Please write a message."
-        );
-
-        return;
-    }
+    if (!sender) return;
 
 
     try {
@@ -1019,427 +771,40 @@ async function sendMessage() {
         }
 
 
-        alert(
-            "✅ Message sent successfully!"
-        );
+        alert("✅ Message sent successfully!");
 
-
-        closeMessageModal();
-
-
-        // Immediately refresh Messages
-        loadMessages();
-
-
-    } catch (error) {
-
-        console.error(
-            "Message error:",
-            error
-        );
-
-        alert(
-            "❌ Cannot connect to backend.\n\n" +
-            "Make sure node server.js is running."
-        );
-    }
-}
-
-
-function closeMessageModal() {
-
-    const modal =
-        document.getElementById(
-            "messageModal"
-        );
-
-    if (modal) {
-        modal.remove();
-    }
-}
-
-
-// ==================================================
-// LOAD MESSAGES
-// ==================================================
-
-async function loadMessages() {
-
-    const container =
-        document.getElementById(
-            "messagesContainer"
-        );
-
-    if (!container) return;
-
-
-    container.innerHTML = `
-        <div style="
-            padding:30px;
-            text-align:center;
-        ">
-            ⏳ Loading messages...
-        </div>
-    `;
-
-
-    try {
-
-        // IMPORTANT:
-        // Do NOT use ?email=all
-        // Load all saved marketplace messages.
-
-        const response =
-            await fetch(
-                `${API}/api/messages`
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Messages failed"
-            );
-        }
-
-
-        const messages =
-            await response.json();
-
-
-        console.log(
-            "Messages received:",
-            messages
-        );
-
-
-        if (
-            !Array.isArray(messages) ||
-            messages.length === 0
-        ) {
-
-            container.innerHTML = `
-                <div style="
-                    background:white;
-                    padding:30px;
-                    text-align:center;
-                    border-radius:15px;
-                    box-shadow:
-                        0 4px 15px
-                        rgba(0,0,0,0.08);
-                ">
-
-                    <div style="
-                        font-size:45px;
-                    ">
-                        💬
-                    </div>
-
-                    <h3>
-                        No messages yet
-                    </h3>
-
-                    <p>
-                        Messages sent from the
-                        marketplace will appear here.
-                    </p>
-
-                </div>
-            `;
-
-            return;
-        }
-
-
-        const sortedMessages =
-            [...messages].reverse();
-
-
-        container.innerHTML =
-            sortedMessages
-                .map(msg => {
-
-                    const productName =
-                        msg.productName ||
-                        msg.product ||
-                        "Marketplace Product";
-
-
-                    const messageText =
-                        msg.message ||
-                        "";
-
-
-                    const sender =
-                        msg.sender ||
-                        "Unknown";
-
-
-                    const receiver =
-                        msg.receiver ||
-                        "Unknown";
-
-
-                    const date =
-                        msg.date ||
-                        "";
-
-
-                    return `
-
-                        <div style="
-                            background:white;
-                            padding:20px;
-                            margin-bottom:15px;
-                            border-radius:15px;
-                            box-shadow:
-                                0 4px 15px
-                                rgba(0,0,0,0.08);
-                        ">
-
-                            <div style="
-                                display:flex;
-                                justify-content:space-between;
-                                align-items:center;
-                                gap:10px;
-                                margin-bottom:10px;
-                            ">
-
-                                <h3 style="
-                                    margin:0;
-                                    color:#312e81;
-                                ">
-                                    📚
-                                    ${escapeHTML(productName)}
-                                </h3>
-
-                                <span style="
-                                    font-size:12px;
-                                    color:#6b7280;
-                                ">
-                                    ${escapeHTML(date)}
-                                </span>
-
-                            </div>
-
-
-                            <p>
-                                📤
-                                <strong>From:</strong>
-                                ${escapeHTML(sender)}
-                            </p>
-
-
-                            <p>
-                                📥
-                                <strong>To:</strong>
-                                ${escapeHTML(receiver)}
-                            </p>
-
-
-                            <div style="
-                                background:#f3f4f6;
-                                padding:15px;
-                                border-radius:10px;
-                                margin:12px 0;
-                            ">
-
-                                💬
-                                ${escapeHTML(messageText)}
-
-                            </div>
-
-
-                            <button
-                                onclick="
-                                    replyMessage(
-                                        '${escapeJS(sender)}',
-                                        ${msg.id || 0},
-                                        '${escapeJS(productName)}',
-                                        ${msg.productId || "null"}
-                                    )
-                                "
-                                style="
-                                    padding:9px 16px;
-                                    border:none;
-                                    border-radius:8px;
-                                    background:#4f46e5;
-                                    color:white;
-                                    font-weight:bold;
-                                    cursor:pointer;
-                                "
-                            >
-                                ↩️ Reply
-                            </button>
-
-
-                        </div>
-
-                    `;
-
-                })
-                .join("");
-
-
-    } catch (error) {
-
-        console.error(
-            "Load messages error:",
-            error
-        );
-
-
-        container.innerHTML = `
-            <div style="
-                padding:30px;
-                text-align:center;
-                color:red;
-            ">
-
-                ❌ Unable to load messages.
-
-                <br><br>
-
-                Make sure backend is running:
-
-                <br>
-
-                <strong>
-                    node server.js
-                </strong>
-
-            </div>
-        `;
-    }
-}
-
-
-// ==================================================
-// REPLY TO MESSAGE
-// ==================================================
-
-async function replyMessage(
-    receiver,
-    messageId,
-    productName,
-    productId
-) {
-
-    const sender =
-        prompt(
-            "Enter your email:"
-        );
-
-
-    if (!sender) return;
-
-
-    const message =
-        prompt(
-            "Enter your reply:"
-        );
-
-
-    if (!message) return;
-
-
-    try {
-
-        const response =
-            await fetch(
-                `${API}/api/messages`,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        sender: sender,
-
-                        receiver: receiver,
-
-                        productId: productId,
-
-                        productName: productName,
-
-                        message: message,
-
-                        replyTo: messageId
-                    })
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            alert(
-                data.message ||
-                "Reply failed."
-            );
-
-            return;
-        }
-
-
-        alert(
-            "✅ Reply sent!"
-        );
-
-
-        loadMessages();
-
+        closeMessageBox();
 
     } catch (error) {
 
         console.error(error);
 
-        alert(
-            "❌ Backend connection failed."
-        );
+        alert("❌ Cannot connect to backend.");
     }
 }
 
 
 // ==================================================
-// SEARCH PRODUCTS
+// SEARCH
 // ==================================================
 
 function searchProducts() {
 
     const input =
-        document.getElementById(
-            "searchInput"
-        );
-
+        document.getElementById("searchInput");
 
     const category =
-        document.getElementById(
-            "categoryFilter"
-        );
-
+        document.getElementById("categoryFilter");
 
     const search =
         input
-        ?
-        input.value.toLowerCase()
-        :
-        "";
-
+        ? input.value.toLowerCase()
+        : "";
 
     const selectedCategory =
         category
-        ?
-        category.value
-        :
-        "all";
+        ? category.value
+        : "all";
 
 
     const filtered =
@@ -1450,17 +815,12 @@ function searchProducts() {
                     .toLowerCase()
                     .includes(search);
 
-
             const matchesCategory =
                 selectedCategory === "all" ||
-                product.category ===
-                selectedCategory;
+                product.category === selectedCategory;
 
-
-            return (
-                matchesSearch &&
-                matchesCategory
-            );
+            return matchesSearch &&
+                   matchesCategory;
         });
 
 
@@ -1482,21 +842,16 @@ function filterCategory() {
 function escapeHTML(value) {
 
     return String(value ?? "")
-
         .replace(/&/g, "&amp;")
-
         .replace(/</g, "&lt;")
-
         .replace(/>/g, "&gt;")
-
         .replace(/"/g, "&quot;")
-
         .replace(/'/g, "&#039;");
 }
 
 
 // ==================================================
-// ESCAPE JAVASCRIPT
+// ESCAPE JS
 // ==================================================
 
 function escapeJS(value) {
@@ -1508,16 +863,14 @@ function escapeJS(value) {
 
 
 // ==================================================
-// START WEBSITE
+// START
 // ==================================================
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
+    function () {
 
         loadProducts();
-
-        loadMessages();
 
     }
 );
