@@ -2,24 +2,78 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>EduHub - My Profile</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css">
-
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(180deg, #312e81, #4f46e5);
+            color: white;
+            padding: 25px 15px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px 15px 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 13px 15px;
+            margin: 6px 0;
+            border-radius: 9px;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .sidebar .active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+        }
 
         .profile-page {
             max-width: 1000px;
             margin: auto;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            text-decoration: none;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 25px;
         }
 
         .profile-card {
@@ -41,11 +95,7 @@
             width: 90px;
             height: 90px;
             border-radius: 50%;
-            background: linear-gradient(
-                135deg,
-                #4f46e5,
-                #7c3aed
-            );
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
             color: white;
             display: flex;
             align-items: center;
@@ -55,11 +105,12 @@
 
         .profile-header h1 {
             margin: 0 0 8px;
+            color: #312e81;
         }
 
         .profile-header p {
-            color: #666;
             margin: 0;
+            color: #666;
         }
 
         .profile-info {
@@ -85,16 +136,6 @@
             font-size: 16px;
         }
 
-        .back-btn {
-            display: inline-block;
-            background: #4f46e5;
-            color: white;
-            text-decoration: none;
-            padding: 12px 20px;
-            border-radius: 9px;
-            margin-bottom: 25px;
-        }
-
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -109,17 +150,38 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.06);
         }
 
+        .stat-icon {
+            font-size: 30px;
+        }
+
         .stat-card h2 {
             color: #4f46e5;
-            margin: 0;
-            font-size: 30px;
+            margin: 8px 0;
+            font-size: 32px;
         }
 
         .stat-card p {
             color: #666;
+            margin: 0;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .sidebar a {
+                display: inline-block;
+                margin: 3px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
 
             .profile-info {
                 grid-template-columns: 1fr;
@@ -133,17 +195,13 @@
                 flex-direction: column;
                 text-align: center;
             }
-
         }
 
     </style>
 
 </head>
 
-
 <body>
-
-    <!-- SIDEBAR -->
 
     <div class="sidebar">
 
@@ -159,7 +217,7 @@
             🛍️ Available Products
         </a>
 
-        <a href="index.html">
+        <a href="messages.html">
             💬 Messages
         </a>
 
@@ -171,7 +229,7 @@
             🧾 Transaction History
         </a>
 
-        <a href="profile.html">
+        <a href="profile.html" class="active">
             👤 My Profile
         </a>
 
@@ -182,18 +240,12 @@
     </div>
 
 
-    <!-- MAIN -->
-
     <div class="main-content">
 
         <div class="profile-page">
 
-            <a
-                href="index.html"
-                class="back-btn">
-
+            <a href="index.html" class="back-btn">
                 ← Back to EduHub
-
             </a>
 
 
@@ -251,7 +303,7 @@
                     <div class="info-box">
 
                         <span>
-                            Account
+                            Account Type
                         </span>
 
                         <strong>
@@ -278,11 +330,13 @@
             </div>
 
 
-            <!-- STATS -->
-
             <div class="stats">
 
                 <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📦
+                    </div>
 
                     <h2 id="productCount">
                         0
@@ -297,6 +351,10 @@
 
                 <div class="stat-card">
 
+                    <div class="stat-icon">
+                        🧾
+                    </div>
+
                     <h2 id="transactionCount">
                         0
                     </h2>
@@ -309,6 +367,10 @@
 
 
                 <div class="stat-card">
+
+                    <div class="stat-icon">
+                        💬
+                    </div>
 
                     <h2 id="messageCount">
                         0
@@ -330,14 +392,13 @@
     <script>
 
         const API =
-            "http://localhost:5000";
+            "https://eduhub-backend-llwi.onrender.com";
 
 
         async function loadProfile() {
 
             const email =
                 localStorage.getItem("userEmail");
-
 
             const name =
                 localStorage.getItem("userName");
@@ -378,6 +439,18 @@
                     "infoName"
                 ).innerText = name;
 
+            } else {
+
+                document.getElementById(
+                    "profileName"
+                ).innerText =
+                    "EduHub Student";
+
+                document.getElementById(
+                    "infoName"
+                ).innerText =
+                    "Student";
+
             }
 
 
@@ -393,53 +466,94 @@
                         `${API}/api/products`
                     );
 
-                const products =
-                    await productsResponse.json();
+                if (productsResponse.ok) {
 
+                    const products =
+                        await productsResponse.json();
 
-                const myProducts =
-                    products.filter(
-                        product =>
-                            product.seller === email
-                    );
+                    const myProducts =
+                        products.filter(
+                            product =>
+                                String(
+                                    product.seller || ""
+                                ).toLowerCase()
+                                ===
+                                email.toLowerCase()
+                        );
 
-
-                document.getElementById(
-                    "productCount"
-                ).innerText =
-                    myProducts.length;
+                    document.getElementById(
+                        "productCount"
+                    ).innerText =
+                        myProducts.length;
+                }
 
 
                 const transactionResponse =
                     await fetch(
-                        `${API}/api/transactions?email=${encodeURIComponent(email)}`
+                        `${API}/api/transactions`
                     );
 
+                if (transactionResponse.ok) {
 
-                const transactions =
-                    await transactionResponse.json();
+                    const transactions =
+                        await transactionResponse.json();
 
+                    const myTransactions =
+                        transactions.filter(
+                            transaction =>
+                                String(
+                                    transaction.buyer || ""
+                                ).toLowerCase()
+                                ===
+                                email.toLowerCase()
+                        );
 
-                document.getElementById(
-                    "transactionCount"
-                ).innerText =
-                    transactions.length;
+                    document.getElementById(
+                        "transactionCount"
+                    ).innerText =
+                        myTransactions.length;
+                }
 
 
                 const messageResponse =
                     await fetch(
-                        `${API}/api/messages?email=${encodeURIComponent(email)}`
+                        `${API}/api/messages`
                     );
 
+                if (messageResponse.ok) {
 
-                const messages =
-                    await messageResponse.json();
+                    const messages =
+                        await messageResponse.json();
 
+                    const myMessages =
+                        messages.filter(
+                            message => {
 
-                document.getElementById(
-                    "messageCount"
-                ).innerText =
-                    messages.length;
+                                const sender =
+                                    String(
+                                        message.sender || ""
+                                    ).toLowerCase();
+
+                                const receiver =
+                                    String(
+                                        message.receiver || ""
+                                    ).toLowerCase();
+
+                                const currentUser =
+                                    email.toLowerCase();
+
+                                return (
+                                    sender === currentUser ||
+                                    receiver === currentUser
+                                );
+                            }
+                        );
+
+                    document.getElementById(
+                        "messageCount"
+                    ).innerText =
+                        myMessages.length;
+                }
 
 
             } catch (error) {
@@ -454,7 +568,10 @@
         }
 
 
-        loadProfile();
+        document.addEventListener(
+            "DOMContentLoaded",
+            loadProfile
+        );
 
     </script>
 
