@@ -1,4 +1,4 @@
-```js
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -85,11 +85,15 @@ app.get("/", (req, res) => {
 // PRODUCTS
 // ========================================
 
+// GET PRODUCTS
+
 app.get("/api/products", (req, res) => {
     const products = readData(productsFile);
 
     res.status(200).json(products);
 });
+
+// ADD PRODUCT
 
 app.post("/api/products", (req, res) => {
     const products = readData(productsFile);
@@ -136,9 +140,11 @@ app.post("/api/products", (req, res) => {
         sellerEmail:
             req.body.sellerEmail || "",
 
-        status: "Available",
+        status:
+            "Available",
 
-        available: true,
+        available:
+            true,
 
         date:
             new Date().toISOString()
@@ -164,6 +170,8 @@ app.post("/api/products", (req, res) => {
         product: newProduct
     });
 });
+
+// UPDATE PRODUCT
 
 app.put("/api/products/:id", (req, res) => {
     const products = readData(productsFile);
@@ -206,6 +214,8 @@ app.put("/api/products/:id", (req, res) => {
     });
 });
 
+// DELETE PRODUCT
+
 app.delete("/api/products/:id", (req, res) => {
     const products = readData(productsFile);
 
@@ -245,11 +255,15 @@ app.delete("/api/products/:id", (req, res) => {
 // USERS
 // ========================================
 
+// GET USERS
+
 app.get("/api/users", (req, res) => {
     const users = readData(usersFile);
 
     res.status(200).json(users);
 });
+
+// ADD USER
 
 app.post("/api/users", (req, res) => {
     const users = readData(usersFile);
@@ -393,7 +407,7 @@ app.post("/api/messages", (req, res) => {
         }
 
         console.log(
-            "Message saved:",
+            "Message saved successfully:",
             newMessage
         );
 
@@ -425,6 +439,11 @@ app.post("/api/messages", (req, res) => {
 app.get("/api/transactions", (req, res) => {
     const transactions =
         readData(transactionsFile);
+
+    console.log(
+        "Transactions found:",
+        transactions.length
+    );
 
     return res.status(200).json(
         transactions
@@ -534,23 +553,23 @@ app.listen(
         );
 
         console.log(
-            "🎓 EduHub Backend Started"
+            "EduHub Backend Started"
         );
 
         console.log(
-            `🌐 Server running on 0.0.0.0:${PORT}`
+            "Server running on 0.0.0.0:" + PORT
         );
 
         console.log(
-            "📦 Products: /api/products"
+            "Products: /api/products"
         );
 
         console.log(
-            "💬 Messages: /api/messages"
+            "Messages: /api/messages"
         );
 
         console.log(
-            "🧾 Transactions: /api/transactions"
+            "Transactions: /api/transactions"
         );
 
         console.log(
@@ -560,4 +579,4 @@ app.listen(
         console.log("");
     }
 );
-```
+
