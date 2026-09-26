@@ -3,7 +3,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -25,21 +24,16 @@
             );
 
             min-height: 100vh;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
         }
-
 
         .login-container {
             width: 100%;
             max-width: 420px;
             padding: 20px;
         }
-
 
         .login-box {
             background: white;
@@ -53,58 +47,40 @@
             text-align: center;
         }
 
-
         .login-box h1 {
             margin: 0;
-
             color: #312e81;
-
             font-size: 30px;
         }
 
-
         .login-box > p {
             color: #666;
-
             margin-top: 5px;
         }
 
-
         .login-box h2 {
             margin-top: 25px;
-
             color: #333;
         }
 
-
         #signupForm {
             display: flex;
-
             flex-direction: column;
-
             gap: 12px;
-
             text-align: left;
         }
 
-
         #signupForm input {
             width: 100%;
-
             box-sizing: border-box;
-
             padding: 13px;
 
-            border:
-                1px solid #ddd;
-
+            border: 1px solid #ddd;
             border-radius: 9px;
 
             font-size: 14px;
-
             outline: none;
         }
-
 
         #signupForm input:focus {
             border-color: #4f46e5;
@@ -114,96 +90,76 @@
                 rgba(79,70,229,0.1);
         }
 
-
         #signupForm button {
             border: none;
 
             background: #4f46e5;
-
             color: white;
 
             padding: 13px;
-
             border-radius: 9px;
 
             font-size: 15px;
-
             font-weight: bold;
 
             cursor: pointer;
-
             margin-top: 5px;
         }
-
 
         #signupForm button:hover {
             background: #4338ca;
         }
 
+        #signupForm button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
 
         .signup-text {
             margin-top: 20px;
-
             color: #666;
         }
-
 
         .signup-text a {
             color: #4f46e5;
-
             font-weight: bold;
-
             text-decoration: none;
         }
-
 
         .back-link {
             display: block;
-
             margin-top: 18px;
 
             color: #666;
-
             text-decoration: none;
-
             font-size: 14px;
         }
-
 
         .back-link:hover {
             color: #4f46e5;
         }
 
-
         .status-message {
             display: none;
 
             padding: 11px;
-
             border-radius: 8px;
 
             margin-bottom: 15px;
 
             font-size: 14px;
-
             text-align: center;
         }
 
-
         .status-error {
             display: block;
-
             background: #fee2e2;
-
             color: #dc2626;
         }
 
-
         .status-success {
             display: block;
-
             background: #dcfce7;
-
             color: #15803d;
         }
 
@@ -214,38 +170,29 @@
 
 <body>
 
-
 <div class="login-container">
 
     <div class="login-box">
-
 
         <h1>
             🎓 EduHub
         </h1>
 
-
         <p>
             College Marketplace
         </p>
-
 
         <h2>
             Create Account
         </h2>
 
 
-        <!-- STATUS MESSAGE -->
-
         <div id="statusMessage"
              class="status-message">
         </div>
 
 
-        <!-- SIGNUP FORM -->
-
         <form id="signupForm">
-
 
             <input
                 type="text"
@@ -254,14 +201,12 @@
                 required
             >
 
-
             <input
                 type="email"
                 id="email"
                 placeholder="College Email"
                 required
             >
-
 
             <input
                 type="password"
@@ -271,14 +216,12 @@
                 required
             >
 
-
             <button
                 type="submit"
                 id="signupButton"
             >
                 Create Account
             </button>
-
 
         </form>
 
@@ -300,7 +243,6 @@
         >
             ← Back to Marketplace
         </a>
-
 
     </div>
 
@@ -325,11 +267,9 @@ const statusMessage =
     document.getElementById("statusMessage");
 
 
-
 function showMessage(message, type) {
 
-    statusMessage.innerText =
-        message;
+    statusMessage.innerText = message;
 
     statusMessage.className =
         "status-message " +
@@ -339,7 +279,6 @@ function showMessage(message, type) {
             : "status-error"
         );
 }
-
 
 
 form.addEventListener(
@@ -366,13 +305,10 @@ form.addEventListener(
         const password =
             document
                 .getElementById("password")
-                .value
-                .trim();
+                .value;
 
 
-        if (!name ||
-            !email ||
-            !password) {
+        if (!name || !email || !password) {
 
             showMessage(
                 "Please fill all fields.",
@@ -402,12 +338,10 @@ form.addEventListener(
 
         try {
 
-
             const response =
                 await fetch(
                     `${API}/signup`,
                     {
-
                         method: "POST",
 
                         headers: {
@@ -416,21 +350,21 @@ form.addEventListener(
                         },
 
                         body: JSON.stringify({
-
                             name: name,
-
                             email: email,
-
                             password: password
-
                         })
-
                     }
                 );
 
 
-            const data =
-                await response.json();
+            let data = {};
+
+            try {
+                data = await response.json();
+            } catch (error) {
+                data = {};
+            }
 
 
             if (!response.ok) {
@@ -476,7 +410,7 @@ form.addEventListener(
 
 
             showMessage(
-                "Unable to connect to EduHub backend.",
+                "Unable to connect to EduHub backend. Please try again.",
                 "error"
             );
 
@@ -485,7 +419,6 @@ form.addEventListener(
 
             button.innerText =
                 "Create Account";
-
         }
 
     }
@@ -493,9 +426,7 @@ form.addEventListener(
 
 </script>
 
-
 </body>
 
 </html>
 ```
-
