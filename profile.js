@@ -1,85 +1,223 @@
+const API = "https://eduhub-backend-llwi.onrender.com";
+
 const userEmail = localStorage.getItem("userEmail");
 
 
-// Check login
+// ================================
+// CHECK LOGIN
+// ================================
+
 if (!userEmail) {
-
     alert("Please login first.");
-
     window.location.href = "login.html";
-
 }
 
 
-// Load user profile
+// ================================
+// LOAD PROFILE
+// ================================
+
 async function loadProfile() {
 
     try {
 
-        const response = await fetch("http://localhost:5000/api/products");
+        const response = await fetch(`${API}/api/products`);
+
+        if (!response.ok) {
+            throw new Error("Failed to load products");
+        }
 
         const products = await response.json();
 
 
-        // Find user's products
-        const myProducts = products.filter(
-            product => product.sellerEmail === userEmail
+        // Find products listed by current user
+        const myProducts = products.filter(product =>
+            String(product.sellerEmail || product.seller || "")
+                .toLowerCase() === userEmail.toLowerCase()
         );
 
 
         // Display email
-        document.getElementById("userEmail").innerText = userEmail;
+        const emailElement =
+            document.getElementById("userEmail");
+
+        if (emailElement) {
+            emailElement.innerText = userEmail;
+        }
 
 
-        // Create name from seller data
-        if (myProducts.length > 0) {
+        // Get saved name
+        const savedName =
+            localStorage.getItem("userName");
 
-            document.getElementById("userName").innerText =
-                myProducts[0].seller;
 
-            document.getElementById("profileIcon").innerText =
-                myProducts[0].seller.charAt(0).toUpperCase();
+        let userName = savedName || "EduHub User";
 
-        } else {
 
-            document.getElementById("userName").innerText =
-                "EduHub User";
+        // If name is available from product data
+        if (myProducts.length > 0 && myProducts[0].seller) {
+            userName = myProducts[0].seller;
+        }
 
-            document.getElementById("profileIcon").innerText =
-                userEmail.charAt(0).toUpperCase();
+
+        // Display name
+        const nameElement =
+            document.getElementById("userName");
+
+        if (nameElement) {
+            nameElement.innerText = userName;
+        }
+
+
+        // Profile icon
+        const profileIcon =
+            document.getElementById("profileIcon");
+
+        if (profileIcon) {
+
+            profileIcon.innerText =
+                userName.charAt(0).toUpperCase();
 
         }
 
 
+        // Display user's products
         displayMyProducts(myProducts);
+
+
+        // Load statistics
+        await loadStats();
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Profile loading error:",
+            error
+        );
 
-        document.getElementById("productsContainer").innerHTML =
-            `<div class="empty">
-                Unable to load your products.
-            </div>`;
+        const container =
+            document.getElementById(
+                "productsContainer"
+            );
+
+        if (container) {
+
+            container.innerHTML = `
+                <div class="empty">
+                    Unable to load your products.
+                </div>
+            `;
+
+        }
 
     }
 
 }
 
 
-// Display products
+// ================================
+// LOAD STATISTICS
+// ================================
+
+async function loadStats() {
+
+    try {
+
+        // Transactions
+        const transactionResponse =
+            await fetch(
+                `${API}/api/transactions?email=${encodeURIComponent(userEmail)}`
+            );
+
+
+        if (transactionResponse.ok) {
+
+            const transactions =
+                await transactionResponse.json();
+
+
+            const transactionCount =
+                document.getElementById(
+                    "transactionCount"
+                );
+
+
+            if (transactionCount) {
+
+                transactionCount.innerText =
+                    Array.isArray(transactions)
+                        ? transactions.length
+                        : 0;
+
+            }
+
+        }
+
+
+        // Messages
+        const messageResponse =
+            await fetch(
+                `${API}/api/messages?email=${encodeURIComponent(userEmail)}`
+            );
+
+
+        if (messageResponse.ok) {
+
+            const messages =
+                await messageResponse.json();
+
+
+            const messageCount =
+                document.getElementById(
+                    "messageCount"
+                );
+
+
+            if (messageCount) {
+
+                messageCount.innerText =
+                    Array.isArray(messages)
+                        ? messages.length
+                        : 0;
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Stats loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ================================
+// DISPLAY MY PRODUCTS
+// ================================
+
 function displayMyProducts(products) {
 
     const container =
-        document.getElementById("productsContainer");
+        document.getElementById(
+            "productsContainer"
+        );
 
 
-    if (products.length === 0) {
+    if (!container) return;
+
+
+    if (!products || products.length === 0) {
 
         container.innerHTML = `
             <div class="empty">
                 You haven't listed any products yet.
                 <br><br>
+
                 <a href="index.html">
                     Sell your first product
                 </a>
@@ -91,42 +229,133 @@ function displayMyProducts(products) {
     }
 
 
-    container.innerHTML = products.map(product => `
+    container.innerHTML =
+        products.map(product => {
 
-        <div class="product-card">
+            const sellingPrice =
+                product.sellingPrice ??
+                product.price ??
+                0;
 
-            <h3>${product.name}</h3>
 
-            <p>
-                Category: ${product.category}
-            </p>
+            const marketPrice =
+                product.marketPrice ??
+                0;
 
-            <p>
-                Market Price: ₹${product.marketPrice}
-            </p>
 
-            <p class="price">
-                Selling Price: ₹${product.price}
-            </p>
+            const isSold =
+                product.available === false;
 
-        </div>
 
-    `).join("");
+            return `
+
+                <div class="product-card">
+
+                    <h3>
+                        ${escapeHTML(
+                            product.name ||
+                            "Product"
+                        )}
+                    </h3>
+
+
+                    <p>
+                        📂 Category:
+                        ${escapeHTML(
+                            product.category ||
+                            "N/A"
+                        )}
+                    </p>
+
+
+                    <p>
+                        💰 Market Price:
+                        ₹${escapeHTML(
+                            marketPrice
+                        )}
+                    </p>
+
+
+                    <p class="price">
+                        🏷️ Selling Price:
+                        ₹${escapeHTML(
+                            sellingPrice
+                        )}
+                    </p>
+
+
+                    <p>
+                        📌 Status:
+
+                        <strong
+                            style="
+                                color:${
+                                    isSold
+                                        ? "#dc2626"
+                                        : "#15803d"
+                                };
+                            "
+                        >
+                            ${
+                                isSold
+                                    ? "Sold"
+                                    : "Available"
+                            }
+                        </strong>
+
+                    </p>
+
+                </div>
+
+            `;
+
+        }).join("");
 
 }
 
 
-// Logout
+// ================================
+// LOGOUT
+// ================================
+
 function logout() {
 
     localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
 
     alert("Logged out successfully!");
 
-    window.location.href = "login.html";
+    window.location.href =
+        "login.html";
 
 }
 
 
-// Start
-loadProfile();
+// ================================
+// ESCAPE HTML
+// ================================
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+}
+
+
+// ================================
+// START
+// ================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadProfile
+);
