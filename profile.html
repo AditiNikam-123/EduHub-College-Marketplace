@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>EduHub - My Profile</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+    <style>
+
+        .profile-page {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(
+                135deg,
+                #4f46e5,
+                #7c3aed
+            );
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .profile-header h1 {
+            margin: 0 0 8px;
+        }
+
+        .profile-header p {
+            color: #666;
+            margin: 0;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .info-box {
+            background: #f5f7fb;
+            padding: 18px;
+            border-radius: 12px;
+        }
+
+        .info-box span {
+            display: block;
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .info-box strong {
+            font-size: 16px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 9px;
+            margin-bottom: 25px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        .stat-card h2 {
+            color: #4f46e5;
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .stat-card p {
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <div class="logo">
+            🎓 EduHub
+        </div>
+
+        <a href="index.html">
+            🏠 Home
+        </a>
+
+        <a href="index.html">
+            🛍️ Available Products
+        </a>
+
+        <a href="index.html">
+            💬 Messages
+        </a>
+
+        <a href="index.html">
+            ➕ Sell Your Product
+        </a>
+
+        <a href="history.html">
+            🧾 Transaction History
+        </a>
+
+        <a href="profile.html">
+            👤 My Profile
+        </a>
+
+        <a href="login.html">
+            🔐 Login
+        </a>
+
+    </div>
+
+
+    <!-- MAIN -->
+
+    <div class="main-content">
+
+        <div class="profile-page">
+
+            <a
+                href="index.html"
+                class="back-btn">
+
+                ← Back to EduHub
+
+            </a>
+
+
+            <div class="profile-card">
+
+                <div class="profile-header">
+
+                    <div class="profile-avatar">
+                        👤
+                    </div>
+
+                    <div>
+
+                        <h1 id="profileName">
+                            Student
+                        </h1>
+
+                        <p id="profileEmail">
+                            Loading...
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-info">
+
+                    <div class="info-box">
+
+                        <span>
+                            Full Name
+                        </span>
+
+                        <strong id="infoName">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <span>
+                            Email
+                        </span>
+
+                        <strong id="infoEmail">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <span>
+                            Account
+                        </span>
+
+                        <strong>
+                            EduHub Student
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <span>
+                            Platform
+                        </span>
+
+                        <strong>
+                            College Marketplace
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATS -->
+
+            <div class="stats">
+
+                <div class="stat-card">
+
+                    <h2 id="productCount">
+                        0
+                    </h2>
+
+                    <p>
+                        Products Listed
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h2 id="transactionCount">
+                        0
+                    </h2>
+
+                    <p>
+                        Transactions
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <h2 id="messageCount">
+                        0
+                    </h2>
+
+                    <p>
+                        Messages
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const API =
+            "http://localhost:5000";
+
+
+        async function loadProfile() {
+
+            const email =
+                localStorage.getItem("userEmail");
+
+
+            const name =
+                localStorage.getItem("userName");
+
+
+            if (email) {
+
+                document.getElementById(
+                    "profileEmail"
+                ).innerText = email;
+
+                document.getElementById(
+                    "infoEmail"
+                ).innerText = email;
+
+            } else {
+
+                document.getElementById(
+                    "profileEmail"
+                ).innerText =
+                    "Not logged in";
+
+                document.getElementById(
+                    "infoEmail"
+                ).innerText =
+                    "Not logged in";
+
+            }
+
+
+            if (name) {
+
+                document.getElementById(
+                    "profileName"
+                ).innerText = name;
+
+                document.getElementById(
+                    "infoName"
+                ).innerText = name;
+
+            }
+
+
+            if (!email) {
+                return;
+            }
+
+
+            try {
+
+                const productsResponse =
+                    await fetch(
+                        `${API}/api/products`
+                    );
+
+                const products =
+                    await productsResponse.json();
+
+
+                const myProducts =
+                    products.filter(
+                        product =>
+                            product.seller === email
+                    );
+
+
+                document.getElementById(
+                    "productCount"
+                ).innerText =
+                    myProducts.length;
+
+
+                const transactionResponse =
+                    await fetch(
+                        `${API}/api/transactions?email=${encodeURIComponent(email)}`
+                    );
+
+
+                const transactions =
+                    await transactionResponse.json();
+
+
+                document.getElementById(
+                    "transactionCount"
+                ).innerText =
+                    transactions.length;
+
+
+                const messageResponse =
+                    await fetch(
+                        `${API}/api/messages?email=${encodeURIComponent(email)}`
+                    );
+
+
+                const messages =
+                    await messageResponse.json();
+
+
+                document.getElementById(
+                    "messageCount"
+                ).innerText =
+                    messages.length;
+
+
+            } catch (error) {
+
+                console.error(
+                    "Profile loading error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        loadProfile();
+
+    </script>
+
+</body>
+
+</html>

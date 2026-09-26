@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduHub - Transaction History</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        /* HEADER */
+
+        .header {
+            background: linear-gradient(
+                135deg,
+                #312e81,
+                #4f46e5
+            );
+
+            color: white;
+
+            padding: 25px 40px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            border: none;
+            background: white;
+            color: #4f46e5;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* MAIN */
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 32px;
+            margin: 0 0 8px;
+            color: #312e81;
+        }
+
+        .page-title p {
+            margin: 0;
+            color: #666;
+        }
+
+        /* TRANSACTION CARD */
+
+        .transaction-card {
+            background: white;
+
+            padding: 25px;
+
+            margin-bottom: 20px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0,0,0,0.07);
+
+            border-left:
+                5px solid #4f46e5;
+
+            transition: 0.3s;
+        }
+
+        .transaction-card:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 10px 25px
+                rgba(0,0,0,0.1);
+        }
+
+        .transaction-card h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #4f46e5;
+            font-size: 21px;
+        }
+
+        .transaction-row {
+            padding: 9px 0;
+
+            color: #555;
+
+            border-bottom:
+                1px solid #f0f0f0;
+        }
+
+        .transaction-row:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-row strong {
+            color: #222;
+        }
+
+        /* STATUS */
+
+        .transaction-status {
+            display: inline-block;
+
+            background: #dcfce7;
+
+            color: #15803d;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+        }
+
+        /* EMPTY */
+
+        .empty-history {
+            background: white;
+
+            padding: 60px 30px;
+
+            text-align: center;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0,0,0,0.06);
+
+            color: #777;
+
+            font-size: 17px;
+        }
+
+        /* ERROR */
+
+        .error-box {
+            background: #fee2e2;
+
+            color: #b91c1c;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            text-align: center;
+
+            line-height: 1.6;
+        }
+
+        .retry-btn {
+            margin-top: 15px;
+
+            padding: 10px 18px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #4f46e5;
+
+            color: white;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 20px;
+
+                flex-direction: column;
+
+                gap: 15px;
+
+                align-items: flex-start;
+            }
+
+            .header h1 {
+                font-size: 23px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+
+            .page-title h2 {
+                font-size: 26px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <h1>
+            🎓 EduHub
+        </h1>
+
+        <button
+            class="back-btn"
+            onclick="goBack()"
+        >
+            ← Back to Marketplace
+        </button>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main class="container">
+
+
+        <div class="page-title">
+
+            <h2>
+                🧾 Transaction History
+            </h2>
+
+            <p>
+                View your completed purchases and
+                transaction details.
+            </p>
+
+        </div>
+
+
+        <!-- TRANSACTIONS -->
+
+        <div id="historyContainer">
+
+            <div class="empty-history">
+
+                ⏳ Loading transactions...
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+
+    <script>
+
+        // =========================================
+        // BACKEND
+        // =========================================
+
+        const API =
+            "http://127.0.0.1:5000";
+
+
+        // =========================================
+        // LOAD TRANSACTIONS
+        // =========================================
+
+        async function loadTransactions() {
+
+            const container =
+                document.getElementById(
+                    "historyContainer"
+                );
+
+
+            container.innerHTML = `
+
+                <div class="empty-history">
+
+                    ⏳ Loading transactions...
+
+                </div>
+
+            `;
+
+
+            try {
+
+                console.log(
+                    "Connecting to:",
+                    `${API}/api/transactions`
+                );
+
+
+                const response =
+                    await fetch(
+                        `${API}/api/transactions`,
+                        {
+                            method: "GET",
+
+                            headers: {
+                                "Accept":
+                                    "application/json"
+                            }
+                        }
+                    );
+
+
+                console.log(
+                    "Response status:",
+                    response.status
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server returned status " +
+                        response.status
+                    );
+
+                }
+
+
+                const transactions =
+                    await response.json();
+
+
+                console.log(
+                    "Transactions received:",
+                    transactions
+                );
+
+
+                // =================================
+                // NO TRANSACTIONS
+                // =================================
+
+                if (
+                    !Array.isArray(
+                        transactions
+                    ) ||
+                    transactions.length === 0
+                ) {
+
+                    container.innerHTML = `
+
+                        <div class="empty-history">
+
+                            🧾
+
+                            <strong>
+                                No transactions yet.
+                            </strong>
+
+                            <br><br>
+
+                            Complete a purchase
+                            to see it here.
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                // =================================
+                // DISPLAY TRANSACTIONS
+                // =================================
+
+                container.innerHTML = "";
+
+
+                transactions
+                    .slice()
+                    .reverse()
+                    .forEach(
+                        transaction => {
+
+
+                            const card =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            card.className =
+                                "transaction-card";
+
+
+                            // DATE
+
+                            let date =
+                                "N/A";
+
+
+                            if (
+                                transaction.date
+                            ) {
+
+                                const dateObject =
+                                    new Date(
+                                        transaction.date
+                                    );
+
+
+                                if (
+                                    !isNaN(
+                                        dateObject.getTime()
+                                    )
+                                ) {
+
+                                    date =
+                                        dateObject.toLocaleString(
+                                            "en-IN"
+                                        );
+
+                                } else {
+
+                                    date =
+                                        transaction.date;
+
+                                }
+
+                            }
+
+
+                            // CARD
+
+                            card.innerHTML = `
+
+                                <h3>
+
+                                    🛍️
+
+                                    ${escapeHTML(
+                                        transaction.productName ||
+                                        "Product"
+                                    )}
+
+                                </h3>
+
+
+                                <div
+                                    class="transaction-row"
+                                >
+
+                                    💰 Amount:
+
+                                    <strong>
+
+                                        ₹${escapeHTML(
+                                            transaction.amount ||
+                                            0
+                                        )}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    class="transaction-row"
+                                >
+
+                                    👤 Buyer:
+
+                                    <strong>
+
+                                        ${escapeHTML(
+                                            transaction.buyer ||
+                                            "N/A"
+                                        )}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    class="transaction-row"
+                                >
+
+                                    👤 Seller:
+
+                                    <strong>
+
+                                        ${escapeHTML(
+                                            transaction.seller ||
+                                            "N/A"
+                                        )}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    class="transaction-row"
+                                >
+
+                                    🆔 Transaction ID:
+
+                                    <strong>
+
+                                        #${escapeHTML(
+                                            transaction.id ||
+                                            "N/A"
+                                        )}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    class="transaction-row"
+                                >
+
+                                    📅 Date:
+
+                                    <strong>
+
+                                        ${escapeHTML(
+                                            date
+                                        )}
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    class="transaction-row"
+                                >
+
+                                    📌 Status:
+
+                                    <span
+                                        class="transaction-status"
+                                    >
+
+                                        ✓
+
+                                        ${escapeHTML(
+                                            transaction.status ||
+                                            "Completed"
+                                        )}
+
+                                    </span>
+
+                                </div>
+
+                            `;
+
+
+                            container.appendChild(
+                                card
+                            );
+
+                        }
+                    );
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Transaction error:",
+                    error
+                );
+
+
+                container.innerHTML = `
+
+                    <div class="error-box">
+
+                        ❌
+
+                        <strong>
+                            Unable to connect
+                            to EduHub backend.
+                        </strong>
+
+                        <br><br>
+
+                        Backend:
+
+                        <br>
+
+                        <strong>
+                            http://127.0.0.1:5000
+                        </strong>
+
+                        <br><br>
+
+                        Error:
+
+                        <br>
+
+                        ${escapeHTML(
+                            error.message
+                        )}
+
+                        <br><br>
+
+                        <button
+                            class="retry-btn"
+                            onclick="loadTransactions()"
+                        >
+                            🔄 Try Again
+                        </button>
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+
+        // =========================================
+        // ESCAPE HTML
+        // =========================================
+
+        function escapeHTML(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                return "";
+
+            }
+
+
+            return String(value)
+
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        }
+
+
+        // =========================================
+        // BACK BUTTON
+        // =========================================
+
+        function goBack() {
+
+            window.location.href =
+                "index.html";
+
+        }
+
+
+        // =========================================
+        // START
+        // =========================================
+
+        loadTransactions();
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EduHub - Sign Up</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="login-container">
+    <div class="login-box">
+
+        <h1>EduHub</h1>
+        <p>College Marketplace</p>
+
+        <h2>Create Account</h2>
+
+        <form id="signupForm">
+
+            <input type="text" id="name" placeholder="Full Name" required>
+
+            <input type="email" id="email" placeholder="College Email" required>
+
+            <input type="password" id="password" placeholder="Password" required>
+
+            <button type="submit">Sign Up</button>
+
+        </form>
+
+        <p class="signup-text">
+            Already have an account?
+            <a href="login.html">Login</a>
+        </p>
+
+    </div>
+</div>
+
+<script>
+document.getElementById("signupForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    alert("Account created successfully!");
+
+    window.location.href = "login.html";
+});
+</script>
+
+</body>
+</html>
+<script>
+document.getElementById("signupForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name,
+            email: email,
+            password: password
+        })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        alert("Account created successfully!");
+        window.location.href = "login.html";
+    } else {
+        alert(data.message);
+    }
+});
+</script>
