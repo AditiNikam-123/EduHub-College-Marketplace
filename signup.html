@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,194 +6,267 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>EduHub - Sign Up</title>
 
+    <link rel="stylesheet" href="style.css">
+
     <style>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
         body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(
+                135deg,
+                #312e81,
+                #4f46e5
+            );
+
             min-height: 100vh;
+
             display: flex;
-            justify-content: center;
+
             align-items: center;
-            background: linear-gradient(135deg, #312e81, #4f46e5);
+
+            justify-content: center;
         }
 
-        .signup-container {
-            width: 400px;
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+
+        .login-box {
             background: white;
-            padding: 35px;
-            border-radius: 18px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            padding: 35px 30px;
+            border-radius: 20px;
+
+            box-shadow:
+                0 20px 50px
+                rgba(0,0,0,0.2);
+
+            text-align: center;
         }
 
-        .logo {
-            text-align: center;
-            font-size: 30px;
-            font-weight: bold;
+
+        .login-box h1 {
+            margin: 0;
+
             color: #312e81;
-            margin-bottom: 5px;
+
+            font-size: 30px;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #777;
-            margin-bottom: 25px;
+
+        .login-box > p {
+            color: #666;
+
+            margin-top: 5px;
         }
 
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 22px;
-        }
 
-        label {
-            display: block;
-            margin-bottom: 7px;
-            font-weight: bold;
+        .login-box h2 {
+            margin-top: 25px;
+
             color: #333;
         }
 
-        input {
+
+        #signupForm {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
+
+            text-align: left;
+        }
+
+
+        #signupForm input {
             width: 100%;
-            padding: 13px;
-            margin-bottom: 17px;
-            border: 1px solid #d1d5db;
-            border-radius: 9px;
-            font-size: 15px;
-        }
 
-        input:focus {
+            box-sizing: border-box;
+
+            padding: 13px;
+
+            border:
+                1px solid #ddd;
+
+            border-radius: 9px;
+
+            font-size: 14px;
+
             outline: none;
+        }
+
+
+        #signupForm input:focus {
             border-color: #4f46e5;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(79,70,229,0.1);
         }
 
-        button {
-            width: 100%;
-            padding: 13px;
+
+        #signupForm button {
             border: none;
-            border-radius: 9px;
+
             background: #4f46e5;
+
             color: white;
-            font-size: 16px;
+
+            padding: 13px;
+
+            border-radius: 9px;
+
+            font-size: 15px;
+
             font-weight: bold;
+
             cursor: pointer;
+
+            margin-top: 5px;
         }
 
-        button:hover {
-            background: #3730a3;
+
+        #signupForm button:hover {
+            background: #4338ca;
         }
 
-        button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
 
-        .login-text {
-            text-align: center;
+        .signup-text {
             margin-top: 20px;
+
             color: #666;
         }
 
-        .login-text a {
+
+        .signup-text a {
             color: #4f46e5;
+
             font-weight: bold;
+
             text-decoration: none;
         }
+
 
         .back-link {
             display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: #666;
-            text-decoration: none;
-        }
 
-        .message {
-            display: none;
-            margin-bottom: 15px;
-            padding: 11px;
-            border-radius: 8px;
-            text-align: center;
+            margin-top: 18px;
+
+            color: #666;
+
+            text-decoration: none;
+
             font-size: 14px;
         }
 
-        .success {
-            display: block;
-            background: #dcfce7;
-            color: #166534;
+
+        .back-link:hover {
+            color: #4f46e5;
         }
 
-        .error {
+
+        .status-message {
+            display: none;
+
+            padding: 11px;
+
+            border-radius: 8px;
+
+            margin-bottom: 15px;
+
+            font-size: 14px;
+
+            text-align: center;
+        }
+
+
+        .status-error {
             display: block;
+
             background: #fee2e2;
-            color: #b91c1c;
+
+            color: #dc2626;
+        }
+
+
+        .status-success {
+            display: block;
+
+            background: #dcfce7;
+
+            color: #15803d;
         }
 
     </style>
 
 </head>
 
+
 <body>
 
-    <div class="signup-container">
 
-        <div class="logo">
+<div class="login-container">
+
+    <div class="login-box">
+
+
+        <h1>
             🎓 EduHub
-        </div>
+        </h1>
 
-        <p class="subtitle">
+
+        <p>
             College Marketplace
         </p>
+
 
         <h2>
             Create Account
         </h2>
 
-        <div id="message" class="message"></div>
+
+        <!-- STATUS MESSAGE -->
+
+        <div id="statusMessage"
+             class="status-message">
+        </div>
+
+
+        <!-- SIGNUP FORM -->
 
         <form id="signupForm">
 
-            <label for="name">
-                Full Name
-            </label>
 
             <input
                 type="text"
                 id="name"
-                placeholder="Enter your full name"
+                placeholder="Full Name"
                 required
             >
 
-
-            <label for="email">
-                College Email
-            </label>
 
             <input
                 type="email"
                 id="email"
-                placeholder="Enter your email"
+                placeholder="College Email"
                 required
             >
 
 
-            <label for="password">
-                Password
-            </label>
-
             <input
                 type="password"
                 id="password"
-                placeholder="Create a password"
+                placeholder="Password"
                 minlength="6"
                 required
             >
@@ -205,10 +279,11 @@
                 Create Account
             </button>
 
+
         </form>
 
 
-        <p class="login-text">
+        <p class="signup-text">
 
             Already have an account?
 
@@ -226,194 +301,201 @@
             ← Back to Marketplace
         </a>
 
+
     </div>
 
+</div>
 
-    <script>
 
-        const API =
-            "https://eduhub-backend-llwi.onrender.com";
+<script>
 
+const API =
+    "https://eduhub-backend-llwi.onrender.com";
 
-        document
-            .getElementById("signupForm")
-            .addEventListener(
-                "submit",
-                async function(e) {
 
-                    e.preventDefault();
+const form =
+    document.getElementById("signupForm");
 
 
-                    const name =
-                        document
-                            .getElementById("name")
-                            .value
-                            .trim();
+const button =
+    document.getElementById("signupButton");
 
 
-                    const email =
-                        document
-                            .getElementById("email")
-                            .value
-                            .trim();
+const statusMessage =
+    document.getElementById("statusMessage");
 
 
-                    const password =
-                        document
-                            .getElementById("password")
-                            .value;
 
+function showMessage(message, type) {
 
-                    const message =
-                        document
-                            .getElementById("message");
+    statusMessage.innerText =
+        message;
 
+    statusMessage.className =
+        "status-message " +
+        (
+            type === "success"
+            ? "status-success"
+            : "status-error"
+        );
+}
 
-                    const button =
-                        document
-                            .getElementById("signupButton");
 
 
-                    message.className =
-                        "message";
+form.addEventListener(
+    "submit",
+    async function(e) {
 
+        e.preventDefault();
 
-                    message.innerText = "";
 
+        const name =
+            document
+                .getElementById("name")
+                .value
+                .trim();
 
-                    if (!name || !email || !password) {
 
-                        message.className =
-                            "message error";
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
 
-                        message.innerText =
-                            "Please fill all fields.";
 
-                        return;
+        const password =
+            document
+                .getElementById("password")
+                .value
+                .trim();
 
-                    }
 
+        if (!name ||
+            !email ||
+            !password) {
 
-                    if (password.length < 6) {
-
-                        message.className =
-                            "message error";
-
-                        message.innerText =
-                            "Password must be at least 6 characters.";
-
-                        return;
-
-                    }
-
-
-                    button.disabled = true;
-
-                    button.innerText =
-                        "Creating Account...";
-
-
-                    try {
-
-                        const response =
-                            await fetch(
-                                `${API}/signup`,
-                                {
-                                    method: "POST",
-
-                                    headers: {
-                                        "Content-Type":
-                                            "application/json"
-                                    },
-
-                                    body: JSON.stringify({
-                                        name: name,
-                                        email: email,
-                                        password: password
-                                    })
-                                }
-                            );
-
-
-                        const data =
-                            await response.json();
-
-
-                        if (response.ok) {
-
-                            localStorage.setItem(
-                                "userEmail",
-                                email
-                            );
-
-                            localStorage.setItem(
-                                "userName",
-                                name
-                            );
-
-
-                            message.className =
-                                "message success";
-
-                            message.innerText =
-                                "Account created successfully! Redirecting...";
-
-
-                            setTimeout(
-                                function() {
-
-                                    window.location.href =
-                                        "login.html";
-
-                                },
-                                1000
-                            );
-
-
-                        } else {
-
-                            message.className =
-                                "message error";
-
-                            message.innerText =
-                                data.message ||
-                                "Unable to create account.";
-
-                            button.disabled = false;
-
-                            button.innerText =
-                                "Create Account";
-
-                        }
-
-
-                    } catch (error) {
-
-                        console.error(
-                            "Signup error:",
-                            error
-                        );
-
-
-                        message.className =
-                            "message error";
-
-                        message.innerText =
-                            "Unable to connect to EduHub backend.";
-
-
-                        button.disabled = false;
-
-                        button.innerText =
-                            "Create Account";
-
-                    }
-
-                }
+            showMessage(
+                "Please fill all fields.",
+                "error"
             );
 
-    </script>
+            return;
+        }
+
+
+        if (password.length < 6) {
+
+            showMessage(
+                "Password must contain at least 6 characters.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        button.disabled = true;
+
+        button.innerText =
+            "Creating Account...";
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    `${API}/signup`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            name: name,
+
+                            email: email,
+
+                            password: password
+
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                showMessage(
+                    data.message ||
+                    "Unable to create account.",
+                    "error"
+                );
+
+                button.disabled = false;
+
+                button.innerText =
+                    "Create Account";
+
+                return;
+            }
+
+
+            showMessage(
+                "Account created successfully! Redirecting...",
+                "success"
+            );
+
+
+            setTimeout(
+                function() {
+
+                    window.location.href =
+                        "login.html";
+
+                },
+                1200
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Signup error:",
+                error
+            );
+
+
+            showMessage(
+                "Unable to connect to EduHub backend.",
+                "error"
+            );
+
+
+            button.disabled = false;
+
+            button.innerText =
+                "Create Account";
+
+        }
+
+    }
+);
+
+</script>
+
 
 </body>
 
 </html>
+```
+
