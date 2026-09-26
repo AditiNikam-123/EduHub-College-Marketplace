@@ -5,7 +5,8 @@ const path = require("path");
 
 const app = express();
 
-const PORT = 5000;
+// Render ke liye PORT automatically milega
+const PORT = process.env.PORT || 5000;
 
 // ========================================
 // MIDDLEWARE
@@ -28,9 +29,7 @@ const transactionsFile = path.join(__dirname, "transactions.json");
 // ========================================
 
 function readData(file) {
-
     try {
-
         if (!fs.existsSync(file)) {
             fs.writeFileSync(file, "[]");
             return [];
@@ -43,81 +42,53 @@ function readData(file) {
         }
 
         return JSON.parse(data);
-
     } catch (error) {
-
         console.log("File read error:", file);
         console.log(error.message);
-
         return [];
-
     }
-
 }
 
-
 function writeData(file, data) {
-
     try {
-
         fs.writeFileSync(
             file,
             JSON.stringify(data, null, 2)
         );
 
         return true;
-
     } catch (error) {
-
         console.log("File write error:", error.message);
-
         return false;
-
     }
-
 }
-
 
 // ========================================
 // HOME
 // ========================================
 
 app.get("/", (req, res) => {
-
     res.status(200).json({
-
         success: true,
-
         message: "EduHub Backend is running",
-
         port: PORT
-
     });
-
 });
-
 
 // ========================================
 // PRODUCTS
 // ========================================
 
 app.get("/api/products", (req, res) => {
-
-    const products =
-        readData(productsFile);
+    const products = readData(productsFile);
 
     res.status(200).json(products);
-
 });
 
-
 app.post("/api/products", (req, res) => {
-
-    const products =
-        readData(productsFile);
+    const products = readData(productsFile);
 
     const newProduct = {
-
         id:
             products.length > 0
                 ? Math.max(
@@ -128,7 +99,14 @@ app.post("/api/products", (req, res) => {
                 : 1,
 
         productName:
-            req.body.productName || "",
+            req.body.productName ||
+            req.body.name ||
+            "",
+
+        name:
+            req.body.name ||
+            req.body.productName ||
+            "",
 
         marketPrice:
             Number(req.body.marketPrice) || 0,
@@ -140,164 +118,140 @@ app.post("/api/products", (req, res) => {
             req.body.category || "Other",
 
         sellerName:
-            req.body.sellerName || "",
+            req.body.sellerName ||
+            req.body.seller ||
+            "",
+
+        seller:
+            req.body.seller ||
+            req.body.sellerName ||
+            "",
 
         sellerEmail:
             req.body.sellerEmail || "",
 
-        status:
-            "Available",
+        status: "Available",
+
+        available: true,
 
         date:
             new Date().toISOString()
-
     };
 
     products.push(newProduct);
 
-    writeData(
+    const saved = writeData(
         productsFile,
         products
     );
 
+    if (!saved) {
+        return res.status(500).json({
+            success: false,
+            message: "Could not save product"
+        });
+    }
+
     res.status(201).json({
-
         success: true,
-
-        message:
-            "Product added successfully",
-
-        product:
-            newProduct
-
+        message: "Product added successfully",
+        product: newProduct
     });
-
 });
 
-
 app.put("/api/products/:id", (req, res) => {
+    const products = readData(productsFile);
 
-    const products =
-        readData(productsFile);
+    const id = Number(req.params.id);
 
-    const id =
-        Number(req.params.id);
-
-    const index =
-        products.findIndex(
-            product =>
-                Number(product.id) === id
-        );
+    const index = products.findIndex(
+        product =>
+            Number(product.id) === id
+    );
 
     if (index === -1) {
-
         return res.status(404).json({
-
             success: false,
-
-            message:
-                "Product not found"
-
+            message: "Product not found"
         });
-
     }
 
     products[index] = {
-
         ...products[index],
-
         ...req.body
-
     };
 
-    writeData(
+    const saved = writeData(
         productsFile,
         products
     );
 
+    if (!saved) {
+        return res.status(500).json({
+            success: false,
+            message: "Could not update product"
+        });
+    }
+
     res.status(200).json({
-
         success: true,
-
-        message:
-            "Product updated successfully",
-
-        product:
-            products[index]
-
+        message: "Product updated successfully",
+        product: products[index]
     });
-
 });
 
-
 app.delete("/api/products/:id", (req, res) => {
+    const products = readData(productsFile);
 
-    const products =
-        readData(productsFile);
+    const id = Number(req.params.id);
 
-    const id =
-        Number(req.params.id);
-
-    const newProducts =
-        products.filter(
-            product =>
-                Number(product.id) !== id
-        );
+    const newProducts = products.filter(
+        product =>
+            Number(product.id) !== id
+    );
 
     if (
         newProducts.length ===
         products.length
     ) {
-
         return res.status(404).json({
-
             success: false,
-
-            message:
-                "Product not found"
-
+            message: "Product not found"
         });
-
     }
 
-    writeData(
+    const saved = writeData(
         productsFile,
         newProducts
     );
 
+    if (!saved) {
+        return res.status(500).json({
+            success: false,
+            message: "Could not delete product"
+        });
+    }
+
     res.status(200).json({
-
         success: true,
-
-        message:
-            "Product deleted"
-
+        message: "Product deleted"
     });
-
 });
-
 
 // ========================================
 // USERS
 // ========================================
 
 app.get("/api/users", (req, res) => {
-
-    const users =
-        readData(usersFile);
+    const users = readData(usersFile);
 
     res.status(200).json(users);
-
 });
 
-
 app.post("/api/users", (req, res) => {
-
-    const users =
-        readData(usersFile);
+    const users = readData(usersFile);
 
     const newUser = {
-
         id:
             users.length > 0
                 ? Math.max(
@@ -318,105 +272,154 @@ app.post("/api/users", (req, res) => {
 
         date:
             new Date().toISOString()
-
     };
 
     users.push(newUser);
 
-    writeData(
+    const saved = writeData(
         usersFile,
         users
     );
 
+    if (!saved) {
+        return res.status(500).json({
+            success: false,
+            message: "Could not save user"
+        });
+    }
+
     res.status(201).json({
-
         success: true,
-
-        message:
-            "User added successfully",
-
-        user:
-            newUser
-
+        message: "User added successfully",
+        user: newUser
     });
-
 });
-
 
 // ========================================
 // MESSAGES
 // ========================================
 
-app.get("/api/messages", (req, res) => {
+// GET ALL MESSAGES
 
-    const messages =
-        readData(messagesFile);
+app.get("/api/messages", (req, res) => {
+    const messages = readData(messagesFile);
 
     res.status(200).json(messages);
-
 });
 
+// SEND MESSAGE
 
 app.post("/api/messages", (req, res) => {
+    try {
+        const messages =
+            readData(messagesFile);
 
-    const messages =
-        readData(messagesFile);
+        const newMessage = {
+            id:
+                messages.length > 0
+                    ? Math.max(
+                        ...messages.map(
+                            m =>
+                                Number(m.id) || 0
+                        )
+                    ) + 1
+                    : 1,
 
-    const newMessage = {
+            sender:
+                req.body.sender || "",
 
-        id:
-            messages.length > 0
-                ? Math.max(
-                    ...messages.map(
-                        m => Number(m.id) || 0
-                    )
-                ) + 1
-                : 1,
+            receiver:
+                req.body.receiver || "",
 
-        sender:
-            req.body.sender || "",
+            productName:
+                req.body.productName ||
+                req.body.product ||
+                "",
 
-        receiver:
-            req.body.receiver || "",
+            product:
+                req.body.product ||
+                req.body.productName ||
+                "",
 
-        product:
-            req.body.product || "",
+            productId:
+                req.body.productId ||
+                null,
 
-        productId:
-            req.body.productId || null,
+            message:
+                req.body.message || "",
 
-        message:
-            req.body.message || "",
+            replyTo:
+                req.body.replyTo ||
+                null,
 
-        replyTo:
-            req.body.replyTo || null,
+            date:
+                new Date().toLocaleString(
+                    "en-IN"
+                )
+        };
 
-        date:
-            new Date().toLocaleString("en-IN")
+        if (!newMessage.sender) {
+            return res.status(400).json({
+                success: false,
+                message: "Sender is required"
+            });
+        }
 
-    };
+        if (!newMessage.receiver) {
+            return res.status(400).json({
+                success: false,
+                message: "Receiver is required"
+            });
+        }
 
-    messages.push(newMessage);
+        if (!newMessage.message) {
+            return res.status(400).json({
+                success: false,
+                message: "Message is required"
+            });
+        }
 
-    writeData(
-        messagesFile,
-        messages
-    );
+        messages.push(newMessage);
 
-    res.status(201).json({
+        const saved =
+            writeData(
+                messagesFile,
+                messages
+            );
 
-        success: true,
+        if (!saved) {
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Could not save message"
+            });
+        }
 
-        message:
-            "Message sent successfully",
-
-        data:
+        console.log(
+            "Message saved:",
             newMessage
+        );
 
-    });
+        return res.status(201).json({
+            success: true,
+            message:
+                "Message sent successfully",
+            data: newMessage
+        });
 
+    } catch (error) {
+        console.log(
+            "Message error:",
+            error.message
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Message could not be saved"
+        });
+    }
 });
-
 
 // ========================================
 // TRANSACTIONS
@@ -424,140 +427,127 @@ app.post("/api/messages", (req, res) => {
 
 // GET TRANSACTIONS
 
-app.get("/api/transactions", (req, res) => {
+app.get(
+    "/api/transactions",
+    (req, res) => {
 
-    console.log(
-        "GET /api/transactions received"
-    );
+        const transactions =
+            readData(
+                transactionsFile
+            );
 
-    const transactions =
-        readData(transactionsFile);
-
-    console.log(
-        "Transactions found:",
-        transactions.length
-    );
-
-    // ALWAYS return 200
-
-    return res.status(200).json(
-        transactions
-    );
-
-});
-
+        return res.status(200).json(
+            transactions
+        );
+    }
+);
 
 // ADD TRANSACTION
 
-app.post("/api/transactions", (req, res) => {
+app.post(
+    "/api/transactions",
+    (req, res) => {
 
-    console.log(
-        "POST /api/transactions received"
-    );
+        try {
 
-    try {
+            const transactions =
+                readData(
+                    transactionsFile
+                );
 
-        const transactions =
-            readData(transactionsFile);
+            const newTransaction = {
 
-        const newTransaction = {
+                id:
+                    transactions.length > 0
+                        ? Math.max(
+                            ...transactions.map(
+                                t =>
+                                    Number(
+                                        t.id
+                                    ) || 0
+                            )
+                        ) + 1
+                        : 1,
 
-            id:
-                transactions.length > 0
-                    ? Math.max(
-                        ...transactions.map(
-                            t =>
-                                Number(t.id) || 0
-                        )
-                    ) + 1
-                    : 1,
+                productName:
+                    req.body.productName ||
+                    "Unknown Product",
 
-            productName:
-                req.body.productName ||
-                "Unknown Product",
+                amount:
+                    Number(
+                        req.body.amount
+                    ) || 0,
 
-            amount:
-                Number(req.body.amount) || 0,
+                buyer:
+                    req.body.buyer || "",
 
-            buyer:
-                req.body.buyer || "",
+                seller:
+                    req.body.seller || "",
 
-            seller:
-                req.body.seller || "",
+                productId:
+                    req.body.productId ||
+                    null,
 
-            productId:
-                req.body.productId || null,
+                status:
+                    req.body.status ||
+                    "Completed",
 
-            status:
-                req.body.status ||
-                "Completed",
+                date:
+                    req.body.date ||
+                    new Date().toISOString()
+            };
 
-            date:
-                req.body.date ||
-                new Date().toISOString()
-
-        };
-
-        transactions.push(
-            newTransaction
-        );
-
-        const saved =
-            writeData(
-                transactionsFile,
-                transactions
+            transactions.push(
+                newTransaction
             );
 
-        if (!saved) {
+            const saved =
+                writeData(
+                    transactionsFile,
+                    transactions
+                );
+
+            if (!saved) {
+                return res.status(500).json({
+                    success: false,
+                    message:
+                        "Could not save transaction"
+                });
+            }
+
+            console.log(
+                "Transaction saved:",
+                newTransaction
+            );
+
+            return res.status(201).json({
+
+                success: true,
+
+                message:
+                    "Transaction saved successfully",
+
+                transaction:
+                    newTransaction
+            });
+
+        } catch (error) {
+
+            console.log(
+                "Transaction error:",
+                error.message
+            );
 
             return res.status(500).json({
 
                 success: false,
 
                 message:
-                    "Could not save transaction"
-
+                    "Transaction could not be saved"
             });
-
         }
-
-        console.log(
-            "Transaction saved:",
-            newTransaction
-        );
-
-        return res.status(201).json({
-
-            success: true,
-
-            message:
-                "Transaction saved successfully",
-
-            transaction:
-                newTransaction
-
-        });
-
-    } catch (error) {
-
-        console.log(
-            "Transaction error:",
-            error.message
-        );
-
-        return res.status(500).json({
-
-            success: false,
-
-            message:
-                "Transaction could not be saved"
-
-        });
-
     }
-
-});
-
+);
 
 // ========================================
 // SERVER
@@ -565,7 +555,7 @@ app.post("/api/transactions", (req, res) => {
 
 app.listen(
     PORT,
-    "127.0.0.1",
+    "0.0.0.0",
     () => {
 
         console.log("");
@@ -578,31 +568,19 @@ app.listen(
         );
 
         console.log(
-            "🌐 http://127.0.0.1:5000"
+            `🌐 Server running on port ${PORT}`
         );
 
         console.log(
-            "📦 Products:"
+            "📦 Products: /api/products"
         );
 
         console.log(
-            "   http://127.0.0.1:5000/api/products"
+            "💬 Messages: /api/messages"
         );
 
         console.log(
-            "💬 Messages:"
-        );
-
-        console.log(
-            "   http://127.0.0.1:5000/api/messages"
-        );
-
-        console.log(
-            "🧾 Transactions:"
-        );
-
-        console.log(
-            "   http://127.0.0.1:5000/api/transactions"
+            "🧾 Transactions: /api/transactions"
         );
 
         console.log(
@@ -610,6 +588,5 @@ app.listen(
         );
 
         console.log("");
-
     }
 );
