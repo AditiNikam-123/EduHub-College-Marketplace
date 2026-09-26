@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,9 +6,13 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>EduHub - Transaction History</title>
+
 
     <style>
 
@@ -15,21 +20,30 @@
             box-sizing: border-box;
         }
 
+
         body {
             margin: 0;
+
             font-family: Arial, sans-serif;
+
             background: #f5f7fb;
+
             color: #222;
         }
 
-        /* HEADER */
+
+        /* ================================
+           HEADER
+        ================================= */
 
         .header {
-            background: linear-gradient(
-                135deg,
-                #312e81,
-                #4f46e5
-            );
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #312e81,
+                    #4f46e5
+                );
 
             color: white;
 
@@ -46,51 +60,85 @@
                 rgba(0,0,0,0.1);
         }
 
+
         .header h1 {
+
             margin: 0;
+
             font-size: 28px;
         }
 
+
         .back-btn {
+
             border: none;
+
             background: white;
+
             color: #4f46e5;
+
             padding: 11px 18px;
+
             border-radius: 8px;
+
             font-weight: bold;
+
             cursor: pointer;
         }
 
+
         .back-btn:hover {
-            transform: translateY(-2px);
+
+            transform:
+                translateY(-2px);
         }
 
-        /* MAIN */
+
+        /* ================================
+           MAIN
+        ================================= */
 
         .container {
+
             max-width: 1000px;
+
             margin: 40px auto;
+
             padding: 0 20px;
         }
 
+
         .page-title {
+
             margin-bottom: 25px;
         }
 
+
         .page-title h2 {
+
             font-size: 32px;
-            margin: 0 0 8px;
+
+            margin:
+                0 0 8px;
+
             color: #312e81;
         }
 
+
         .page-title p {
+
             margin: 0;
+
             color: #666;
         }
 
-        /* TRANSACTION CARD */
+
+        /* ================================
+           TRANSACTION CARD
+        ================================= */
 
         .transaction-card {
+
             background: white;
 
             padding: 25px;
@@ -109,22 +157,32 @@
             transition: 0.3s;
         }
 
+
         .transaction-card:hover {
-            transform: translateY(-3px);
+
+            transform:
+                translateY(-3px);
 
             box-shadow:
                 0 10px 25px
                 rgba(0,0,0,0.1);
         }
 
+
         .transaction-card h3 {
+
             margin-top: 0;
+
             margin-bottom: 20px;
+
             color: #4f46e5;
+
             font-size: 21px;
         }
 
+
         .transaction-row {
+
             padding: 9px 0;
 
             color: #555;
@@ -133,17 +191,25 @@
                 1px solid #f0f0f0;
         }
 
+
         .transaction-row:last-child {
+
             border-bottom: none;
         }
 
+
         .transaction-row strong {
+
             color: #222;
         }
 
-        /* STATUS */
+
+        /* ================================
+           STATUS
+        ================================= */
 
         .transaction-status {
+
             display: inline-block;
 
             background: #dcfce7;
@@ -159,9 +225,13 @@
             font-weight: bold;
         }
 
-        /* EMPTY */
+
+        /* ================================
+           EMPTY
+        ================================= */
 
         .empty-history {
+
             background: white;
 
             padding: 60px 30px;
@@ -179,9 +249,13 @@
             font-size: 17px;
         }
 
-        /* ERROR */
+
+        /* ================================
+           ERROR
+        ================================= */
 
         .error-box {
+
             background: #fee2e2;
 
             color: #b91c1c;
@@ -195,7 +269,9 @@
             line-height: 1.6;
         }
 
+
         .retry-btn {
+
             margin-top: 15px;
 
             padding: 10px 18px;
@@ -213,11 +289,15 @@
             cursor: pointer;
         }
 
-        /* RESPONSIVE */
+
+        /* ================================
+           RESPONSIVE
+        ================================= */
 
         @media (max-width: 600px) {
 
             .header {
+
                 padding: 20px;
 
                 flex-direction: column;
@@ -227,15 +307,21 @@
                 align-items: flex-start;
             }
 
+
             .header h1 {
+
                 font-size: 23px;
             }
 
+
             .container {
+
                 margin-top: 25px;
             }
 
+
             .page-title h2 {
+
                 font-size: 26px;
             }
 
@@ -249,13 +335,16 @@
 <body>
 
 
-    <!-- HEADER -->
+    <!-- =================================
+         HEADER
+    ================================== -->
 
     <header class="header">
 
         <h1>
             🎓 EduHub
         </h1>
+
 
         <button
             class="back-btn"
@@ -267,7 +356,9 @@
     </header>
 
 
-    <!-- MAIN -->
+    <!-- =================================
+         MAIN
+    ================================== -->
 
     <main class="container">
 
@@ -278,6 +369,7 @@
                 🧾 Transaction History
             </h2>
 
+
             <p>
                 View your completed purchases and
                 transaction details.
@@ -286,7 +378,9 @@
         </div>
 
 
-        <!-- TRANSACTIONS -->
+        <!-- =================================
+             TRANSACTION CONTAINER
+        ================================== -->
 
         <div id="historyContainer">
 
@@ -304,12 +398,13 @@
 
     <script>
 
+
         // =========================================
-        // BACKEND
+        // LIVE RENDER BACKEND
         // =========================================
 
         const API =
-            "http://127.0.0.1:5000";
+            "https://eduhub-backend-llwi.onrender.com";
 
 
         // =========================================
@@ -322,6 +417,13 @@
                 document.getElementById(
                     "historyContainer"
                 );
+
+
+            if (!container) {
+
+                return;
+
+            }
 
 
             container.innerHTML = `
@@ -337,9 +439,9 @@
 
             try {
 
+
                 console.log(
-                    "Connecting to:",
-                    `${API}/api/transactions`
+                    "Connecting to EduHub backend..."
                 );
 
 
@@ -358,7 +460,7 @@
 
 
                 console.log(
-                    "Response status:",
+                    "Backend response:",
                     response.status
                 );
 
@@ -384,30 +486,115 @@
 
 
                 // =================================
-                // NO TRANSACTIONS
+                // CHECK DATA
                 // =================================
 
                 if (
                     !Array.isArray(
                         transactions
-                    ) ||
-                    transactions.length === 0
+                    )
+                ) {
+
+                    throw new Error(
+                        "Invalid transaction data"
+                    );
+
+                }
+
+
+                // =================================
+                // CURRENT BUYER
+                // =================================
+
+                const buyer =
+                    localStorage.getItem(
+                        "userEmail"
+                    );
+
+
+                /*
+                    If userEmail exists,
+                    show only that user's
+                    transactions.
+
+                    If it does not exist,
+                    show all transactions.
+                */
+
+                let myTransactions =
+                    transactions;
+
+
+                if (buyer) {
+
+                    myTransactions =
+                        transactions.filter(
+                            transaction =>
+                                String(
+                                    transaction.buyer ||
+                                    ""
+                                ).toLowerCase()
+                                ===
+                                String(
+                                    buyer
+                                ).toLowerCase()
+                        );
+
+                }
+
+
+                // =================================
+                // NO TRANSACTIONS
+                // =================================
+
+                if (
+                    myTransactions.length === 0
                 ) {
 
                     container.innerHTML = `
 
                         <div class="empty-history">
 
-                            🧾
+                            <div
+                                style="
+                                    font-size:45px;
+                                    margin-bottom:15px;
+                                "
+                            >
+                                🧾
+                            </div>
+
 
                             <strong>
                                 No transactions yet.
                             </strong>
 
+
                             <br><br>
+
 
                             Complete a purchase
                             to see it here.
+
+
+                            <br><br>
+
+
+                            <a
+                                href="index.html"
+                                style="
+                                    display:inline-block;
+                                    margin-top:10px;
+                                    padding:10px 18px;
+                                    background:#4f46e5;
+                                    color:white;
+                                    text-decoration:none;
+                                    border-radius:8px;
+                                    font-weight:bold;
+                                "
+                            >
+                                🛍️ Explore Marketplace
+                            </a>
 
                         </div>
 
@@ -425,7 +612,7 @@
                 container.innerHTML = "";
 
 
-                transactions
+                myTransactions
                     .slice()
                     .reverse()
                     .forEach(
@@ -442,7 +629,9 @@
                                 "transaction-card";
 
 
+                            // =================================
                             // DATE
+                            // =================================
 
                             let date =
                                 "N/A";
@@ -479,7 +668,63 @@
                             }
 
 
-                            // CARD
+                            // =================================
+                            // PRODUCT NAME
+                            // =================================
+
+                            const productName =
+                                transaction.productName ||
+                                "Product";
+
+
+                            // =================================
+                            // AMOUNT
+                            // =================================
+
+                            const amount =
+                                transaction.amount ||
+                                0;
+
+
+                            // =================================
+                            // BUYER
+                            // =================================
+
+                            const transactionBuyer =
+                                transaction.buyer ||
+                                "N/A";
+
+
+                            // =================================
+                            // SELLER
+                            // =================================
+
+                            const seller =
+                                transaction.seller ||
+                                "N/A";
+
+
+                            // =================================
+                            // ID
+                            // =================================
+
+                            const transactionId =
+                                transaction.id ||
+                                "N/A";
+
+
+                            // =================================
+                            // STATUS
+                            // =================================
+
+                            const status =
+                                transaction.status ||
+                                "Completed";
+
+
+                            // =================================
+                            // CARD HTML
+                            // =================================
 
                             card.innerHTML = `
 
@@ -488,8 +733,7 @@
                                     🛍️
 
                                     ${escapeHTML(
-                                        transaction.productName ||
-                                        "Product"
+                                        productName
                                     )}
 
                                 </h3>
@@ -504,8 +748,7 @@
                                     <strong>
 
                                         ₹${escapeHTML(
-                                            transaction.amount ||
-                                            0
+                                            amount
                                         )}
 
                                     </strong>
@@ -522,8 +765,7 @@
                                     <strong>
 
                                         ${escapeHTML(
-                                            transaction.buyer ||
-                                            "N/A"
+                                            transactionBuyer
                                         )}
 
                                     </strong>
@@ -540,8 +782,7 @@
                                     <strong>
 
                                         ${escapeHTML(
-                                            transaction.seller ||
-                                            "N/A"
+                                            seller
                                         )}
 
                                     </strong>
@@ -558,8 +799,7 @@
                                     <strong>
 
                                         #${escapeHTML(
-                                            transaction.id ||
-                                            "N/A"
+                                            transactionId
                                         )}
 
                                     </strong>
@@ -597,8 +837,7 @@
                                         ✓
 
                                         ${escapeHTML(
-                                            transaction.status ||
-                                            "Completed"
+                                            status
                                         )}
 
                                     </span>
@@ -637,27 +876,35 @@
                             to EduHub backend.
                         </strong>
 
+
                         <br><br>
+
 
                         Backend:
 
                         <br>
 
+
                         <strong>
-                            http://127.0.0.1:5000
+                            https://eduhub-backend-llwi.onrender.com
                         </strong>
 
+
                         <br><br>
+
 
                         Error:
 
                         <br>
 
+
                         ${escapeHTML(
                             error.message
                         )}
 
+
                         <br><br>
+
 
                         <button
                             class="retry-btn"
@@ -737,7 +984,14 @@
         // START
         // =========================================
 
-        loadTransactions();
+        document.addEventListener(
+            "DOMContentLoaded",
+            function() {
+
+                loadTransactions();
+
+            }
+        );
 
     </script>
 
@@ -745,3 +999,4 @@
 </body>
 
 </html>
+```
