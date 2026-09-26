@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1790324816308,
+    "buyer": "nikamaditi39@gmail.com",
+    "seller": "Rahul",
+    "productId": 1,
+    "productName": "Engineering Mathematics Book",
+    "amount": 500,
+    "date": "2026-09-25T08:26:56.308Z",
+    "status": "Completed"
+  },
+  {
+    "id": 1790325667950,
+    "buyer": "nikamaditi39@gmail.com",
+    "seller": "Sneha",
+    "productId": 4,
+    "productName": "College Notebook Set",
+    "amount": 180,
+    "date": "2026-09-25T08:41:07.950Z",
+    "status": "Completed"
+  },
+  {
+    "transactionId": "EDU-1790361600855",
+    "id": 1790361600855,
+    "productId": 2,
+    "product": "Unknown Product",
+    "productName": "Unknown Product",
+    "buyer": "abc@gmail.com",
+    "buyerEmail": "",
+    "seller": "Unknown Seller",
+    "sellerEmail": "",
+    "amount": 0,
+    "status": "Completed",
+    "date": "26/9/2026, 12:10:00 am"
+  }
+]

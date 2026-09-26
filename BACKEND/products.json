@@ -1,0 +1,53 @@
+[
+  {
+    "id": 1,
+    "name": "Engineering Mathematics Book",
+    "marketPrice": 800,
+    "sellingPrice": 500,
+    "category": "Books",
+    "seller": "Rahul",
+    "image": "",
+    "available": false
+  },
+  {
+    "id": 2,
+    "name": "Physics Notes",
+    "marketPrice": 400,
+    "sellingPrice": 250,
+    "category": "Notes",
+    "seller": "Priya",
+    "image": "",
+    "available": true
+  },
+  {
+    "id": 3,
+    "name": "Scientific Calculator",
+    "marketPrice": 1200,
+    "sellingPrice": 800,
+    "category": "Electronics",
+    "seller": "Aman",
+    "image": "",
+    "available": true
+  },
+  {
+    "id": 4,
+    "name": "College Notebook Set",
+    "marketPrice": 300,
+    "sellingPrice": 180,
+    "category": "Stationery",
+    "seller": "Sneha",
+    "image": "",
+    "available": false
+  },
+  {
+    "id": 1790324718521,
+    "name": "Graphics Kit",
+    "marketPrice": 500,
+    "sellingPrice": 300,
+    "category": "Stationery",
+    "seller": "abc29@gmail.com",
+    "image": "",
+    "available": true,
+    "createdAt": "2026-09-25T08:25:18.521Z"
+  }
+]
