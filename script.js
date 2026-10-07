@@ -2,54 +2,67 @@ const API =
     "https://eduhub-backend-llwi.onrender.com";
 
 let allProducts = [];
+
 let selectedProduct = null;
 
 let selectedSeller = "";
+
 let selectedProductId = null;
+
 let selectedProductName = "";
 
+let paytmScriptPromise = null;
+
+let paytmHandledOrders =
+    new Set();
 
 // ==================================================
 // PAGE NAVIGATION
 // ==================================================
 
-function showSection(sectionId) {
+function showSection(
+    sectionId
+) {
 
     document
-        .querySelectorAll(".section")
-        .forEach(section => {
-
-            section.classList.remove("active");
-
-        });
-
+        .querySelectorAll(
+            ".section"
+        )
+        .forEach(
+            section =>
+                section.classList.remove(
+                    "active"
+                )
+        );
 
     const section =
-        document.getElementById(sectionId);
-
+        document.getElementById(
+            sectionId
+        );
 
     if (section) {
 
-        section.classList.add("active");
-
+        section.classList.add(
+            "active"
+        );
     }
 
-
-    if (sectionId === "products") {
+    if (
+        sectionId ===
+        "products"
+    ) {
 
         loadProducts();
-
     }
 
-
-    if (sectionId === "messages") {
+    if (
+        sectionId ===
+        "messages"
+    ) {
 
         loadMessages();
-
     }
-
 }
-
 
 // ==================================================
 // LOAD PRODUCTS
@@ -62,19 +75,19 @@ async function loadProducts() {
             "productContainer"
         );
 
+    if (!container) {
+        return;
+    }
 
-    if (!container) return;
-
-
-    container.innerHTML = `
+    container.innerHTML =
+        `
         <div style="
             padding:20px;
             text-align:center;
         ">
             ⏳ Loading products...
         </div>
-    `;
-
+        `;
 
     try {
 
@@ -83,191 +96,171 @@ async function loadProducts() {
                 `${API}/api/products`
             );
 
-
         if (!response.ok) {
 
             throw new Error(
                 "Products could not be loaded"
             );
-
         }
-
 
         allProducts =
             await response.json();
-
 
         displayProducts(
             allProducts
         );
 
-
     } catch (error) {
 
         console.error(
-            "Load products error:",
             error
         );
 
-
-        container.innerHTML = `
+        container.innerHTML =
+            `
             <div style="
                 padding:30px;
                 text-align:center;
                 color:red;
             ">
                 ❌ Backend connection failed.
-
-                <br><br>
-
-                Please check your Render backend.
             </div>
-        `;
+            `;
     }
 }
-
 
 // ==================================================
 // DISPLAY PRODUCTS
 // ==================================================
 
-function displayProducts(products) {
+function displayProducts(
+    products
+) {
 
     const container =
         document.getElementById(
             "productContainer"
         );
 
-
-    if (!container) return;
-
+    if (!container) {
+        return;
+    }
 
     if (
-        !Array.isArray(products) ||
-        products.length === 0
+        !Array.isArray(
+            products
+        ) ||
+        !products.length
     ) {
 
-        container.innerHTML = `
+        container.innerHTML =
+            `
             <div style="
                 padding:30px;
                 text-align:center;
             ">
                 🛍️ No products found.
             </div>
-        `;
+            `;
 
         return;
     }
 
-
     container.innerHTML =
         products
-            .map(product => {
+            .map(
+                product => {
 
-                const sold =
-                    product.available === false ||
-                    product.status === "Sold";
+                    const isSold =
+                        product.available ===
+                        false;
 
+                    const marketPrice =
+                        Number(
+                            product.marketPrice ||
+                            0
+                        );
 
-                const marketPrice =
-                    Number(
-                        product.marketPrice || 0
-                    );
+                    const sellingPrice =
+                        Number(
+                            product.sellingPrice ||
+                            0
+                        );
 
+                    const saving =
+                        marketPrice -
+                        sellingPrice;
 
-                const sellingPrice =
-                    Number(
-                        product.sellingPrice || 0
-                    );
+                    const name =
+                        product.name ||
+                        product.productName ||
+                        "Product";
 
+                    const seller =
+                        product.seller ||
+                        product.sellerName ||
+                        "";
 
-                const saving =
-                    marketPrice -
-                    sellingPrice;
-
-
-                const productName =
-                    product.name ||
-                    product.productName ||
-                    "Product";
-
-
-                const seller =
-                    product.seller ||
-                    product.sellerName ||
-                    "Seller";
-
-
-                return `
-
+                    return `
                     <div
                         class="product-card"
                         style="
                             position:relative;
                             ${
-                                sold
-                                    ? "opacity:0.70;"
+                                isSold
+                                    ? "opacity:.72;"
                                     : ""
                             }
                         "
                     >
 
                         ${
-                            sold
-                            ?
-                            `
-                            <div style="
-                                position:absolute;
-                                top:12px;
-                                right:12px;
-                                background:#dc2626;
-                                color:white;
-                                padding:7px 13px;
-                                border-radius:20px;
-                                font-weight:bold;
-                                z-index:5;
-                            ">
-                                🔴 SOLD
-                            </div>
-                            `
-                            :
-                            ""
+                            isSold
+                                ? `
+                                <div style="
+                                    position:absolute;
+                                    top:12px;
+                                    right:12px;
+                                    background:#dc2626;
+                                    color:white;
+                                    padding:7px 13px;
+                                    border-radius:20px;
+                                    font-weight:bold;
+                                    z-index:5;
+                                ">
+                                    🔴 SOLD
+                                </div>
+                                `
+                                : ""
                         }
-
 
                         <div class="product-image">
 
                             ${
                                 product.image
-                                ?
-                                `
-                                <img
-                                    src="${escapeHTML(
-                                        product.image
-                                    )}"
-                                    style="
-                                        width:100%;
-                                        height:100%;
-                                        object-fit:cover;
-                                        border-radius:10px;
-                                    "
-                                >
-                                `
-                                :
-                                `
-                                📚
-                                `
+                                    ? `
+                                    <img
+                                        src="${escapeHTML(
+                                            product.image
+                                        )}"
+                                        style="
+                                            width:100%;
+                                            height:100%;
+                                            object-fit:cover;
+                                            border-radius:10px;
+                                        "
+                                    >
+                                    `
+                                    : "📚"
                             }
 
                         </div>
 
-
                         <h3>
                             ${escapeHTML(
-                                productName
+                                name
                             )}
                         </h3>
-
 
                         <p>
                             📂
@@ -277,7 +270,6 @@ function displayProducts(products) {
                             )}
                         </p>
 
-
                         <p>
                             👤 Seller:
                             ${escapeHTML(
@@ -285,12 +277,10 @@ function displayProducts(products) {
                             )}
                         </p>
 
-
                         <p>
                             Market Price:
                             ₹${marketPrice}
                         </p>
-
 
                         <p style="
                             font-size:20px;
@@ -300,28 +290,27 @@ function displayProducts(products) {
                             ₹${sellingPrice}
                         </p>
 
-
                         ${
-                            !sold
-                            ?
-                            `
-                            <p style="
-                                color:#15803d;
-                            ">
-                                💰 Save ₹${saving}
-                            </p>
-                            `
-                            :
-                            `
-                            <p style="
-                                color:#dc2626;
-                                font-weight:bold;
-                            ">
-                                This product has been sold.
-                            </p>
-                            `
+                            !isSold
+                                ? `
+                                <p style="
+                                    color:#15803d;
+                                ">
+                                    💰 Save ₹${Math.max(
+                                        0,
+                                        saving
+                                    )}
+                                </p>
+                                `
+                                : `
+                                <p style="
+                                    color:#dc2626;
+                                    font-weight:bold;
+                                ">
+                                    This product has been sold.
+                                </p>
+                                `
                         }
-
 
                         <div style="
                             display:flex;
@@ -330,55 +319,60 @@ function displayProducts(products) {
                             margin-top:15px;
                         ">
 
-
                             ${
-                                sold
-                                ?
-                                `
-                                <button
-                                    disabled
-                                    style="
-                                        flex:1;
-                                        padding:11px;
-                                        border:none;
-                                        border-radius:8px;
-                                        background:#9ca3af;
-                                        color:white;
-                                        cursor:not-allowed;
-                                    "
-                                >
-                                    🔴 Sold Out
-                                </button>
-                                `
-                                :
-                                `
-                                <button
-                                    onclick="buyProduct(
-                                        ${Number(product.id)}
-                                    )"
-                                    style="
-                                        flex:1;
-                                        padding:11px;
-                                        border:none;
-                                        border-radius:8px;
-                                        background:#4f46e5;
-                                        color:white;
-                                        font-weight:bold;
-                                        cursor:pointer;
-                                    "
-                                >
-                                    🛒 Buy Now
-                                </button>
-                                `
+                                isSold
+                                    ? `
+                                    <button
+                                        disabled
+                                        style="
+                                            flex:1;
+                                            padding:11px;
+                                            border:none;
+                                            border-radius:8px;
+                                            background:#9ca3af;
+                                            color:white;
+                                        "
+                                    >
+                                        🔴 Sold Out
+                                    </button>
+                                    `
+                                    : `
+                                    <button
+                                        onclick="
+                                            buyProduct(
+                                                ${Number(
+                                                    product.id
+                                                )}
+                                            )
+                                        "
+                                        style="
+                                            flex:1;
+                                            padding:11px;
+                                            border:none;
+                                            border-radius:8px;
+                                            background:#4f46e5;
+                                            color:white;
+                                            font-weight:bold;
+                                            cursor:pointer;
+                                        "
+                                    >
+                                        🛒 Buy Now
+                                    </button>
+                                    `
                             }
-
 
                             <button
                                 onclick="
                                     openMessageBox(
-                                        '${escapeJS(seller)}',
-                                        '${escapeJS(productName)}',
-                                        ${Number(product.id)}
+                                        '${escapeJS(
+                                            seller
+                                        )}',
+                                        '${escapeJS(
+                                            name
+                                        )}',
+                                        ${Number(
+                                            product.id
+                                        )}
                                     )
                                 "
                                 style="
@@ -395,32 +389,33 @@ function displayProducts(products) {
                                 💬 Message
                             </button>
 
-
                         </div>
 
-
                     </div>
-
-                `;
-
-            })
+                    `;
+                }
+            )
             .join("");
 }
-
 
 // ==================================================
 // BUY PRODUCT
 // ==================================================
 
-function buyProduct(productId) {
+function buyProduct(
+    productId
+) {
 
     selectedProduct =
         allProducts.find(
             product =>
-                Number(product.id) ===
-                Number(productId)
+                Number(
+                    product.id
+                ) ===
+                Number(
+                    productId
+                )
         );
-
 
     if (!selectedProduct) {
 
@@ -431,23 +426,20 @@ function buyProduct(productId) {
         return;
     }
 
-
     if (
-        selectedProduct.available === false ||
-        selectedProduct.status === "Sold"
+        selectedProduct.available ===
+        false
     ) {
 
         alert(
-            "❌ This product is already sold."
+            "❌ Sorry! This product is already sold."
         );
 
         return;
     }
 
-
     showPurchaseModal();
 }
-
 
 // ==================================================
 // PURCHASE MODAL
@@ -457,157 +449,121 @@ function showPurchaseModal() {
 
     const old =
         document.getElementById(
-            "purchaseModal"
+            "paytmPurchaseModal"
         );
-
 
     if (old) {
-
         old.remove();
-
     }
-
-
-    const productName =
-        selectedProduct.name ||
-        selectedProduct.productName ||
-        "Product";
-
-
-    const seller =
-        selectedProduct.seller ||
-        selectedProduct.sellerName ||
-        "Seller";
-
-
-    const price =
-        Number(
-            selectedProduct.sellingPrice || 0
-        );
-
 
     const modal =
         document.createElement(
             "div"
         );
 
-
     modal.id =
-        "purchaseModal";
+        "paytmPurchaseModal";
 
-
-    modal.style.cssText = `
+    modal.style.cssText =
+        `
         position:fixed;
         inset:0;
-        background:rgba(0,0,0,0.70);
+        background:rgba(0,0,0,.65);
         display:flex;
         align-items:center;
         justify-content:center;
-        z-index:9999;
+        z-index:99999;
         padding:20px;
-    `;
+        `;
 
-
-    modal.innerHTML = `
-
+    modal.innerHTML =
+        `
         <div style="
             background:white;
             width:100%;
             max-width:450px;
             border-radius:18px;
             padding:30px;
-            box-shadow:
-                0 20px 50px
-                rgba(0,0,0,0.25);
+            box-shadow:0 20px 50px rgba(0,0,0,.25);
         ">
 
-
             <h2 style="
-                margin-top:0;
                 color:#312e81;
+                margin-top:0;
             ">
-
-                🛒 Buy Product
-
+                🛒 Pay with Paytm
             </h2>
 
-
             <p>
-
                 <strong>
                     Product:
                 </strong>
 
                 ${escapeHTML(
-                    productName
+                    selectedProduct.name ||
+                    selectedProduct.productName
                 )}
-
             </p>
 
-
             <p>
-
                 <strong>
                     Seller:
                 </strong>
 
                 ${escapeHTML(
-                    seller
+                    selectedProduct.seller ||
+                    selectedProduct.sellerName ||
+                    ""
                 )}
-
             </p>
 
-
             <p style="
-                font-size:25px;
+                font-size:24px;
                 font-weight:bold;
                 color:#4f46e5;
             ">
-
-                ₹${price}
-
+                ₹${Number(
+                    selectedProduct.sellingPrice
+                ).toFixed(2)}
             </p>
-
 
             <hr>
 
-
-            <label style="
-                display:block;
-                margin:12px 0 6px;
-                font-weight:bold;
+            <p style="
+                color:#4b5563;
             ">
-
-                Buyer Email
-
-            </label>
-
+                Enter your details to continue to Paytm checkout.
+            </p>
 
             <input
                 id="buyerEmail"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Your email"
                 style="
                     width:100%;
                     box-sizing:border-box;
                     padding:12px;
-                    border:1px solid #d1d5db;
+                    border:1px solid #ddd;
                     border-radius:8px;
+                    margin:10px 0;
                 "
             >
 
-
-            <p style="
-                font-size:13px;
-                color:#6b7280;
-                margin-top:10px;
-            ">
-
-                🔒 Secure payment will open in
-                Razorpay Checkout.
-
-            </p>
-
+            <input
+                id="buyerMobile"
+                type="tel"
+                inputmode="numeric"
+                maxlength="10"
+                placeholder="10-digit mobile number"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ddd;
+                    border-radius:8px;
+                    margin:10px 0;
+                "
+            >
 
             <div style="
                 display:flex;
@@ -615,412 +571,516 @@ function showPurchaseModal() {
                 margin-top:20px;
             ">
 
-
                 <button
-                    onclick="startPayment()"
+                    id="paytmPayButton"
+                    onclick="
+                        confirmPurchase()
+                    "
                     style="
                         flex:1;
                         padding:12px;
                         border:none;
                         border-radius:8px;
-                        background:#4f46e5;
+                        background:#16a34a;
                         color:white;
                         font-weight:bold;
                         cursor:pointer;
                     "
                 >
-
-                    💳 Pay Now
-
+                    💳 Continue to Paytm
                 </button>
 
-
                 <button
-                    onclick="closePurchaseModal()"
+                    onclick="
+                        closePurchaseModal()
+                    "
                     style="
                         flex:1;
                         padding:12px;
                         border:none;
                         border-radius:8px;
                         background:#e5e7eb;
-                        color:#111827;
                         cursor:pointer;
                     "
                 >
-
                     Cancel
-
                 </button>
-
 
             </div>
 
-
         </div>
-
-    `;
-
+        `;
 
     document.body.appendChild(
         modal
     );
 }
 
+// ==================================================
+// CLOSE PURCHASE
+// ==================================================
+
+function closePurchaseModal() {
+
+    const modal =
+        document.getElementById(
+            "paytmPurchaseModal"
+        );
+
+    if (modal) {
+
+        modal.remove();
+    }
+}
 
 // ==================================================
-// START REAL PAYMENT
+// LOAD PAYTM CHECKOUT
 // ==================================================
 
-async function startPayment() {
+async function loadPaytmCheckoutScript(
+    url
+) {
+
+    if (
+        window.Paytm &&
+        window.Paytm.CheckoutJS
+    ) {
+
+        return;
+    }
+
+    if (paytmScriptPromise) {
+
+        return paytmScriptPromise;
+    }
+
+    if (!url) {
+
+        throw new Error(
+            "Paytm CheckoutJS URL is missing."
+        );
+    }
+
+    paytmScriptPromise =
+        new Promise(
+            (
+                resolve,
+                reject
+            ) => {
+
+                const script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    url;
+
+                script.async =
+                    true;
+
+                script.onload =
+                    function() {
+
+                        if (
+                            !window.Paytm ||
+                            !window.Paytm.CheckoutJS
+                        ) {
+
+                            reject(
+                                new Error(
+                                    "Paytm CheckoutJS did not load."
+                                )
+                            );
+
+                            return;
+                        }
+
+                        window.Paytm.CheckoutJS.onLoad(
+                            function() {
+
+                                resolve();
+                            }
+                        );
+                    };
+
+                script.onerror =
+                    function() {
+
+                        reject(
+                            new Error(
+                                "Paytm CheckoutJS could not load."
+                            )
+                        );
+                    };
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
+
+    return paytmScriptPromise;
+}
+
+// ==================================================
+// CONFIRM PURCHASE
+// ==================================================
+
+async function confirmPurchase() {
 
     if (!selectedProduct) {
 
         alert(
-            "❌ No product selected."
+            "No product selected."
         );
 
         return;
     }
-
-
-    if (
-        typeof Razorpay ===
-        "undefined"
-    ) {
-
-        alert(
-            "❌ Razorpay Checkout could not load."
-        );
-
-        return;
-    }
-
 
     const emailInput =
         document.getElementById(
             "buyerEmail"
         );
 
-
-    if (!emailInput) {
-
-        alert(
-            "❌ Buyer email field not found."
+    const mobileInput =
+        document.getElementById(
+            "buyerMobile"
         );
 
-        return;
-    }
+    const button =
+        document.getElementById(
+            "paytmPayButton"
+        );
 
+    const buyer =
+        emailInput
+            ? emailInput.value.trim()
+            : "";
 
-    const buyerEmail =
-        emailInput.value.trim();
-
+    const mobile =
+        mobileInput
+            ? mobileInput.value.trim()
+            : "";
 
     if (
-        !buyerEmail ||
-        !buyerEmail.includes("@")
+        !buyer ||
+        !buyer.includes("@")
     ) {
 
         alert(
-            "❌ Please enter a valid email."
+            "Please enter a valid email."
         );
 
         return;
     }
 
+    if (
+        !/^\d{10}$/.test(
+            mobile
+        )
+    ) {
+
+        alert(
+            "Please enter a valid 10-digit mobile number."
+        );
+
+        return;
+    }
 
     try {
 
-        const orderResponse =
-            await fetch(
-                `${API}/api/payment/create-order`,
-                {
+        if (button) {
 
-                    method:
-                        "POST",
+            button.disabled =
+                true;
+
+            button.textContent =
+                "⏳ Opening Paytm...";
+        }
+
+        const response =
+            await fetch(
+                `${API}/api/paytm/create-order`,
+                {
+                    method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body:
                         JSON.stringify({
-
                             productId:
                                 selectedProduct.id,
 
-                            buyerEmail:
-                                buyerEmail
+                            buyer:
+                                buyer,
 
+                            mobile:
+                                mobile
                         })
-
                 }
             );
 
+        const data =
+            await response.json();
 
-        const orderData =
-            await orderResponse.json();
+        if (
+            !response.ok ||
+            !data.success
+        ) {
 
-
-        if (!orderResponse.ok) {
-
-            alert(
-                "❌ " +
-                (
-                    orderData.message ||
-                    "Could not create payment order."
-                )
+            throw new Error(
+                data.message ||
+                "Could not create Paytm order."
             );
-
-            return;
         }
 
-
-        closePurchaseModal();
-
-
-        const options = {
-
-            key:
-                orderData.key,
-
-
-            amount:
-                orderData.order.amount,
-
-
-            currency:
-                orderData.order.currency,
-
-
-            name:
-                "EduHub",
-
-
-            description:
-                orderData.product.name,
-
-
-            order_id:
-                orderData.order.id,
-
-
-            prefill: {
-
-                email:
-                    buyerEmail
-
-            },
-
-
-            notes: {
-
-                productId:
-                    String(
-                        selectedProduct.id
-                    )
-
-            },
-
-
-            theme: {
-
-                color:
-                    "#4f46e5"
-
-            },
-
-
-            handler:
-                async function(
-                    response
-                ) {
-
-                    await verifyPayment(
-                        response,
-                        buyerEmail
-                    );
-
-                },
-
-
-            modal: {
-
-                ondismiss:
-                    function() {
-
-                        console.log(
-                            "Payment window closed."
-                        );
-
-                    }
-
-            }
-
-        };
-
-
-        const paymentObject =
-            new Razorpay(
-                options
-            );
-
-
-        paymentObject.on(
-            "payment.failed",
-            function(response) {
-
-                console.error(
-                    "Payment failed:",
-                    response.error
-                );
-
-
-                alert(
-                    "❌ Payment failed. Please try again."
-                );
-
-            }
+        await loadPaytmCheckoutScript(
+            data.checkoutJsUrl
         );
 
+        const config = {
 
-        paymentObject.open();
+            root: "",
 
+            flow:
+                "DEFAULT",
+
+            data: {
+
+                orderId:
+                    data.orderId,
+
+                token:
+                    data.txnToken,
+
+                tokenType:
+                    "TXN_TOKEN",
+
+                amount:
+                    data.amount
+            },
+
+            merchant: {
+
+                redirect:
+                    true
+            },
+
+            handler: {
+
+                notifyMerchant:
+                    function(
+                        eventName,
+                        eventData
+                    ) {
+
+                        console.log(
+                            "Paytm event:",
+                            eventName,
+                            eventData
+                        );
+                    },
+
+                transactionStatus:
+                    function(
+                        paymentData
+                    ) {
+
+                        const orderId =
+                            paymentData &&
+                            paymentData.ORDERID
+                                ? paymentData.ORDERID
+                                : data.orderId;
+
+                        if (
+                            paymentData &&
+                            paymentData.STATUS ===
+                                "TXN_SUCCESS"
+                        ) {
+
+                            reconcilePaytmOrder(
+                                orderId
+                            );
+
+                            return;
+                        }
+
+                        if (
+                            paymentData &&
+                            paymentData.STATUS ===
+                                "PENDING"
+                        ) {
+
+                            reconcilePaytmOrder(
+                                orderId
+                            );
+
+                            return;
+                        }
+
+                        alert(
+                            "❌ Payment failed or was cancelled."
+                        );
+                    }
+            }
+        };
+
+        await window.Paytm.CheckoutJS.init(
+            config
+        );
+
+        window.Paytm.CheckoutJS.invoke();
 
     } catch (error) {
 
         console.error(
-            "Start payment error:",
+            "Paytm payment error:",
             error
         );
 
-
         alert(
-            "❌ Could not connect to payment server."
+            "❌ " +
+            (
+                error.message ||
+                "Unable to open Paytm payment."
+            )
         );
+
+        if (button) {
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "💳 Continue to Paytm";
+        }
     }
 }
-
 
 // ==================================================
 // VERIFY PAYMENT
 // ==================================================
 
-async function verifyPayment(
-    paymentResponse,
-    buyerEmail
+async function reconcilePaytmOrder(
+    orderId
 ) {
 
-    if (!selectedProduct) {
-
-        alert(
-            "❌ Product information is missing."
-        );
-
+    if (!orderId) {
         return;
     }
 
+    if (
+        paytmHandledOrders.has(
+            orderId
+        )
+    ) {
+
+        return;
+    }
 
     try {
 
         const response =
             await fetch(
-                `${API}/api/payment/verify`,
+                `${API}/api/paytm/verify`,
                 {
-
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body:
                         JSON.stringify({
-
-                            razorpay_order_id:
-                                paymentResponse
-                                    .razorpay_order_id,
-
-                            razorpay_payment_id:
-                                paymentResponse
-                                    .razorpay_payment_id,
-
-                            razorpay_signature:
-                                paymentResponse
-                                    .razorpay_signature,
-
-                            productId:
-                                selectedProduct.id,
-
-                            buyerEmail:
-                                buyerEmail
-
+                            orderId
                         })
-
                 }
             );
-
 
         const data =
             await response.json();
 
+        if (
+            data.success &&
+            data.transaction
+        ) {
 
-        if (!response.ok) {
+            paytmHandledOrders.add(
+                orderId
+            );
 
-            alert(
-                "❌ " +
-                (
-                    data.message ||
-                    "Payment verification failed."
-                )
+            closePurchaseModal();
+
+            const product =
+                allProducts.find(
+                    p =>
+                        Number(
+                            p.id
+                        ) ===
+                        Number(
+                            data.transaction.productId
+                        )
+                );
+
+            if (product) {
+
+                product.available =
+                    false;
+
+                product.status =
+                    "Sold";
+            }
+
+            displayProducts(
+                allProducts
+            );
+
+            showPurchaseSuccess(
+                data.transaction
             );
 
             return;
         }
 
+        if (
+            data.paymentStatus ===
+            "PENDING"
+        ) {
 
-        selectedProduct.available =
-            false;
+            alert(
+                "⏳ Payment is still pending. Please check Transaction History shortly."
+            );
 
+            return;
+        }
 
-        selectedProduct.status =
-            "Sold";
-
-
-        displayProducts(
-            allProducts
+        alert(
+            "❌ " +
+            (
+                data.message ||
+                "Payment could not be verified."
+            )
         );
-
-
-        showPurchaseSuccess(
-            data.transaction
-        );
-
 
     } catch (error) {
 
         console.error(
-            "Payment verification error:",
             error
         );
 
-
         alert(
-            "❌ Payment completed, but verification could not be completed. Please contact the administrator."
+            "❌ Payment verification could not be reached right now. Please check Transaction History shortly."
         );
     }
 }
 
-
 // ==================================================
-// SUCCESS MESSAGE
+// PURCHASE SUCCESS
 // ==================================================
 
 function showPurchaseSuccess(
@@ -1029,41 +1089,35 @@ function showPurchaseSuccess(
 
     const old =
         document.getElementById(
-            "successModal"
+            "paytmSuccessModal"
         );
 
-
     if (old) {
-
         old.remove();
-
     }
-
 
     const modal =
         document.createElement(
             "div"
         );
 
-
     modal.id =
-        "successModal";
+        "paytmSuccessModal";
 
-
-    modal.style.cssText = `
+    modal.style.cssText =
+        `
         position:fixed;
         inset:0;
-        background:rgba(0,0,0,0.70);
+        background:rgba(0,0,0,.65);
         display:flex;
         align-items:center;
         justify-content:center;
-        z-index:10000;
+        z-index:100000;
         padding:20px;
-    `;
+        `;
 
-
-    modal.innerHTML = `
-
+    modal.innerHTML =
+        `
         <div style="
             background:white;
             width:100%;
@@ -1072,43 +1126,23 @@ function showPurchaseSuccess(
             padding:30px;
         ">
 
-
             <div style="
                 text-align:center;
                 font-size:55px;
             ">
-
                 🎉
-
             </div>
-
 
             <h2 style="
                 text-align:center;
                 color:#15803d;
             ">
-
-                Payment Successful!
-
+                Purchase Successful!
             </h2>
-
-
-            <p style="
-                text-align:center;
-                color:#6b7280;
-            ">
-
-                Your payment has been
-                verified successfully.
-
-            </p>
-
 
             <hr>
 
-
             <p>
-
                 🛍️
                 <strong>
                     Product:
@@ -1117,24 +1151,20 @@ function showPurchaseSuccess(
                 ${escapeHTML(
                     transaction.productName
                 )}
-
             </p>
 
-
             <p>
-
                 💰
                 <strong>
                     Amount:
                 </strong>
 
-                ₹${transaction.amount}
-
+                ₹${escapeHTML(
+                    transaction.amount
+                )}
             </p>
 
-
             <p>
-
                 👤
                 <strong>
                     Seller:
@@ -1143,38 +1173,20 @@ function showPurchaseSuccess(
                 ${escapeHTML(
                     transaction.seller
                 )}
-
             </p>
 
-
             <p>
-
-                💳
-                <strong>
-                    Payment ID:
-                </strong>
-
-                ${escapeHTML(
-                    transaction.paymentId
-                )}
-
-            </p>
-
-
-            <p>
-
                 🆔
                 <strong>
                     Transaction ID:
                 </strong>
 
-                #${transaction.id}
-
+                #${escapeHTML(
+                    transaction.id
+                )}
             </p>
 
-
             <p>
-
                 📌
                 <strong>
                     Status:
@@ -1182,18 +1194,15 @@ function showPurchaseSuccess(
 
                 <span style="
                     color:#15803d;
-                    font-weight:bold;
                 ">
-
-                    Paid / Completed
-
+                    ✓ Completed
                 </span>
-
             </p>
 
-
             <button
-                onclick="closeSuccess()"
+                onclick="
+                    closeSuccess()
+                "
                 style="
                     width:100%;
                     padding:12px;
@@ -1206,16 +1215,11 @@ function showPurchaseSuccess(
                     margin-top:15px;
                 "
             >
-
                 Done
-
             </button>
 
-
         </div>
-
-    `;
-
+        `;
 
     document.body.appendChild(
         modal
@@ -1223,40 +1227,21 @@ function showPurchaseSuccess(
 }
 
 
-function closePurchaseModal() {
-
-    const modal =
-        document.getElementById(
-            "purchaseModal"
-        );
-
-
-    if (modal) {
-
-        modal.remove();
-
-    }
-}
-
-
 function closeSuccess() {
 
     const modal =
         document.getElementById(
-            "successModal"
+            "paytmSuccessModal"
         );
-
 
     if (modal) {
 
         modal.remove();
-
     }
 }
 
-
 // ==================================================
-// MESSAGES
+// MESSAGE SELLER
 // ==================================================
 
 function openMessageBox(
@@ -1274,234 +1259,92 @@ function openMessageBox(
     selectedProductId =
         productId;
 
-
-    const old =
+    const modal =
         document.getElementById(
             "messageModal"
         );
 
-
-    if (old) {
-
-        old.remove();
-
+    if (!modal) {
+        return;
     }
 
-
-    const modal =
-        document.createElement(
-            "div"
+    const sellerText =
+        document.getElementById(
+            "messageSeller"
         );
 
+    const productText =
+        document.getElementById(
+            "messageProduct"
+        );
 
-    modal.id =
-        "messageModal";
+    const messageBox =
+        document.getElementById(
+            "sellerMessage"
+        );
 
+    if (sellerText) {
 
-    modal.style.cssText = `
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,0.65);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        z-index:9999;
-        padding:20px;
-    `;
+        sellerText.textContent =
+            `Seller: ${seller}`;
+    }
 
+    if (productText) {
 
-    modal.innerHTML = `
+        productText.textContent =
+            `Product: ${productName}`;
+    }
 
-        <div style="
-            background:white;
-            width:100%;
-            max-width:500px;
-            border-radius:18px;
-            padding:30px;
-        ">
+    if (messageBox) {
 
+        messageBox.value =
+            "";
+    }
 
-            <h2 style="
-                color:#312e81;
-                margin-top:0;
-            ">
-
-                💬 Message Seller
-
-            </h2>
-
-
-            <p>
-
-                📚
-                <strong>
-                    ${escapeHTML(
-                        productName
-                    )}
-                </strong>
-
-            </p>
-
-
-            <p>
-
-                👤 Seller:
-                ${escapeHTML(
-                    seller
-                )}
-
-            </p>
-
-
-            <input
-                id="senderEmail"
-                type="email"
-                placeholder="Your email"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ddd;
-                    border-radius:8px;
-                    margin:10px 0;
-                "
-            >
-
-
-            <textarea
-                id="messageText"
-                placeholder="Write your message..."
-                rows="5"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ddd;
-                    border-radius:8px;
-                    resize:none;
-                "
-            ></textarea>
-
-
-            <div style="
-                display:flex;
-                gap:10px;
-                margin-top:15px;
-            ">
-
-
-                <button
-                    onclick="sendMessage()"
-                    style="
-                        flex:1;
-                        padding:12px;
-                        border:none;
-                        border-radius:8px;
-                        background:#4f46e5;
-                        color:white;
-                        font-weight:bold;
-                        cursor:pointer;
-                    "
-                >
-
-                    📤 Send Message
-
-                </button>
-
-
-                <button
-                    onclick="closeMessageModal()"
-                    style="
-                        flex:1;
-                        padding:12px;
-                        border:none;
-                        border-radius:8px;
-                        background:#e5e7eb;
-                        cursor:pointer;
-                    "
-                >
-
-                    Cancel
-
-                </button>
-
-
-            </div>
-
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(
-        modal
+    modal.classList.remove(
+        "hidden"
     );
 }
 
 
-function closeMessageModal() {
+function closeMessageBox() {
 
     const modal =
         document.getElementById(
             "messageModal"
         );
 
-
     if (modal) {
 
-        modal.remove();
-
+        modal.classList.add(
+            "hidden"
+        );
     }
 }
 
+// ==================================================
+// SEND MESSAGE
+// ==================================================
 
 async function sendMessage() {
 
-    const senderInput =
+    const messageBox =
         document.getElementById(
-            "senderEmail"
+            "sellerMessage"
         );
-
-
-    const messageInput =
-        document.getElementById(
-            "messageText"
-        );
-
-
-    if (
-        !senderInput ||
-        !messageInput
-    ) {
-
-        alert(
-            "❌ Message box not found."
-        );
-
-        return;
-    }
-
 
     const sender =
-        senderInput.value.trim();
-
-
-    const message =
-        messageInput.value.trim();
-
-
-    if (!sender) {
-
-        alert(
-            "Please enter your email."
+        localStorage.getItem(
+            "userEmail"
+        ) ||
+        prompt(
+            "Enter your email:"
         );
 
-        return;
-    }
-
-
-    if (!sender.includes("@")) {
+    if (
+        !sender ||
+        !sender.includes("@")
+    ) {
 
         alert(
             "Please enter a valid email."
@@ -1510,8 +1353,10 @@ async function sendMessage() {
         return;
     }
 
-
-    if (!message) {
+    if (
+        !messageBox ||
+        !messageBox.value.trim()
+    ) {
 
         alert(
             "Please write a message."
@@ -1520,29 +1365,23 @@ async function sendMessage() {
         return;
     }
 
-
     try {
 
         const response =
             await fetch(
                 `${API}/api/messages`,
                 {
-
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body:
                         JSON.stringify({
 
-                            sender:
-                                sender,
+                            sender,
 
                             receiver:
                                 selectedSeller,
@@ -1554,20 +1393,16 @@ async function sendMessage() {
                                 selectedProductName,
 
                             message:
-                                message,
+                                messageBox.value.trim(),
 
                             replyTo:
                                 null
-
                         })
-
                 }
             );
 
-
         const data =
             await response.json();
-
 
         if (!response.ok) {
 
@@ -1582,32 +1417,25 @@ async function sendMessage() {
             return;
         }
 
-
         alert(
             "✅ Message sent successfully!"
         );
 
-
-        closeMessageModal();
-
+        closeMessageBox();
 
         loadMessages();
-
 
     } catch (error) {
 
         console.error(
-            "Message error:",
             error
         );
-
 
         alert(
             "❌ Cannot connect to backend."
         );
     }
 }
-
 
 // ==================================================
 // LOAD MESSAGES
@@ -1620,23 +1448,19 @@ async function loadMessages() {
             "messagesContainer"
         );
 
-
     if (!container) {
         return;
     }
 
-
-    container.innerHTML = `
+    container.innerHTML =
+        `
         <div style="
             padding:30px;
             text-align:center;
         ">
-
             ⏳ Loading messages...
-
         </div>
-    `;
-
+        `;
 
     try {
 
@@ -1645,89 +1469,48 @@ async function loadMessages() {
                 `${API}/api/messages`
             );
 
-
         if (!response.ok) {
 
             throw new Error(
                 "Messages failed"
             );
-
         }
-
 
         const messages =
             await response.json();
 
-
         if (
-            !Array.isArray(messages) ||
-            messages.length === 0
+            !Array.isArray(
+                messages
+            ) ||
+            !messages.length
         ) {
 
-            container.innerHTML = `
+            container.innerHTML =
+                `
                 <div style="
-                    background:white;
                     padding:30px;
                     text-align:center;
-                    border-radius:15px;
                 ">
-
-                    <div style="
-                        font-size:45px;
-                    ">
-
-                        💬
-
-                    </div>
-
-                    <h3>
-                        No messages yet
-                    </h3>
-
-                    <p>
-                        Messages will appear here.
-                    </p>
-
+                    💬 No messages yet.
                 </div>
-            `;
+                `;
 
             return;
         }
 
-
         container.innerHTML =
             [...messages]
                 .reverse()
-                .map(message => {
+                .map(
+                    msg => {
 
-                    const productName =
-                        message.productName ||
-                        message.product ||
-                        "Marketplace Product";
+                        const productName =
+                            msg.productName ||
+                            msg.product ||
+                            "Marketplace Product";
 
-
-                    const sender =
-                        message.sender ||
-                        "Unknown";
-
-
-                    const receiver =
-                        message.receiver ||
-                        "Unknown";
-
-
-                    const text =
-                        message.message ||
-                        "";
-
-
-                    const date =
-                        message.date ||
-                        "";
-
-
-                    return `
-
+                        return `
                         <div style="
                             background:white;
                             padding:20px;
@@ -1735,83 +1518,84 @@ async function loadMessages() {
                             border-radius:15px;
                             box-shadow:
                                 0 4px 15px
-                                rgba(0,0,0,0.08);
+                                rgba(0,0,0,.08);
                         ">
 
                             <h3 style="
+                                margin:0;
                                 color:#312e81;
                             ">
-
                                 📚
                                 ${escapeHTML(
                                     productName
                                 )}
-
                             </h3>
 
-
                             <p>
-
                                 📤
                                 <strong>
                                     From:
                                 </strong>
 
                                 ${escapeHTML(
-                                    sender
+                                    msg.sender
                                 )}
-
                             </p>
 
-
                             <p>
-
                                 📥
                                 <strong>
                                     To:
                                 </strong>
 
                                 ${escapeHTML(
-                                    receiver
+                                    msg.receiver
                                 )}
-
                             </p>
-
 
                             <div style="
                                 background:#f3f4f6;
                                 padding:15px;
                                 border-radius:10px;
-                                margin:12px 0;
                             ">
-
                                 💬
                                 ${escapeHTML(
-                                    text
+                                    msg.message
                                 )}
-
                             </div>
-
 
                             <p style="
                                 font-size:12px;
                                 color:#6b7280;
                             ">
-
                                 ${escapeHTML(
-                                    date
+                                    msg.date ||
+                                    ""
                                 )}
-
                             </p>
-
 
                             <button
                                 onclick="
                                     replyMessage(
-                                        '${escapeJS(sender)}',
-                                        ${message.id || 0},
-                                        '${escapeJS(productName)}',
-                                        ${message.productId || "null"}
+                                        '${escapeJS(
+                                            msg.sender
+                                        )}',
+                                        ${
+                                            Number(
+                                                msg.id
+                                            ) || 0
+                                        },
+                                        '${escapeJS(
+                                            productName
+                                        )}',
+                                        ${
+                                            msg.productId ==
+                                            null
+                                                ? "null"
+                                                : Number(
+                                                      msg.productId
+                                                  )
+                                        }
                                     )
                                 "
                                 style="
@@ -1824,41 +1608,33 @@ async function loadMessages() {
                                     cursor:pointer;
                                 "
                             >
-
                                 ↩️ Reply
-
                             </button>
 
                         </div>
-
-                    `;
-
-                })
+                        `;
+                    }
+                )
                 .join("");
-
 
     } catch (error) {
 
         console.error(
-            "Load messages error:",
             error
         );
 
-
-        container.innerHTML = `
+        container.innerHTML =
+            `
             <div style="
                 padding:30px;
                 text-align:center;
                 color:red;
             ">
-
                 ❌ Unable to load messages.
-
             </div>
-        `;
+            `;
     }
 }
-
 
 // ==================================================
 // REPLY MESSAGE
@@ -1872,36 +1648,26 @@ async function replyMessage(
 ) {
 
     const sender =
+        localStorage.getItem(
+            "userEmail"
+        ) ||
         prompt(
             "Enter your email:"
         );
-
-
-    if (!sender) {
-        return;
-    }
-
-
-    if (!sender.includes("@")) {
-
-        alert(
-            "Please enter a valid email."
-        );
-
-        return;
-    }
-
 
     const message =
         prompt(
             "Enter your reply:"
         );
 
+    if (
+        !sender ||
+        !sender.includes("@") ||
+        !message
+    ) {
 
-    if (!message) {
         return;
     }
-
 
     try {
 
@@ -1909,47 +1675,34 @@ async function replyMessage(
             await fetch(
                 `${API}/api/messages`,
                 {
-
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body:
                         JSON.stringify({
 
-                            sender:
-                                sender,
+                            sender,
 
-                            receiver:
-                                receiver,
+                            receiver,
 
-                            productId:
-                                productId,
+                            productId,
 
-                            productName:
-                                productName,
+                            productName,
 
-                            message:
-                                message,
+                            message,
 
                             replyTo:
                                 messageId
-
                         })
-
                 }
             );
 
-
         const data =
             await response.json();
-
 
         if (!response.ok) {
 
@@ -1964,26 +1717,23 @@ async function replyMessage(
             return;
         }
 
-
         alert(
             "✅ Reply sent!"
         );
 
-
         loadMessages();
-
 
     } catch (error) {
 
-        console.error(error);
-
+        console.error(
+            error
+        );
 
         alert(
             "❌ Backend connection failed."
         );
     }
 }
-
 
 // ==================================================
 // SEARCH
@@ -1996,29 +1746,20 @@ function searchProducts() {
             "searchInput"
         );
 
-
     const category =
         document.getElementById(
             "categoryFilter"
         );
 
-
     const search =
         input
-        ?
-        input.value
-            .toLowerCase()
-        :
-        "";
-
+            ? input.value.toLowerCase()
+            : "";
 
     const selectedCategory =
         category
-        ?
-        category.value
-        :
-        "all";
-
+            ? category.value
+            : "all";
 
     const filtered =
         allProducts.filter(
@@ -2029,31 +1770,25 @@ function searchProducts() {
                         product.name ||
                         product.productName ||
                         ""
-                    )
-                        .toLowerCase();
+                    ).toLowerCase();
 
-
-                const matchesSearch =
+                const matchSearch =
                     name.includes(
                         search
                     );
 
-
-                const matchesCategory =
+                const matchCategory =
                     selectedCategory ===
                         "all" ||
                     product.category ===
                         selectedCategory;
 
-
                 return (
-                    matchesSearch &&
-                    matchesCategory
+                    matchSearch &&
+                    matchCategory
                 );
-
             }
         );
-
 
     displayProducts(
         filtered
@@ -2064,293 +1799,61 @@ function searchProducts() {
 function filterCategory() {
 
     searchProducts();
-
 }
-
-
-// ==================================================
-// SELL PRODUCT
-// ==================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-
-        const productForm =
-            document.getElementById(
-                "productForm"
-            );
-
-
-        if (productForm) {
-
-            productForm.addEventListener(
-                "submit",
-                submitProduct
-            );
-
-        }
-
-
-        loadProducts();
-
-        loadMessages();
-
-    }
-);
-
-
-async function submitProduct(event) {
-
-    event.preventDefault();
-
-
-    const name =
-        document
-            .getElementById(
-                "productName"
-            )
-            .value
-            .trim();
-
-
-    const marketPrice =
-        Number(
-            document
-                .getElementById(
-                    "marketPrice"
-                )
-                .value
-        );
-
-
-    const sellingPrice =
-        Number(
-            document
-                .getElementById(
-                    "sellingPrice"
-                )
-                .value
-        );
-
-
-    const category =
-        document
-            .getElementById(
-                "category"
-            )
-            .value;
-
-
-    const seller =
-        document
-            .getElementById(
-                "sellerName"
-            )
-            .value
-            .trim();
-
-
-    const sellerEmail =
-        document
-            .getElementById(
-                "sellerEmail"
-            )
-            .value
-            .trim();
-
-
-    if (
-        !name ||
-        !marketPrice ||
-        !sellingPrice ||
-        !category ||
-        !seller ||
-        !sellerEmail
-    ) {
-
-        alert(
-            "❌ Please fill all fields."
-        );
-
-        return;
-    }
-
-
-    if (
-        sellingPrice >
-        marketPrice
-    ) {
-
-        alert(
-            "❌ Selling price cannot be greater than market price."
-        );
-
-        return;
-    }
-
-
-    try {
-
-        const response =
-            await fetch(
-                `${API}/api/products`,
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            name:
-                                name,
-
-                            marketPrice:
-                                marketPrice,
-
-                            sellingPrice:
-                                sellingPrice,
-
-                            category:
-                                category,
-
-                            seller:
-                                seller,
-
-                            sellerEmail:
-                                sellerEmail
-
-                        })
-
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            alert(
-                "❌ " +
-                (
-                    data.message ||
-                    "Product could not be added."
-                )
-            );
-
-            return;
-        }
-
-
-        alert(
-            "✅ Product listed successfully!"
-        );
-
-
-        const productForm =
-            document.getElementById(
-                "productForm"
-            );
-
-
-        if (productForm) {
-
-            productForm.reset();
-
-        }
-
-
-        await loadProducts();
-
-
-        showSection(
-            "products"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Product listing error:",
-            error
-        );
-
-
-        alert(
-            "❌ Could not connect to the backend."
-        );
-    }
-}
-
 
 // ==================================================
 // ESCAPE HTML
 // ==================================================
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     return String(
         value ?? ""
     )
-
         .replace(
             /&/g,
             "&amp;"
         )
-
         .replace(
             /</g,
             "&lt;"
         )
-
         .replace(
             />/g,
             "&gt;"
         )
-
         .replace(
             /"/g,
             "&quot;"
         )
-
         .replace(
             /'/g,
             "&#039;"
         );
 }
 
-
 // ==================================================
 // ESCAPE JS
 // ==================================================
 
-function escapeJS(value) {
+function escapeJS(
+    value
+) {
 
     return String(
         value ?? ""
     )
-
         .replace(
             /\\/g,
             "\\\\"
         )
-
         .replace(
             /'/g,
             "\\'"
         );
 }
-
 
 // ==================================================
 // LOGOUT
@@ -2363,27 +1866,69 @@ function logoutUser() {
             "Are you sure you want to logout?"
         );
 
-
     if (!confirmLogout) {
         return;
     }
-
 
     localStorage.removeItem(
         "userName"
     );
 
-
     localStorage.removeItem(
         "userEmail"
     );
-
 
     localStorage.removeItem(
         "user"
     );
 
-
     window.location.href =
         "login.html";
 }
+
+// ==================================================
+// PAYTM RETURN
+// ==================================================
+
+async function handlePaytmReturn() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const orderId =
+        params.get(
+            "orderId"
+        );
+
+    if (!orderId) {
+        return;
+    }
+
+    window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+    );
+
+    await reconcilePaytmOrder(
+        orderId
+    );
+}
+
+// ==================================================
+// START
+// ==================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        loadProducts();
+
+        loadMessages();
+
+        handlePaytmReturn();
+    }
+);
