@@ -2,17 +2,30 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EduHub - College Marketplace</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="style.css">
+    <title>
+        EduHub - College Marketplace
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
 </head>
+
 
 <body>
 
-<!-- ================= TOP RIGHT LOGOUT ================= -->
+
+<!-- ==================================================
+     TOP RIGHT LOGOUT
+================================================== -->
 
 <div style="
     position: fixed;
@@ -20,123 +33,176 @@
     right: 20px;
     z-index: 9999;
 ">
+
     <button
         onclick="logoutUser()"
         style="
-            background: #4f46e5;
-            color: white;
-            border: none;
-            padding: 11px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-        ">
+            background:#4f46e5;
+            color:white;
+            border:none;
+            padding:11px 20px;
+            border-radius:8px;
+            font-size:14px;
+            font-weight:bold;
+            cursor:pointer;
+            box-shadow:0 3px 10px rgba(0,0,0,0.15);
+        "
+    >
+
         🚪 Logout
+
     </button>
+
 </div>
 
 
-<!-- ================= SIDEBAR ================= -->
+
+<!-- ==================================================
+     SIDEBAR
+================================================== -->
 
 <div class="sidebar">
 
+
     <div class="logo">
+
         🎓 EduHub
+
     </div>
 
+
     <div class="sidebar-subtitle">
+
         College Marketplace
+
     </div>
+
 
     <nav>
 
+
+        <!-- HOME -->
+
         <button
             class="nav-btn active"
-            onclick="showSection('home')">
+            onclick="showSection('home')"
+        >
 
             🏠 Home
 
         </button>
 
 
+
+        <!-- AVAILABLE PRODUCTS -->
+
         <button
             class="nav-btn"
-            onclick="showSection('products')">
+            onclick="showSection('products')"
+        >
 
             🛍️ Available Products
 
         </button>
 
 
+
+        <!-- MESSAGES -->
+
         <a
             href="messages.html"
-            class="nav-btn">
+            class="nav-btn"
+        >
 
             💬 Messages
 
         </a>
 
 
+
+        <!-- SELL -->
+
         <button
             class="nav-btn"
-            onclick="showSection('sell')">
+            onclick="showSection('sell')"
+        >
 
             ➕ Sell Your Product
 
         </button>
 
 
+
+        <!-- HISTORY -->
+
         <a
             href="history.html"
-            class="nav-btn">
+            class="nav-btn"
+        >
 
             🧾 Transaction History
 
         </a>
 
 
+
+        <!-- PROFILE -->
+
         <a
             href="profile.html"
-            class="nav-btn">
+            class="nav-btn"
+        >
 
             👤 My Profile
 
         </a>
 
 
+
         <!-- LOGIN -->
 
         <a
             href="login.html"
-            class="nav-btn">
+            class="nav-btn"
+        >
 
             🔐 Login
 
         </a>
 
+
     </nav>
+
 
 </div>
 
 
 
-<!-- ================= MAIN CONTENT ================= -->
+<!-- ==================================================
+     MAIN CONTENT
+================================================== -->
 
 <div class="main-content">
 
 
-    <!-- ================= HOME ================= -->
+
+    <!-- ==================================================
+         HOME SECTION
+    ================================================== -->
 
     <section
         id="home"
-        class="section active">
+        class="section active"
+    >
+
 
         <div class="page-section">
 
 
+            <!-- HERO -->
+
             <div class="hero">
+
 
                 <div class="welcome">
 
@@ -162,11 +228,13 @@
 
                 <button
                     class="primary-btn"
-                    onclick="showSection('products')">
+                    onclick="showSection('products')"
+                >
 
                     🛍️ Explore Products
 
                 </button>
+
 
             </div>
 
@@ -177,88 +245,139 @@
             <div class="feature-grid">
 
 
+                <!-- BUY -->
+
                 <div class="feature-card">
 
+
                     <div class="feature-icon">
+
                         🛍️
+
                     </div>
 
+
                     <h3>
+
                         Buy
+
                     </h3>
 
+
                     <p>
-                        Find affordable books, notes,
-                        calculators and other college products.
+
+                        Find affordable books,
+                        notes, calculators and
+                        other college products.
+
                     </p>
+
 
                 </div>
 
 
 
+                <!-- SELL -->
+
                 <div class="feature-card">
 
+
                     <div class="feature-icon">
+
                         💰
+
                     </div>
 
+
                     <h3>
+
                         Sell
+
                     </h3>
 
+
                     <p>
-                        Sell your unused college products
-                        to other students.
+
+                        Sell your unused college
+                        products to other students.
+
                     </p>
+
 
                 </div>
 
 
 
+                <!-- CONNECT -->
+
                 <div class="feature-card">
 
+
                     <div class="feature-icon">
+
                         💬
+
                     </div>
 
+
                     <h3>
+
                         Connect
+
                     </h3>
 
+
                     <p>
-                        Contact sellers directly through
-                        EduHub messaging.
+
+                        Contact sellers directly
+                        through EduHub messaging.
+
                     </p>
+
 
                 </div>
 
 
             </div>
 
+
         </div>
+
 
     </section>
 
 
 
-    <!-- ================= PRODUCTS ================= -->
+    <!-- ==================================================
+         PRODUCTS SECTION
+    ================================================== -->
 
     <section
         id="products"
-        class="section">
+        class="section"
+    >
+
 
         <div class="page-section">
 
 
             <div class="section-heading">
 
+
                 <h2>
+
                     🛍️ Available Products
+
                 </h2>
 
+
                 <p>
-                    Find useful products from other college students.
+
+                    Find useful products from
+                    other college students.
+
                 </p>
+
 
             </div>
 
@@ -273,34 +392,53 @@
                     type="text"
                     id="searchInput"
                     placeholder="🔎 Search products..."
-                    onkeyup="searchProducts()">
+                    onkeyup="searchProducts()"
+                >
 
 
                 <select
                     id="categoryFilter"
-                    onchange="filterCategory()">
+                    onchange="filterCategory()"
+                >
+
 
                     <option value="all">
+
                         All Categories
+
                     </option>
+
 
                     <option value="Books">
+
                         Books
+
                     </option>
+
 
                     <option value="Notes">
+
                         Notes
+
                     </option>
+
 
                     <option value="Electronics">
+
                         Electronics
+
                     </option>
+
 
                     <option value="Stationery">
+
                         Stationery
+
                     </option>
 
+
                 </select>
+
 
             </div>
 
@@ -310,7 +448,8 @@
 
             <div
                 id="productContainer"
-                class="product-grid">
+                class="product-grid"
+            >
 
                 Loading products...
 
@@ -319,15 +458,20 @@
 
         </div>
 
+
     </section>
 
 
 
-    <!-- ================= SELL PRODUCT ================= -->
+    <!-- ==================================================
+         SELL PRODUCT SECTION
+    ================================================== -->
 
     <section
         id="sell"
-        class="section">
+        class="section"
+    >
+
 
         <div class="page-section">
 
@@ -336,18 +480,26 @@
 
 
                 <h2>
+
                     ➕ Sell Your Product
+
                 </h2>
 
 
                 <p>
-                    List your college product for other students.
+
+                    List your college product
+                    for other students.
+
                 </p>
 
 
 
+                <!-- PRODUCT FORM -->
+
                 <form
-                    id="productForm">
+                    id="productForm"
+                >
 
 
                     <!-- PRODUCT NAME -->
@@ -356,7 +508,8 @@
                         type="text"
                         id="productName"
                         placeholder="Product Name"
-                        required>
+                        required
+                    >
 
 
 
@@ -367,7 +520,8 @@
                         id="marketPrice"
                         placeholder="Original Market Price"
                         min="1"
-                        required>
+                        required
+                    >
 
 
 
@@ -378,7 +532,8 @@
                         id="sellingPrice"
                         placeholder="Your Selling Price"
                         min="1"
-                        required>
+                        required
+                    >
 
 
 
@@ -386,27 +541,44 @@
 
                     <select
                         id="category"
-                        required>
+                        required
+                    >
+
 
                         <option value="">
+
                             Select Category
+
                         </option>
+
 
                         <option value="Books">
+
                             Books
+
                         </option>
+
 
                         <option value="Notes">
+
                             Notes
+
                         </option>
+
 
                         <option value="Electronics">
+
                             Electronics
+
                         </option>
 
+
                         <option value="Stationery">
+
                             Stationery
+
                         </option>
+
 
                     </select>
 
@@ -418,7 +590,8 @@
                         type="text"
                         id="sellerName"
                         placeholder="Your Name"
-                        required>
+                        required
+                    >
 
 
 
@@ -428,15 +601,42 @@
                         type="email"
                         id="sellerEmail"
                         placeholder="Your College Email"
-                        required>
+                        required
+                    >
 
 
 
-                    <!-- LIST BUTTON -->
+                    <!-- PAYTM CHILD MID -->
+
+                    <input
+                        type="text"
+                        id="sellerPaytmMid"
+                        placeholder="Paytm Seller Child MID"
+                        required
+                    >
+
+
+                    <small style="
+                        display:block;
+                        margin-top:-5px;
+                        margin-bottom:15px;
+                        color:#6b7280;
+                        line-height:1.5;
+                    ">
+
+                        Enter the Paytm Child/Vendor MID
+                        provided for your seller account.
+
+                    </small>
+
+
+
+                    <!-- SUBMIT -->
 
                     <button
                         type="submit"
-                        class="sell-btn">
+                        class="sell-btn"
+                    >
 
                         ➕ List Product
 
@@ -448,7 +648,9 @@
 
             </div>
 
+
         </div>
+
 
     </section>
 
@@ -457,24 +659,25 @@
 
 
 
-<!-- ================================================== -->
-<!-- PRODUCT DETAILS MODAL -->
-<!-- ================================================== -->
+<!-- ==================================================
+     MESSAGE MODAL
+================================================== -->
 
 <div
-    id="detailsModal"
-    class="modal hidden">
+    id="messageModal"
+    class="modal hidden"
+>
 
 
-    <div
-        class="modal-box">
+    <div class="modal-box">
 
 
         <!-- CLOSE -->
 
         <button
             class="close-modal"
-            onclick="closeDetailsModal()">
+            onclick="closeMessageBox()"
+        >
 
             ✕
 
@@ -486,365 +689,13 @@
 
         <div class="modal-icon">
 
-            🛍️
-
-        </div>
-
-
-
-        <!-- PRODUCT NAME -->
-
-        <h2
-            id="detailsProductName">
-
-            Product Name
-
-        </h2>
-
-
-
-        <!-- CATEGORY -->
-
-        <p
-            id="detailsCategory">
-
-            Category
-
-        </p>
-
-
-
-        <!-- SELLER -->
-
-        <p
-            id="detailsSeller">
-
-            Seller
-
-        </p>
-
-
-
-        <!-- PRICE BOX -->
-
-        <div
-            class="price-box">
-
-
-            <p
-                id="detailsMarketPrice"
-                class="old-price">
-
-                Original Price
-
-            </p>
-
-
-
-            <p
-                id="detailsSellingPrice"
-                class="big-price">
-
-                Selling Price
-
-            </p>
-
-
-
-            <p
-                id="detailsSaving"
-                class="saving-text">
-
-                You Save
-
-            </p>
-
-
-        </div>
-
-
-
-        <!-- BUTTONS -->
-
-        <div
-            class="modal-buttons">
-
-
-            <button
-                id="detailsBuyButton"
-                class="buy-btn large-btn">
-
-                🛒 Buy Now
-
-            </button>
-
-
-
-            <button
-                onclick="closeDetailsModal()"
-                class="cancel-btn">
-
-                Close
-
-            </button>
-
-
-        </div>
-
-
-    </div>
-
-</div>
-
-
-
-<!-- ================================================== -->
-<!-- BUY MODAL -->
-<!-- ================================================== -->
-
-<div
-    id="buyModal"
-    class="modal hidden">
-
-
-    <div
-        class="modal-box buy-confirm-box">
-
-
-        <div class="success-icon">
-
-            🛒
-
-        </div>
-
-
-
-        <h2>
-
-            Confirm Purchase
-
-        </h2>
-
-
-
-        <p>
-
-            Continue to secure payment?
-
-        </p>
-
-
-
-        <div
-            class="purchase-summary">
-
-
-            <h3
-                id="buyProductName">
-
-                Product
-
-            </h3>
-
-
-            <p
-                id="buyProductSeller">
-
-                Seller
-
-            </p>
-
-
-            <strong
-                id="buyProductPrice">
-
-                ₹0
-
-            </strong>
-
-
-        </div>
-
-
-
-        <div
-            class="modal-buttons">
-
-
-            <button
-                id="confirmBuyButton"
-                class="buy-btn large-btn">
-
-                💳 Pay Now
-
-            </button>
-
-
-
-            <button
-                onclick="closeBuyModal()"
-                class="cancel-btn">
-
-                Cancel
-
-            </button>
-
-
-        </div>
-
-
-    </div>
-
-</div>
-
-
-
-<!-- ================================================== -->
-<!-- SUCCESS MODAL -->
-<!-- ================================================== -->
-
-<div
-    id="successModal"
-    class="modal hidden">
-
-
-    <div
-        class="modal-box success-box">
-
-
-        <div class="success-big">
-
-            🎉
-
-        </div>
-
-
-
-        <h2>
-
-            Payment Successful!
-
-        </h2>
-
-
-
-        <p class="success-message">
-
-            Your transaction has been completed successfully.
-
-        </p>
-
-
-
-        <div
-            class="transaction-summary">
-
-
-            <p>
-
-                <strong>
-                    Product:
-                </strong>
-
-                <span
-                    id="successProduct">
-                </span>
-
-            </p>
-
-
-
-            <p>
-
-                <strong>
-                    Amount:
-                </strong>
-
-                ₹<span
-                    id="successAmount">
-                </span>
-
-            </p>
-
-
-
-            <p>
-
-                <strong>
-                    Seller:
-                </strong>
-
-                <span
-                    id="successSeller">
-                </span>
-
-            </p>
-
-
-
-            <p>
-
-                <strong>
-                    Transaction ID:
-                </strong>
-
-                <span
-                    id="successTransactionId">
-                </span>
-
-            </p>
-
-
-        </div>
-
-
-
-        <button
-            onclick="closeSuccessModal()"
-            class="buy-btn large-btn">
-
-            Done
-
-        </button>
-
-
-    </div>
-
-</div>
-
-
-
-<!-- ================================================== -->
-<!-- MESSAGE MODAL -->
-<!-- ================================================== -->
-
-<div
-    id="messageModal"
-    class="modal hidden">
-
-
-    <div
-        class="modal-box">
-
-
-        <button
-            class="close-modal"
-            onclick="closeMessageBox()">
-
-            ✕
-
-        </button>
-
-
-
-        <div
-            class="modal-icon">
-
             💬
 
         </div>
 
 
+
+        <!-- TITLE -->
 
         <h2>
 
@@ -854,8 +705,9 @@
 
 
 
-        <p
-            id="messageSeller">
+        <!-- SELLER -->
+
+        <p id="messageSeller">
 
             Seller:
 
@@ -863,8 +715,9 @@
 
 
 
-        <p
-            id="messageProduct">
+        <!-- PRODUCT -->
+
+        <p id="messageProduct">
 
             Product:
 
@@ -872,19 +725,24 @@
 
 
 
+        <!-- MESSAGE -->
+
         <textarea
             id="sellerMessage"
-            placeholder="Write your message to the seller..."></textarea>
+            placeholder="Write your message to the seller..."
+        ></textarea>
 
 
 
-        <div
-            class="modal-buttons">
+        <!-- BUTTONS -->
+
+        <div class="modal-buttons">
 
 
             <button
                 onclick="sendMessage()"
-                class="send-message-btn">
+                class="send-message-btn"
+            >
 
                 📤 Send Message
 
@@ -894,7 +752,8 @@
 
             <button
                 onclick="closeMessageBox()"
-                class="cancel-btn">
+                class="cancel-btn"
+            >
 
                 Cancel
 
@@ -906,26 +765,18 @@
 
     </div>
 
+
 </div>
 
 
 
-<!-- ================================================== -->
-<!-- RAZORPAY CHECKOUT -->
-<!-- ================================================== -->
-
-<script
-    src="https://checkout.razorpay.com/v1/checkout.js">
-</script>
-
-
-
-<!-- ================================================== -->
-<!-- MAIN JAVASCRIPT -->
-<!-- ================================================== -->
+<!-- ==================================================
+     SCRIPT
+================================================== -->
 
 <script src="script.js"></script>
 
 
 </body>
+
 </html>
