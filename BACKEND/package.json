@@ -6,9 +6,12 @@
   "scripts": {
     "start": "node server.js"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "razorpay": "^2.9.8"
+    "paytmchecksum": "^1.5.1"
   }
 }
