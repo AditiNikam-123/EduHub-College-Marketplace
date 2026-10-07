@@ -2,8 +2,7 @@
 // EDuhub - College Marketplace
 // ==================================================
 
-const API = "http://localhost:5000";
-
+const API = "https://eduhub-backend-llwi.onrender.com";
 let allProducts = [];
 let selectedProduct = null;
 
