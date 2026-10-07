@@ -6,13 +6,9 @@
   "scripts": {
     "start": "node server.js"
   },
-  "engines": {
-    "node": ">=18"
-  },
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "mongodb": "^6.21.0",
     "paytmchecksum": "^1.5.1"
   }
 }
