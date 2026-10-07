@@ -1,4 +1,8 @@
-const API = "https://eduhub-backend-llwi.onrender.com";
+// ==================================================
+// EDuhub - College Marketplace
+// ==================================================
+
+const API = "http://localhost:5000";
 
 let allProducts = [];
 let selectedProduct = null;
@@ -24,10 +28,6 @@ function showSection(sectionId) {
         section.classList.add("active");
     }
 
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-        btn.classList.remove("active");
-    });
-
     if (sectionId === "products") {
         loadProducts();
     }
@@ -44,7 +44,8 @@ function showSection(sectionId) {
 
 async function loadProducts() {
 
-    const container = document.getElementById("productContainer");
+    const container =
+        document.getElementById("productContainer");
 
     if (!container) return;
 
@@ -56,10 +57,11 @@ async function loadProducts() {
 
     try {
 
-        const response = await fetch(`${API}/api/products`);
+        const response =
+            await fetch(`${API}/api/products`);
 
         if (!response.ok) {
-            throw new Error("Backend error");
+            throw new Error("Products could not be loaded");
         }
 
         allProducts = await response.json();
@@ -68,7 +70,7 @@ async function loadProducts() {
 
     } catch (error) {
 
-        console.error("Product Error:", error);
+        console.error(error);
 
         container.innerHTML = `
             <div style="
@@ -76,9 +78,13 @@ async function loadProducts() {
                 text-align:center;
                 color:red;
             ">
-                ❌ Not connected to backend.
+                ❌ Backend connection failed.
                 <br><br>
-                Please check your Render backend.
+                Make sure:
+                <br>
+                <strong>node server.js</strong>
+                <br><br>
+                is running.
             </div>
         `;
     }
@@ -96,7 +102,7 @@ function displayProducts(products) {
 
     if (!container) return;
 
-    if (!products || products.length === 0) {
+    if (!products || !products.length) {
 
         container.innerHTML = `
             <div style="
@@ -112,54 +118,51 @@ function displayProducts(products) {
 
     container.innerHTML = products.map(product => {
 
-        const isSold = product.available === false;
-
-        const marketPrice =
-            Number(product.marketPrice || 0);
-
-        const sellingPrice =
-            Number(
-                product.sellingPrice ??
-                product.price ??
-                0
-            );
+        const isSold =
+            product.available === false;
 
         const saving =
-            marketPrice - sellingPrice;
+            Number(product.marketPrice || 0) -
+            Number(product.sellingPrice || 0);
 
         return `
 
-        <div class="product-card"
-             style="
-                position:relative;
-                ${isSold ? "opacity:0.7;" : ""}
-             ">
+            <div
+                class="product-card"
+                style="
+                    position:relative;
+                    ${isSold ? "opacity:0.72;" : ""}
+                "
+            >
 
-            ${
-                isSold
-                ? `
+                ${
+                    isSold
+                    ?
+                    `
                     <div style="
                         position:absolute;
                         top:12px;
                         right:12px;
                         background:#dc2626;
                         color:white;
-                        padding:6px 12px;
+                        padding:7px 13px;
                         border-radius:20px;
                         font-weight:bold;
                         z-index:5;
                     ">
                         🔴 SOLD
                     </div>
-                `
-                : ""
-            }
+                    `
+                    :
+                    ""
+                }
 
-            <div class="product-image">
+                <div class="product-image">
 
-                ${
-                    product.image
-                    ? `
+                    ${
+                        product.image
+                        ?
+                        `
                         <img
                             src="${escapeHTML(product.image)}"
                             style="
@@ -169,57 +172,89 @@ function displayProducts(products) {
                                 border-radius:10px;
                             "
                         >
-                    `
-                    : `📚`
-                }
+                        `
+                        :
+                        `
+                        📚
+                        `
+                    }
 
-            </div>
+                </div>
 
-            <h3>
-                ${escapeHTML(product.name)}
-            </h3>
 
-            <p>
-                📂 ${escapeHTML(product.category)}
-            </p>
+                <h3>
+                    ${escapeHTML(product.name)}
+                </h3>
 
-            <p>
-                👤 Seller:
-                ${escapeHTML(product.seller)}
-            </p>
 
-            <p class="market-price">
-                Market Price:
-                ₹${marketPrice}
-            </p>
+                <p>
+                    📂 ${escapeHTML(product.category)}
+                </p>
 
-            <p class="selling-price">
-                Selling Price:
-                ₹${sellingPrice}
-            </p>
 
-            ${
-                !isSold
-                ? `
-                    <p class="saving-text">
-                        💰 Save ₹${saving}
-                    </p>
-                `
-                : `
-                    <p class="sold-label">
-                        This product has been sold.
-                    </p>
-                `
-            }
+                <p>
+                    👤 Seller:
+                    ${escapeHTML(product.seller)}
+                </p>
 
-            <div class="product-buttons">
+
+                <p>
+                    Market Price:
+                    ₹${product.marketPrice}
+                </p>
+
+
+                <p
+                    style="
+                        font-size:20px;
+                        font-weight:bold;
+                        color:#4f46e5;
+                    "
+                >
+                    ₹${product.sellingPrice}
+                </p>
+
 
                 ${
-                    isSold
-                    ? `
+                    !isSold
+                    ?
+                    `
+                    <p style="color:#15803d;">
+                        💰 Save ₹${saving}
+                    </p>
+                    `
+                    :
+                    `
+                    <p style="
+                        color:#dc2626;
+                        font-weight:bold;
+                    ">
+                        This product has been sold.
+                    </p>
+                    `
+                }
+
+
+                <div
+                    style="
+                        display:flex;
+                        gap:10px;
+                        flex-wrap:wrap;
+                        margin-top:15px;
+                    "
+                >
+
+                    ${
+                        isSold
+                        ?
+                        `
                         <button
                             disabled
                             style="
+                                flex:1;
+                                padding:11px;
+                                border:none;
+                                border-radius:8px;
                                 background:#9ca3af;
                                 color:white;
                                 cursor:not-allowed;
@@ -227,33 +262,53 @@ function displayProducts(products) {
                         >
                             🔴 Sold Out
                         </button>
-                    `
-                    : `
+                        `
+                        :
+                        `
                         <button
-                            class="buy-btn"
                             onclick="buyProduct(${product.id})"
+                            style="
+                                flex:1;
+                                padding:11px;
+                                border:none;
+                                border-radius:8px;
+                                background:#4f46e5;
+                                color:white;
+                                font-weight:bold;
+                                cursor:pointer;
+                            "
                         >
                             🛒 Buy Now
                         </button>
-                    `
-                }
+                        `
+                    }
 
-                <button
-                    class="contact-btn"
-                    onclick="
-                        openMessageBox(
-                            '${escapeJS(product.seller)}',
-                            '${escapeJS(product.name)}',
-                            ${product.id}
-                        )
-                    "
-                >
-                    💬 Message
-                </button>
+
+                    <button
+                        onclick="
+                            openMessageBox(
+                                '${escapeJS(product.seller)}',
+                                '${escapeJS(product.name)}',
+                                ${product.id}
+                            )
+                        "
+                        style="
+                            flex:1;
+                            padding:11px;
+                            border:none;
+                            border-radius:8px;
+                            background:#111827;
+                            color:white;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+                        💬 Message
+                    </button>
+
+                </div>
 
             </div>
-
-        </div>
 
         `;
 
@@ -275,12 +330,18 @@ function buyProduct(productId) {
         );
 
     if (!selectedProduct) {
+
         alert("❌ Product not found.");
+
         return;
     }
 
     if (selectedProduct.available === false) {
-        alert("❌ This product is already sold.");
+
+        alert(
+            "❌ Sorry! This product is already sold."
+        );
+
         return;
     }
 
@@ -294,56 +355,79 @@ function buyProduct(productId) {
 
 function showPurchaseModal() {
 
-    const oldModal =
+    const old =
         document.getElementById("purchaseModal");
 
-    if (oldModal) {
-        oldModal.remove();
+    if (old) {
+        old.remove();
     }
+
 
     const modal =
         document.createElement("div");
 
     modal.id = "purchaseModal";
 
-    modal.className = "modal";
+
+    modal.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.65);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:9999;
+        padding:20px;
+    `;
+
 
     modal.innerHTML = `
 
-        <div class="modal-box buy-confirm-box">
+        <div style="
+            background:white;
+            width:100%;
+            max-width:450px;
+            border-radius:18px;
+            padding:30px;
+            box-shadow:0 20px 50px rgba(0,0,0,0.25);
+        ">
 
-            <div class="success-icon">
-                🛒
-            </div>
-
-            <h2>
-                Confirm Purchase
+            <h2 style="
+                color:#312e81;
+                margin-top:0;
+            ">
+                🛒 Confirm Purchase
             </h2>
 
-            <div class="purchase-summary">
-
-                <h3>
-                    ${escapeHTML(selectedProduct.name)}
-                </h3>
-
-                <p>
-                    👤 Seller:
-                    ${escapeHTML(selectedProduct.seller)}
-                </p>
-
-                <strong>
-                    ₹${
-                        selectedProduct.sellingPrice ??
-                        selectedProduct.price ??
-                        0
-                    }
-                </strong>
-
-            </div>
 
             <p>
-                Enter your email to complete the purchase.
+                <strong>Product:</strong>
+                ${escapeHTML(selectedProduct.name)}
             </p>
+
+
+            <p>
+                <strong>Seller:</strong>
+                ${escapeHTML(selectedProduct.seller)}
+            </p>
+
+
+            <p style="
+                font-size:24px;
+                font-weight:bold;
+                color:#4f46e5;
+            ">
+                ₹${selectedProduct.sellingPrice}
+            </p>
+
+
+            <hr>
+
+
+            <p>
+                Enter your email to complete purchase.
+            </p>
+
 
             <input
                 id="buyerEmail"
@@ -351,25 +435,48 @@ function showPurchaseModal() {
                 placeholder="Your email"
                 style="
                     width:100%;
-                    padding:13px;
+                    box-sizing:border-box;
+                    padding:12px;
                     border:1px solid #ddd;
                     border-radius:8px;
-                    margin-top:10px;
+                    margin:10px 0;
                 "
             >
 
-            <div class="modal-buttons">
+
+            <div style="
+                display:flex;
+                gap:10px;
+                margin-top:20px;
+            ">
 
                 <button
                     onclick="confirmPurchase()"
-                    class="buy-btn large-btn"
+                    style="
+                        flex:1;
+                        padding:12px;
+                        border:none;
+                        border-radius:8px;
+                        background:#16a34a;
+                        color:white;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
                 >
                     ✅ Confirm Purchase
                 </button>
 
+
                 <button
                     onclick="closePurchaseModal()"
-                    class="cancel-btn"
+                    style="
+                        flex:1;
+                        padding:12px;
+                        border:none;
+                        border-radius:8px;
+                        background:#e5e7eb;
+                        cursor:pointer;
+                    "
                 >
                     Cancel
                 </button>
@@ -377,6 +484,7 @@ function showPurchaseModal() {
             </div>
 
         </div>
+
     `;
 
     document.body.appendChild(modal);
@@ -390,30 +498,44 @@ function showPurchaseModal() {
 async function confirmPurchase() {
 
     if (!selectedProduct) {
-        alert("❌ No product selected.");
+
+        alert("No product selected.");
+
         return;
     }
+
 
     const emailInput =
         document.getElementById("buyerEmail");
 
+
     if (!emailInput) {
-        alert("❌ Email field not found.");
+
+        alert("Email field not found.");
+
         return;
     }
+
 
     const buyer =
         emailInput.value.trim();
 
+
     if (!buyer) {
+
         alert("Please enter your email.");
+
         return;
     }
 
+
     if (!buyer.includes("@")) {
+
         alert("Please enter a valid email.");
+
         return;
     }
+
 
     try {
 
@@ -429,15 +551,19 @@ async function confirmPurchase() {
                     },
 
                     body: JSON.stringify({
+
                         buyer: buyer,
+
                         productId:
                             selectedProduct.id
                     })
                 }
             );
 
+
         const data =
             await response.json();
+
 
         if (!response.ok) {
 
@@ -452,22 +578,27 @@ async function confirmPurchase() {
             return;
         }
 
+
         closePurchaseModal();
+
 
         selectedProduct.available = false;
 
+
         displayProducts(allProducts);
+
 
         showPurchaseSuccess(
             data.transaction
         );
+
 
     } catch (error) {
 
         console.error(error);
 
         alert(
-            "❌ Cannot connect to Render backend."
+            "❌ Cannot connect to backend."
         );
     }
 }
@@ -484,67 +615,107 @@ function showPurchaseSuccess(transaction) {
 
     modal.id = "successModal";
 
-    modal.className = "modal";
+
+    modal.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.65);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:10000;
+        padding:20px;
+    `;
+
 
     modal.innerHTML = `
 
-        <div class="modal-box success-box">
+        <div style="
+            background:white;
+            width:100%;
+            max-width:480px;
+            border-radius:18px;
+            padding:30px;
+        ">
 
-            <div class="success-big">
+            <div style="
+                text-align:center;
+                font-size:55px;
+            ">
                 🎉
             </div>
 
-            <h2>
+
+            <h2 style="
+                text-align:center;
+                color:#15803d;
+            ">
                 Purchase Successful!
             </h2>
 
-            <p class="success-message">
-                Your transaction has been completed successfully.
+
+            <hr>
+
+
+            <p>
+                🛍️
+                <strong>Product:</strong>
+                ${escapeHTML(transaction.productName)}
             </p>
 
-            <div class="transaction-summary">
 
-                <p>
-                    <strong>Product:</strong>
-                    <span>
-                        ${escapeHTML(
-                            transaction.productName
-                        )}
-                    </span>
-                </p>
+            <p>
+                💰
+                <strong>Amount:</strong>
+                ₹${transaction.amount}
+            </p>
 
-                <p>
-                    <strong>Amount:</strong>
-                    ₹${transaction.amount}
-                </p>
 
-                <p>
-                    <strong>Seller:</strong>
-                    <span>
-                        ${escapeHTML(
-                            transaction.seller
-                        )}
-                    </span>
-                </p>
+            <p>
+                👤
+                <strong>Seller:</strong>
+                ${escapeHTML(transaction.seller)}
+            </p>
 
-                <p>
-                    <strong>Transaction ID:</strong>
-                    <span>
-                        #${transaction.id}
-                    </span>
-                </p>
 
-            </div>
+            <p>
+                🆔
+                <strong>Transaction ID:</strong>
+                #${transaction.id}
+            </p>
+
+
+            <p>
+                📌
+                <strong>Status:</strong>
+
+                <span style="color:#15803d;">
+                    ✓ Completed
+                </span>
+            </p>
+
 
             <button
                 onclick="closeSuccess()"
-                class="buy-btn large-btn"
+                style="
+                    width:100%;
+                    padding:12px;
+                    border:none;
+                    border-radius:8px;
+                    background:#4f46e5;
+                    color:white;
+                    font-weight:bold;
+                    cursor:pointer;
+                    margin-top:15px;
+                "
             >
                 Done
             </button>
 
         </div>
+
     `;
+
 
     document.body.appendChild(modal);
 }
@@ -592,6 +763,7 @@ function openMessageBox(
 
     selectedProductId = productId;
 
+
     const old =
         document.getElementById(
             "messageModal"
@@ -601,31 +773,42 @@ function openMessageBox(
         old.remove();
     }
 
+
     const modal =
         document.createElement("div");
 
     modal.id = "messageModal";
 
-    modal.className = "modal";
+
+    modal.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.65);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:9999;
+        padding:20px;
+    `;
+
 
     modal.innerHTML = `
 
-        <div class="modal-box">
+        <div style="
+            background:white;
+            width:100%;
+            max-width:500px;
+            border-radius:18px;
+            padding:30px;
+        ">
 
-            <button
-                class="close-modal"
-                onclick="closeMessageModal()"
-            >
-                ✕
-            </button>
-
-            <div class="modal-icon">
-                💬
-            </div>
-
-            <h2>
-                Message Seller
+            <h2 style="
+                color:#312e81;
+                margin-top:0;
+            ">
+                💬 Message Seller
             </h2>
+
 
             <p>
                 📚
@@ -634,10 +817,12 @@ function openMessageBox(
                 </strong>
             </p>
 
+
             <p>
                 👤 Seller:
                 ${escapeHTML(seller)}
             </p>
+
 
             <input
                 id="senderEmail"
@@ -645,31 +830,63 @@ function openMessageBox(
                 placeholder="Your email"
                 style="
                     width:100%;
-                    padding:13px;
+                    box-sizing:border-box;
+                    padding:12px;
                     border:1px solid #ddd;
                     border-radius:8px;
                     margin:10px 0;
                 "
             >
 
+
             <textarea
                 id="messageText"
                 placeholder="Write your message..."
                 rows="5"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ddd;
+                    border-radius:8px;
+                    resize:none;
+                "
             ></textarea>
 
-            <div class="modal-buttons">
+
+            <div style="
+                display:flex;
+                gap:10px;
+                margin-top:15px;
+            ">
 
                 <button
                     onclick="sendMessage()"
-                    class="send-message-btn"
+                    style="
+                        flex:1;
+                        padding:12px;
+                        border:none;
+                        border-radius:8px;
+                        background:#4f46e5;
+                        color:white;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
                 >
                     📤 Send Message
                 </button>
 
+
                 <button
                     onclick="closeMessageModal()"
-                    class="cancel-btn"
+                    style="
+                        flex:1;
+                        padding:12px;
+                        border:none;
+                        border-radius:8px;
+                        background:#e5e7eb;
+                        cursor:pointer;
+                    "
                 >
                     Cancel
                 </button>
@@ -677,7 +894,9 @@ function openMessageBox(
             </div>
 
         </div>
+
     `;
+
 
     document.body.appendChild(modal);
 }
@@ -690,15 +909,23 @@ function openMessageBox(
 async function sendMessage() {
 
     const senderInput =
-        document.getElementById("senderEmail");
+        document.getElementById(
+            "senderEmail"
+        );
 
     const messageInput =
-        document.getElementById("messageText");
+        document.getElementById(
+            "messageText"
+        );
+
 
     if (!senderInput || !messageInput) {
+
         alert("Message box not found.");
+
         return;
     }
+
 
     const sender =
         senderInput.value.trim();
@@ -706,20 +933,36 @@ async function sendMessage() {
     const message =
         messageInput.value.trim();
 
+
     if (!sender) {
-        alert("Please enter your email.");
+
+        alert(
+            "Please enter your email."
+        );
+
         return;
     }
+
 
     if (!sender.includes("@")) {
-        alert("Please enter a valid email.");
+
+        alert(
+            "Please enter a valid email."
+        );
+
         return;
     }
 
+
     if (!message) {
-        alert("Please write a message.");
+
+        alert(
+            "Please write a message."
+        );
+
         return;
     }
+
 
     try {
 
@@ -747,16 +990,19 @@ async function sendMessage() {
                         productName:
                             selectedProductName,
 
-                        message: message,
+                        message:
+                            message,
 
-                        replyTo: null
-
+                        replyTo:
+                            null
                     })
                 }
             );
 
+
         const data =
             await response.json();
+
 
         if (!response.ok) {
 
@@ -771,18 +1017,28 @@ async function sendMessage() {
             return;
         }
 
+
         alert(
             "✅ Message sent successfully!"
         );
 
+
         closeMessageModal();
+
+
+        loadMessages();
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Message error:",
+            error
+        );
 
         alert(
-            "❌ Cannot connect to Render backend."
+            "❌ Cannot connect to backend.\n\n" +
+            "Make sure node server.js is running."
         );
     }
 }
@@ -814,6 +1070,7 @@ async function loadMessages() {
 
     if (!container) return;
 
+
     container.innerHTML = `
         <div style="
             padding:30px;
@@ -823,6 +1080,7 @@ async function loadMessages() {
         </div>
     `;
 
+
     try {
 
         const response =
@@ -830,12 +1088,24 @@ async function loadMessages() {
                 `${API}/api/messages`
             );
 
+
         if (!response.ok) {
-            throw new Error("Messages failed");
+
+            throw new Error(
+                "Messages failed"
+            );
         }
+
 
         const messages =
             await response.json();
+
+
+        console.log(
+            "Messages received:",
+            messages
+        );
+
 
         if (
             !Array.isArray(messages) ||
@@ -843,9 +1113,19 @@ async function loadMessages() {
         ) {
 
             container.innerHTML = `
-                <div class="message-empty">
+                <div style="
+                    background:white;
+                    padding:30px;
+                    text-align:center;
+                    border-radius:15px;
+                    box-shadow:
+                        0 4px 15px
+                        rgba(0,0,0,0.08);
+                ">
 
-                    <div style="font-size:45px;">
+                    <div style="
+                        font-size:45px;
+                    ">
                         💬
                     </div>
 
@@ -854,7 +1134,8 @@ async function loadMessages() {
                     </h3>
 
                     <p>
-                        Messages will appear here.
+                        Messages sent from the
+                        marketplace will appear here.
                     </p>
 
                 </div>
@@ -863,88 +1144,142 @@ async function loadMessages() {
             return;
         }
 
+
         const sortedMessages =
             [...messages].reverse();
 
+
         container.innerHTML =
-            sortedMessages.map(msg => {
+            sortedMessages
+                .map(msg => {
 
-                const productName =
-                    msg.productName ||
-                    msg.product ||
-                    "Marketplace Product";
+                    const productName =
+                        msg.productName ||
+                        msg.product ||
+                        "Marketplace Product";
 
-                const messageText =
-                    msg.message || "";
 
-                const sender =
-                    msg.sender || "Unknown";
+                    const messageText =
+                        msg.message || "";
 
-                const receiver =
-                    msg.receiver || "Unknown";
 
-                const date =
-                    msg.date || "";
+                    const sender =
+                        msg.sender ||
+                        "Unknown";
 
-                return `
 
-                    <div class="message-card">
+                    const receiver =
+                        msg.receiver ||
+                        "Unknown";
 
-                        <div class="message-card-header">
 
-                            <strong>
-                                📚
-                                ${escapeHTML(productName)}
-                            </strong>
+                    const date =
+                        msg.date || "";
 
-                            <span>
-                                ${escapeHTML(date)}
-                            </span>
+
+                    return `
+
+                        <div style="
+                            background:white;
+                            padding:20px;
+                            margin-bottom:15px;
+                            border-radius:15px;
+                            box-shadow:
+                                0 4px 15px
+                                rgba(0,0,0,0.08);
+                        ">
+
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                align-items:center;
+                                gap:10px;
+                                margin-bottom:10px;
+                            ">
+
+                                <h3 style="
+                                    margin:0;
+                                    color:#312e81;
+                                ">
+                                    📚
+                                    ${escapeHTML(productName)}
+                                </h3>
+
+                                <span style="
+                                    font-size:12px;
+                                    color:#6b7280;
+                                ">
+                                    ${escapeHTML(date)}
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                📤
+                                <strong>From:</strong>
+                                ${escapeHTML(sender)}
+                            </p>
+
+
+                            <p>
+                                📥
+                                <strong>To:</strong>
+                                ${escapeHTML(receiver)}
+                            </p>
+
+
+                            <div style="
+                                background:#f3f4f6;
+                                padding:15px;
+                                border-radius:10px;
+                                margin:12px 0;
+                            ">
+
+                                💬
+                                ${escapeHTML(messageText)}
+
+                            </div>
+
+
+                            <button
+                                onclick="
+                                    replyMessage(
+                                        '${escapeJS(sender)}',
+                                        ${msg.id || 0},
+                                        '${escapeJS(productName)}',
+                                        ${msg.productId || "null"}
+                                    )
+                                "
+                                style="
+                                    padding:9px 16px;
+                                    border:none;
+                                    border-radius:8px;
+                                    background:#4f46e5;
+                                    color:white;
+                                    font-weight:bold;
+                                    cursor:pointer;
+                                "
+                            >
+                                ↩️ Reply
+                            </button>
+
 
                         </div>
 
-                        <p>
-                            📤
-                            <strong>From:</strong>
-                            ${escapeHTML(sender)}
-                        </p>
+                    `;
 
-                        <p>
-                            📥
-                            <strong>To:</strong>
-                            ${escapeHTML(receiver)}
-                        </p>
+                })
+                .join("");
 
-                        <div class="message-content">
-
-                            💬
-                            ${escapeHTML(messageText)}
-
-                        </div>
-
-                        <button
-                            class="buy-btn"
-                            onclick="
-                                replyMessage(
-                                    '${escapeJS(sender)}',
-                                    ${msg.id || 0},
-                                    '${escapeJS(productName)}',
-                                    ${msg.productId || "null"}
-                                )
-                            "
-                        >
-                            ↩️ Reply
-                        </button>
-
-                    </div>
-
-                `;
-
-            }).join("");
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Load messages error:",
+            error
+        );
+
 
         container.innerHTML = `
             <div style="
@@ -952,7 +1287,19 @@ async function loadMessages() {
                 text-align:center;
                 color:red;
             ">
+
                 ❌ Unable to load messages.
+
+                <br><br>
+
+                Make sure backend is running:
+
+                <br>
+
+                <strong>
+                    node server.js
+                </strong>
+
             </div>
         `;
     }
@@ -960,7 +1307,7 @@ async function loadMessages() {
 
 
 // ==================================================
-// REPLY MESSAGE
+// REPLY TO MESSAGE
 // ==================================================
 
 async function replyMessage(
@@ -971,14 +1318,22 @@ async function replyMessage(
 ) {
 
     const sender =
-        prompt("Enter your email:");
+        prompt(
+            "Enter your email:"
+        );
+
 
     if (!sender) return;
 
+
     const message =
-        prompt("Enter your reply:");
+        prompt(
+            "Enter your reply:"
+        );
+
 
     if (!message) return;
+
 
     try {
 
@@ -1006,13 +1361,14 @@ async function replyMessage(
                         message: message,
 
                         replyTo: messageId
-
                     })
                 }
             );
 
+
         const data =
             await response.json();
+
 
         if (!response.ok) {
 
@@ -1024,9 +1380,14 @@ async function replyMessage(
             return;
         }
 
-        alert("✅ Reply sent!");
+
+        alert(
+            "✅ Reply sent!"
+        );
+
 
         loadMessages();
+
 
     } catch (error) {
 
@@ -1040,7 +1401,7 @@ async function replyMessage(
 
 
 // ==================================================
-// SEARCH
+// SEARCH PRODUCTS
 // ==================================================
 
 function searchProducts() {
@@ -1050,20 +1411,28 @@ function searchProducts() {
             "searchInput"
         );
 
+
     const category =
         document.getElementById(
             "categoryFilter"
         );
 
+
     const search =
         input
-        ? input.value.toLowerCase()
-        : "";
+        ?
+        input.value.toLowerCase()
+        :
+        "";
+
 
     const selectedCategory =
         category
-        ? category.value
-        : "all";
+        ?
+        category.value
+        :
+        "all";
+
 
     const filtered =
         allProducts.filter(product => {
@@ -1073,10 +1442,12 @@ function searchProducts() {
                     .toLowerCase()
                     .includes(search);
 
+
             const matchesCategory =
                 selectedCategory === "all" ||
                 product.category ===
                 selectedCategory;
+
 
             return (
                 matchesSearch &&
@@ -1084,12 +1455,15 @@ function searchProducts() {
             );
         });
 
+
     displayProducts(filtered);
 }
 
 
 function filterCategory() {
+
     searchProducts();
+
 }
 
 
@@ -1100,10 +1474,15 @@ function filterCategory() {
 function escapeHTML(value) {
 
     return String(value ?? "")
+
         .replace(/&/g, "&amp;")
+
         .replace(/</g, "&lt;")
+
         .replace(/>/g, "&gt;")
+
         .replace(/"/g, "&quot;")
+
         .replace(/'/g, "&#039;");
 }
 
@@ -1121,6 +1500,34 @@ function escapeJS(value) {
 
 
 // ==================================================
+// LOGOUT
+// ==================================================
+
+function logoutUser() {
+
+    const confirmLogout =
+        confirm(
+            "Are you sure you want to logout?"
+        );
+
+
+    if (!confirmLogout) {
+        return;
+    }
+
+
+    // Remove saved login information
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("user");
+
+
+    // Go back to Login page
+    window.location.href = "login.html";
+}
+
+
+// ==================================================
 // START WEBSITE
 // ==================================================
 
@@ -1129,6 +1536,8 @@ document.addEventListener(
     function() {
 
         loadProducts();
+
+        loadMessages();
 
     }
 );
