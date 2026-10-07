@@ -1,8 +1,5 @@
-// ==================================================
-// EDuhub - College Marketplace
-// ==================================================
-
 const API = "https://eduhub-backend-llwi.onrender.com";
+
 let allProducts = [];
 let selectedProduct = null;
 
@@ -43,8 +40,7 @@ function showSection(sectionId) {
 
 async function loadProducts() {
 
-    const container =
-        document.getElementById("productContainer");
+    const container = document.getElementById("productContainer");
 
     if (!container) return;
 
@@ -56,8 +52,7 @@ async function loadProducts() {
 
     try {
 
-        const response =
-            await fetch(`${API}/api/products`);
+        const response = await fetch(`${API}/api/products`);
 
         if (!response.ok) {
             throw new Error("Products could not be loaded");
@@ -79,10 +74,14 @@ async function loadProducts() {
             ">
                 ❌ Backend connection failed.
                 <br><br>
+
                 Make sure:
                 <br>
+
                 <strong>node server.js</strong>
+
                 <br><br>
+
                 is running.
             </div>
         `;
@@ -101,7 +100,7 @@ function displayProducts(products) {
 
     if (!container) return;
 
-    if (!products || !products.length) {
+    if (!products.length) {
 
         container.innerHTML = `
             <div style="
@@ -155,6 +154,7 @@ function displayProducts(products) {
                     :
                     ""
                 }
+
 
                 <div class="product-image">
 
@@ -486,6 +486,7 @@ function showPurchaseModal() {
 
     `;
 
+
     document.body.appendChild(modal);
 }
 
@@ -506,7 +507,6 @@ async function confirmPurchase() {
 
     const emailInput =
         document.getElementById("buyerEmail");
-
 
     if (!emailInput) {
 
@@ -929,6 +929,7 @@ async function sendMessage() {
     const sender =
         senderInput.value.trim();
 
+
     const message =
         messageInput.value.trim();
 
@@ -1025,6 +1026,7 @@ async function sendMessage() {
         closeMessageModal();
 
 
+        // Immediately refresh Messages
         loadMessages();
 
 
@@ -1081,6 +1083,10 @@ async function loadMessages() {
 
 
     try {
+
+        // IMPORTANT:
+        // Do NOT use ?email=all
+        // Load all saved marketplace messages.
 
         const response =
             await fetch(
@@ -1159,7 +1165,8 @@ async function loadMessages() {
 
 
                     const messageText =
-                        msg.message || "";
+                        msg.message ||
+                        "";
 
 
                     const sender =
@@ -1173,7 +1180,8 @@ async function loadMessages() {
 
 
                     const date =
-                        msg.date || "";
+                        msg.date ||
+                        "";
 
 
                     return `
@@ -1467,6 +1475,171 @@ function filterCategory() {
 
 
 // ==================================================
+// SELL PRODUCT
+// ==================================================
+
+const productForm =
+    document.getElementById("productForm");
+
+
+if (productForm) {
+
+    productForm.addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+            const name =
+                document
+                    .getElementById("productName")
+                    .value
+                    .trim();
+
+            const marketPrice =
+                Number(
+                    document
+                        .getElementById("marketPrice")
+                        .value
+                );
+
+            const sellingPrice =
+                Number(
+                    document
+                        .getElementById("sellingPrice")
+                        .value
+                );
+
+            const category =
+                document
+                    .getElementById("category")
+                    .value;
+
+            const seller =
+                document
+                    .getElementById("sellerName")
+                    .value
+                    .trim();
+
+            const sellerEmail =
+                document
+                    .getElementById("sellerEmail")
+                    .value
+                    .trim();
+
+
+            // CHECK EMPTY FIELDS
+            if (
+                !name ||
+                !marketPrice ||
+                !sellingPrice ||
+                !category ||
+                !seller ||
+                !sellerEmail
+            ) {
+
+                alert(
+                    "❌ Please fill all fields."
+                );
+
+                return;
+            }
+
+
+            // CHECK SELLING PRICE
+            if (sellingPrice > marketPrice) {
+
+                alert(
+                    "❌ Selling price cannot be greater than market price."
+                );
+
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API}/api/products`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                name: name,
+
+                                marketPrice:
+                                    marketPrice,
+
+                                sellingPrice:
+                                    sellingPrice,
+
+                                category:
+                                    category,
+
+                                seller:
+                                    seller
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    alert(
+                        "❌ " +
+                        (
+                            data.message ||
+                            "Product could not be added."
+                        )
+                    );
+
+                    return;
+                }
+
+
+                alert(
+                    "✅ Product listed successfully!"
+                );
+
+
+                productForm.reset();
+
+
+                await loadProducts();
+
+
+                showSection("products");
+
+
+            } catch (error) {
+
+                console.error(
+                    "Product listing error:",
+                    error
+                );
+
+                alert(
+                    "❌ Could not connect to the backend.\n\n" +
+                    "Please check your Render backend and try again."
+                );
+            }
+        }
+    );
+}
+
+
+// ==================================================
 // ESCAPE HTML
 // ==================================================
 
@@ -1505,23 +1678,16 @@ function escapeJS(value) {
 function logoutUser() {
 
     const confirmLogout =
-        confirm(
-            "Are you sure you want to logout?"
-        );
-
+        confirm("Are you sure you want to logout?");
 
     if (!confirmLogout) {
         return;
     }
 
-
-    // Remove saved login information
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("user");
 
-
-    // Go back to Login page
     window.location.href = "login.html";
 }
 
