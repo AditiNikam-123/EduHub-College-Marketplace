@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
+const { MongoClient } = require("mongodb");
 const PaytmChecksum = require("paytmchecksum");
 
 const app = express();
@@ -10,8 +11,37 @@ const app = express();
 // PORT
 // ==================================================
 
-const PORT =
-    process.env.PORT || 10000;
+const PORT = process.env.PORT || 10000;
+
+
+// ==================================================
+// FRONTEND / BACKEND URL
+// ==================================================
+
+const FRONTEND_URL =
+    process.env.FRONTEND_URL ||
+    "https://eduhub-college-marketplace.onrender.com";
+
+const BACKEND_URL =
+    process.env.BACKEND_PUBLIC_URL ||
+    process.env.RENDER_EXTERNAL_URL ||
+    "https://eduhub-backend-llwi.onrender.com";
+
+
+// ==================================================
+// MONGODB CONFIG
+// ==================================================
+
+const MONGODB_URI =
+    process.env.MONGODB_URI || "";
+
+const DB_NAME =
+    process.env.DB_NAME ||
+    "eduhub";
+
+let mongoClient = null;
+let db = null;
+
 
 // ==================================================
 // PAYTM CONFIG
@@ -33,15 +63,6 @@ const PAYTM_WEBSITE_NAME =
     process.env.PAYTM_WEBSITE_NAME ||
     "WEBSTAGING";
 
-const FRONTEND_URL =
-    process.env.FRONTEND_URL ||
-    "https://eduhub-college-marketplace.onrender.com";
-
-const BACKEND_URL =
-    process.env.BACKEND_PUBLIC_URL ||
-    process.env.RENDER_EXTERNAL_URL ||
-    "https://eduhub-backend-llwi.onrender.com";
-
 const PAYTM_BASE_URL =
     PAYTM_ENVIRONMENT === "production"
         ? "https://secure.paytmpayments.com"
@@ -50,6 +71,7 @@ const PAYTM_BASE_URL =
 const PAYTM_CALLBACK_URL =
     process.env.PAYTM_CALLBACK_URL ||
     `${BACKEND_URL}/paytm/callback`;
+
 
 // ==================================================
 // MIDDLEWARE
@@ -67,8 +89,10 @@ app.use(
     })
 );
 
+
 // ==================================================
-// DATA FILES
+// OLD JSON FILES
+// Used ONLY for first-time migration
 // ==================================================
 
 const productsFile =
@@ -95,51 +119,44 @@ const transactionsFile =
         "transactions.json"
     );
 
-const paytmOrdersFile =
-    path.join(
-        __dirname,
-        "paytm_orders.json"
-    );
 
 // ==================================================
-// FILE FUNCTIONS
+// JSON READ HELPER
 // ==================================================
 
-function readData(file) {
+function readOldJson(file) {
 
     try {
 
-        if (!fs.existsSync(file)) {
+        if (
+            !fs.existsSync(file)
+        ) {
 
-            fs.writeFileSync(
-                file,
-                "[]"
-            );
+            return [];
         }
 
-        const data =
+        const text =
             fs.readFileSync(
                 file,
                 "utf8"
             ).trim();
 
-        if (!data) {
+        if (!text) {
 
             return [];
         }
 
-        const parsed =
-            JSON.parse(data);
+        const data =
+            JSON.parse(text);
 
-        return Array.isArray(parsed)
-            ? parsed
+        return Array.isArray(data)
+            ? data
             : [];
 
     } catch (error) {
 
-        console.error(
-            "Read error:",
-            file,
+        console.log(
+            "Old JSON read error:",
             error.message
         );
 
@@ -148,57 +165,191 @@ function readData(file) {
 }
 
 
-function writeData(
-    file,
-    data
-) {
+// ==================================================
+// MONGODB CONNECT
+// ==================================================
 
-    try {
+async function connectMongoDB() {
 
-        fs.writeFileSync(
-            file,
-            JSON.stringify(
-                data,
-                null,
-                2
-            )
+    if (db) {
+
+        return db;
+    }
+
+    if (!MONGODB_URI) {
+
+        throw new Error(
+            "MONGODB_URI is missing. Add it in Render Environment Variables."
+        );
+    }
+
+    mongoClient =
+        new MongoClient(
+            MONGODB_URI
         );
 
-        return true;
+    await mongoClient.connect();
 
-    } catch (error) {
-
-        console.error(
-            "Write error:",
-            file,
-            error.message
+    db =
+        mongoClient.db(
+            DB_NAME
         );
 
-        return false;
+    await db
+        .command({
+            ping: 1
+        });
+
+    console.log(
+        "✅ MongoDB connected successfully."
+    );
+
+    return db;
+}
+
+
+// ==================================================
+// ONE-TIME MIGRATION
+// ==================================================
+
+async function migrateOldJsonData() {
+
+    const database =
+        await connectMongoDB();
+
+    const migrationList = [
+
+        {
+            collection:
+                "products",
+
+            file:
+                productsFile
+        },
+
+        {
+            collection:
+                "users",
+
+            file:
+                usersFile
+        },
+
+        {
+            collection:
+                "messages",
+
+            file:
+                messagesFile
+        },
+
+        {
+            collection:
+                "transactions",
+
+            file:
+                transactionsFile
+        }
+    ];
+
+
+    for (
+        const item
+        of migrationList
+    ) {
+
+        try {
+
+            const collection =
+                database.collection(
+                    item.collection
+                );
+
+            const count =
+                await collection.countDocuments();
+
+            // Only migrate if collection is empty
+            if (
+                count === 0
+            ) {
+
+                const oldData =
+                    readOldJson(
+                        item.file
+                    );
+
+                if (
+                    oldData.length > 0
+                ) {
+
+                    await collection.insertMany(
+                        oldData,
+                        {
+                            ordered: false
+                        }
+                    );
+
+                    console.log(
+                        `✅ Migrated ${oldData.length} ${item.collection} records to MongoDB.`
+                    );
+                }
+            }
+
+        } catch (error) {
+
+            console.log(
+                `Migration error for ${item.collection}:`,
+                error.message
+            );
+        }
     }
 }
 
 
-function nextId(items) {
+// ==================================================
+// PAYTM ORDER COLLECTION
+// ==================================================
 
-    if (
-        !Array.isArray(items) ||
-        items.length === 0
-    ) {
+function paytmOrdersCollection() {
+
+    return db.collection(
+        "paytm_orders"
+    );
+}
+
+
+// ==================================================
+// GENERATE NEW NUMERIC ID
+// ==================================================
+
+async function nextId(
+    collectionName
+) {
+
+    const collection =
+        db.collection(
+            collectionName
+        );
+
+    const last =
+        await collection
+            .find({})
+            .sort({
+                id: -1
+            })
+            .limit(1)
+            .next();
+
+    if (!last) {
 
         return 1;
     }
 
     return (
-        Math.max(
-            ...items.map(
-                item =>
-                    Number(
-                        item.id
-                    ) || 0
-            )
-        ) + 1
-    );
+        Number(
+            last.id
+        ) || 0
+    ) + 1;
 }
 
 
@@ -235,7 +386,9 @@ function createCustomerId(
 
     return (
         "EDU_" +
-        String(email)
+        String(
+            email
+        )
             .toLowerCase()
             .replace(
                 /[^a-z0-9]/g,
@@ -243,82 +396,7 @@ function createCustomerId(
             )
             .slice(
                 0,
-                40
-            )
-    );
-}
-
-
-async function generatePaytmSignature(
-    body
-) {
-
-    return PaytmChecksum.generateSignature(
-        JSON.stringify(body),
-        PAYTM_MERCHANT_KEY
-    );
-}
-
-
-function savePaytmOrder(
-    order
-) {
-
-    const orders =
-        readData(
-            paytmOrdersFile
-        );
-
-    const index =
-        orders.findIndex(
-            item =>
-                String(
-                    item.orderId
-                ) ===
-                String(
-                    order.orderId
-                )
-        );
-
-    if (index === -1) {
-
-        orders.push(
-            order
-        );
-
-    } else {
-
-        orders[index] = {
-
-            ...orders[index],
-
-            ...order
-        };
-    }
-
-    return writeData(
-        paytmOrdersFile,
-        orders
-    );
-}
-
-
-function getPaytmOrder(
-    orderId
-) {
-
-    const orders =
-        readData(
-            paytmOrdersFile
-        );
-
-    return orders.find(
-        item =>
-            String(
-                item.orderId
-            ) ===
-            String(
-                orderId
+                30
             )
     );
 }
@@ -330,85 +408,140 @@ function getPaytmOrder(
 
 app.get(
     "/",
-    (req, res) => {
-
-        res.json({
-
-            success: true,
-
-            message:
-                "EduHub Backend is running",
-
-            paymentGateway:
-                "Paytm",
-
-            splitSettlement:
-                true
-        });
-    }
-);
-
-
-// ==================================================
-// PAYTM CONFIG STATUS
-// ==================================================
-
-app.get(
-    "/api/paytm/config-status",
-    (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         res.json({
 
             success:
-                paytmConfigured(),
-
-            environment:
-                PAYTM_ENVIRONMENT,
-
-            splitSettlement:
                 true,
 
-            configured:
-                paytmConfigured()
+            message:
+                "EduHub Backend is running",
+
+            database:
+                db
+                    ? "MongoDB connected"
+                    : "MongoDB not connected",
+
+            paymentGateway:
+                "Paytm"
         });
     }
 );
 
 
 // ==================================================
-// PRODUCTS
+// DATABASE STATUS
 // ==================================================
 
 app.get(
-    "/api/products",
-    (req, res) => {
+    "/api/database-status",
+    async (
+        req,
+        res
+    ) => {
 
-        const products =
-            readData(
-                productsFile
-            );
+        try {
 
-        res.status(200).json(
-            products
-        );
+            await connectMongoDB();
+
+            return res.json({
+
+                success:
+                    true,
+
+                database:
+                    DB_NAME,
+
+                status:
+                    "Connected"
+            });
+
+        } catch (error) {
+
+            return res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    status:
+                        "Not connected",
+
+                    message:
+                        error.message
+                });
+        }
     }
 );
 
 
 // ==================================================
-// ADD PRODUCT
+// PRODUCTS - GET
 // ==================================================
 
-app.post(
+app.get(
     "/api/products",
-    (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
             const products =
-                readData(
-                    productsFile
-                );
+                await db
+                    .collection(
+                        "products"
+                    )
+                    .find({})
+                    .sort({
+                        id: 1
+                    })
+                    .toArray();
+
+            return res.json(
+                products
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Get products error:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Could not load products."
+                });
+        }
+    }
+);
+
+
+// ==================================================
+// PRODUCTS - ADD
+// ==================================================
+
+app.post(
+    "/api/products",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
 
             const productName =
                 String(
@@ -452,9 +585,6 @@ app.post(
                     "Other"
                 ).trim();
 
-            // ------------------------------
-            // VALIDATION
-            // ------------------------------
 
             if (!productName) {
 
@@ -462,27 +592,29 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Product name is required."
                     });
             }
 
-            if (
-                !sellerName
-            ) {
+
+            if (!sellerName) {
 
                 return res
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Seller name is required."
                     });
             }
+
 
             if (
                 !sellerEmail ||
@@ -493,27 +625,14 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Valid seller email is required."
                     });
             }
 
-            if (
-                !sellerPaytmMid
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        success: false,
-
-                        message:
-                            "Seller Paytm Child MID is required for Split Settlement."
-                    });
-            }
 
             if (
                 !Number.isFinite(
@@ -526,12 +645,14 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Invalid market price."
                     });
             }
+
 
             if (
                 !Number.isFinite(
@@ -544,12 +665,14 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Invalid selling price."
                     });
             }
+
 
             if (
                 sellingPrice >
@@ -560,92 +683,79 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Selling price cannot be greater than market price."
                     });
             }
 
-            const newProduct = {
 
-                id:
-                    nextId(
-                        products
-                    ),
+            const id =
+                await nextId(
+                    "products"
+                );
+
+
+            const product = {
+
+                id,
 
                 productName:
+
                     productName,
 
                 name:
+
                     productName,
 
-                marketPrice:
-                    marketPrice,
+                marketPrice,
 
-                sellingPrice:
-                    sellingPrice,
+                sellingPrice,
 
-                category:
-                    category,
+                category,
 
-                sellerName:
-                    sellerName,
+                sellerName,
 
                 seller:
                     sellerName,
 
-                sellerEmail:
-                    sellerEmail,
+                sellerEmail,
 
-                // IMPORTANT
-                sellerPaytmMid:
-                    sellerPaytmMid,
-
-                status:
-                    "Available",
+                sellerPaytmMid,
 
                 available:
                     true,
+
+                status:
+                    "Available",
 
                 date:
                     new Date().toISOString()
             };
 
-            products.push(
-                newProduct
-            );
 
-            const saved =
-                writeData(
-                    productsFile,
-                    products
+            await db
+                .collection(
+                    "products"
+                )
+                .insertOne(
+                    product
                 );
 
-            if (!saved) {
-
-                return res
-                    .status(500)
-                    .json({
-
-                        success: false,
-
-                        message:
-                            "Could not save product."
-                    });
-            }
 
             return res
                 .status(201)
                 .json({
 
-                    success: true,
+                    success:
+                        true,
 
                     message:
                         "Product listed successfully.",
 
-                    product:
-                        newProduct
+                    product
                 });
 
         } catch (error) {
@@ -659,10 +769,11 @@ app.post(
                 .status(500)
                 .json({
 
-                    success: false,
+                    success:
+                        false,
 
                     message:
-                        "Could not add product."
+                        "Could not save product."
                 });
         }
     }
@@ -670,79 +781,73 @@ app.post(
 
 
 // ==================================================
-// UPDATE PRODUCT
+// PRODUCTS - UPDATE
 // ==================================================
 
 app.put(
     "/api/products/:id",
-    (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
-
-            const products =
-                readData(
-                    productsFile
-                );
 
             const id =
                 Number(
                     req.params.id
                 );
 
-            const index =
-                products.findIndex(
-                    product =>
-                        Number(
-                            product.id
-                        ) === id
-                );
+            const result =
+                await db
+                    .collection(
+                        "products"
+                    )
+                    .updateOne(
+                        {
+                            id
+                        },
+                        {
+                            $set:
+                                req.body
+                        }
+                    );
+
 
             if (
-                index === -1
+                result.matchedCount ===
+                0
             ) {
 
                 return res
                     .status(404)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Product not found."
                     });
             }
 
-            products[index] = {
 
-                ...products[index],
-
-                ...req.body
-            };
-
-            if (
-                !writeData(
-                    productsFile,
-                    products
-                )
-            ) {
-
-                return res
-                    .status(500)
-                    .json({
-
-                        success: false,
-
-                        message:
-                            "Could not update product."
+            const product =
+                await db
+                    .collection(
+                        "products"
+                    )
+                    .findOne({
+                        id
                     });
-            }
+
 
             return res.json({
 
-                success: true,
+                success:
+                    true,
 
-                product:
-                    products[index]
+                product
             });
 
         } catch (error) {
@@ -756,7 +861,8 @@ app.put(
                 .status(500)
                 .json({
 
-                    success: false,
+                    success:
+                        false,
 
                     message:
                         "Could not update product."
@@ -767,70 +873,55 @@ app.put(
 
 
 // ==================================================
-// DELETE PRODUCT
+// PRODUCTS - DELETE
 // ==================================================
 
 app.delete(
     "/api/products/:id",
-    (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
-
-            const products =
-                readData(
-                    productsFile
-                );
 
             const id =
                 Number(
                     req.params.id
                 );
 
-            const filtered =
-                products.filter(
-                    product =>
-                        Number(
-                            product.id
-                        ) !== id
-                );
+            const result =
+                await db
+                    .collection(
+                        "products"
+                    )
+                    .deleteOne({
+                        id
+                    });
+
 
             if (
-                filtered.length ===
-                products.length
+                result.deletedCount ===
+                0
             ) {
 
                 return res
                     .status(404)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Product not found."
                     });
             }
 
-            if (
-                !writeData(
-                    productsFile,
-                    filtered
-                )
-            ) {
-
-                return res
-                    .status(500)
-                    .json({
-
-                        success: false,
-
-                        message:
-                            "Could not delete product."
-                    });
-            }
 
             return res.json({
 
-                success: true,
+                success:
+                    true,
 
                 message:
                     "Product deleted."
@@ -847,7 +938,8 @@ app.delete(
                 .status(500)
                 .json({
 
-                    success: false,
+                    success:
+                        false,
 
                     message:
                         "Could not delete product."
@@ -858,12 +950,465 @@ app.delete(
 
 
 // ==================================================
-// CREATE PAYTM SPLIT PAYMENT LINK
+// USERS - GET
+// ==================================================
+
+app.get(
+    "/api/users",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const users =
+                await db
+                    .collection(
+                        "users"
+                    )
+                    .find({})
+                    .sort({
+                        id: 1
+                    })
+                    .toArray();
+
+            return res.json(
+                users
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Get users error:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Could not load users."
+                });
+        }
+    }
+);
+
+
+// ==================================================
+// USERS - ADD
+// ==================================================
+
+app.post(
+    "/api/users",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const name =
+                String(
+                    req.body.name ||
+                    ""
+                ).trim();
+
+            const email =
+                String(
+                    req.body.email ||
+                    ""
+                ).trim();
+
+            const password =
+                String(
+                    req.body.password ||
+                    ""
+                );
+
+
+            if (!name || !email) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Name and email are required."
+                    });
+            }
+
+
+            const existing =
+                await db
+                    .collection(
+                        "users"
+                    )
+                    .findOne({
+                        email
+                    });
+
+
+            if (existing) {
+
+                return res
+                    .status(409)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "User with this email already exists."
+                    });
+            }
+
+
+            const id =
+                await nextId(
+                    "users"
+                );
+
+
+            const user = {
+
+                id,
+
+                name,
+
+                email,
+
+                password,
+
+                date:
+                    new Date().toISOString()
+            };
+
+
+            await db
+                .collection(
+                    "users"
+                )
+                .insertOne(
+                    user
+                );
+
+
+            return res
+                .status(201)
+                .json({
+
+                    success:
+                        true,
+
+                    message:
+                        "User added successfully.",
+
+                    user
+                });
+
+        } catch (error) {
+
+            console.error(
+                "Add user error:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Could not save user."
+                });
+        }
+    }
+);
+
+
+// ==================================================
+// MESSAGES - GET
+// ==================================================
+
+app.get(
+    "/api/messages",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const messages =
+                await db
+                    .collection(
+                        "messages"
+                    )
+                    .find({})
+                    .sort({
+                        id: -1
+                    })
+                    .toArray();
+
+            return res.json(
+                messages
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Get messages error:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Could not load messages."
+                });
+        }
+    }
+);
+
+
+// ==================================================
+// MESSAGES - ADD
+// ==================================================
+
+app.post(
+    "/api/messages",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const sender =
+                String(
+                    req.body.sender ||
+                    ""
+                ).trim();
+
+            const receiver =
+                String(
+                    req.body.receiver ||
+                    ""
+                ).trim();
+
+            const messageText =
+                String(
+                    req.body.message ||
+                    ""
+                ).trim();
+
+
+            if (
+                !sender ||
+                !receiver ||
+                !messageText
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Sender, receiver and message are required."
+                    });
+            }
+
+
+            const id =
+                await nextId(
+                    "messages"
+                );
+
+
+            const message = {
+
+                id,
+
+                sender,
+
+                receiver,
+
+                productId:
+                    req.body.productId ||
+                    null,
+
+                productName:
+                    req.body.productName ||
+                    req.body.product ||
+                    "",
+
+                product:
+                    req.body.product ||
+                    req.body.productName ||
+                    "",
+
+                message:
+                    messageText,
+
+                replyTo:
+                    req.body.replyTo ||
+                    null,
+
+                date:
+                    new Date().toLocaleString(
+                        "en-IN"
+                    )
+            };
+
+
+            await db
+                .collection(
+                    "messages"
+                )
+                .insertOne(
+                    message
+                );
+
+
+            return res
+                .status(201)
+                .json({
+
+                    success:
+                        true,
+
+                    message:
+                        "Message sent successfully.",
+
+                    data:
+                        message
+                });
+
+        } catch (error) {
+
+            console.error(
+                "Add message error:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Could not save message."
+                });
+        }
+    }
+);
+
+
+// ==================================================
+// TRANSACTIONS - GET
+// ==================================================
+
+app.get(
+    "/api/transactions",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const transactions =
+                await db
+                    .collection(
+                        "transactions"
+                    )
+                    .find({})
+                    .sort({
+                        id: -1
+                    })
+                    .toArray();
+
+            return res.json(
+                transactions
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Get transactions error:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Could not load transactions."
+                });
+        }
+    }
+);
+
+
+// ==================================================
+// DIRECT TRANSACTION CREATION DISABLED
+// ==================================================
+
+app.post(
+    "/api/transactions",
+    async (
+        req,
+        res
+    ) => {
+
+        return res
+            .status(403)
+            .json({
+
+                success:
+                    false,
+
+                message:
+                    "Transactions are created only after successful payment verification."
+            });
+    }
+);
+
+
+// ==================================================
+// PAYTM CREATE PAYMENT
 // ==================================================
 
 app.post(
     "/api/paytm/create-payment",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
@@ -875,12 +1420,14 @@ app.post(
                     .status(503)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
-                            "Paytm is not configured. Add PAYTM_MID and PAYTM_MERCHANT_KEY in Render."
+                            "Paytm is not configured yet."
                     });
             }
+
 
             const productId =
                 Number(
@@ -899,6 +1446,7 @@ app.post(
                     ""
                 ).trim();
 
+
             if (
                 !Number.isInteger(
                     productId
@@ -909,12 +1457,14 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
-                            "Invalid product."
+                            "Invalid product ID."
                     });
             }
+
 
             if (
                 !buyerEmail ||
@@ -925,12 +1475,14 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Enter a valid buyer email."
                     });
             }
+
 
             if (
                 !/^\d{10}$/.test(
@@ -942,26 +1494,25 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Enter a valid 10-digit mobile number."
                     });
             }
 
-            const products =
-                readData(
-                    productsFile
-                );
 
             const product =
-                products.find(
-                    item =>
-                        Number(
-                            item.id
-                        ) ===
-                        productId
-                );
+                await db
+                    .collection(
+                        "products"
+                    )
+                    .findOne({
+                        id:
+                            productId
+                    });
+
 
             if (!product) {
 
@@ -969,12 +1520,14 @@ app.post(
                     .status(404)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Product not found."
                     });
             }
+
 
             if (
                 product.available ===
@@ -985,18 +1538,21 @@ app.post(
                     .status(409)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "This product is already sold."
                     });
             }
 
+
             const sellerPaytmMid =
                 String(
                     product.sellerPaytmMid ||
                     ""
                 ).trim();
+
 
             if (
                 !sellerPaytmMid
@@ -1006,47 +1562,48 @@ app.post(
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
-                            "This seller does not have a Paytm Child MID configured."
+                            "Seller does not have a Paytm Child MID configured."
                     });
             }
+
 
             const amount =
                 Number(
                     product.sellingPrice
                 );
 
+
             if (
                 !Number.isFinite(
                     amount
                 ) ||
-                amount < 1
+                amount <= 0
             ) {
 
                 return res
                     .status(400)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
-                            "Invalid selling price."
+                            "Invalid product price."
                     });
             }
+
 
             const orderId =
                 createOrderId();
 
-            // ==================================================
-            // PAYTM CREATE LINK REQUEST
-            // ==================================================
-            //
-            // 100% of customer payment is assigned
-            // to the seller child MID.
-            //
-            // ==================================================
+
+            // ==============================================
+            // PAYTM CREATE LINK
+            // ==============================================
 
             const requestBody = {
 
@@ -1061,6 +1618,7 @@ app.post(
                         "EduHub - " +
                         (
                             product.name ||
+                            product.productName ||
                             "Product"
                         )
                     ).slice(
@@ -1069,15 +1627,15 @@ app.post(
                     ),
 
                 linkDescription:
-                    "EduHub Marketplace Payment",
+                    "EduHub College Marketplace Payment",
 
                 linkType:
                     "FIXED",
 
                 amount:
-                    Number(
-                        amount
-                    ).toFixed(2),
+                    amount.toFixed(
+                        2
+                    ),
 
                 customerContact: {
 
@@ -1107,10 +1665,6 @@ app.post(
                 singleTransactionOnly:
                     true,
 
-                // ==================================================
-                // SPLIT SETTLEMENT
-                // ==================================================
-
                 splitSettlementInfo: {
 
                     splitMethod:
@@ -1120,11 +1674,9 @@ app.post(
 
                         {
 
-                            // Seller's Paytm child/vendor MID
                             mid:
                                 sellerPaytmMid,
 
-                            // Seller receives 100%
                             percentage:
                                 "100"
                         }
@@ -1132,40 +1684,42 @@ app.post(
                 },
 
                 redirectionUrlSuccess:
-                    `${FRONTEND_URL}?paytm_status=success&orderId=${encodeURIComponent(
+                    `${FRONTEND_URL}?paytm_status=TXN_SUCCESS&orderId=${encodeURIComponent(
                         orderId
                     )}`,
 
                 redirectionUrlFailure:
-                    `${FRONTEND_URL}?paytm_status=failure&orderId=${encodeURIComponent(
+                    `${FRONTEND_URL}?paytm_status=TXN_FAILURE&orderId=${encodeURIComponent(
                         orderId
-                    )}`,
-
-                customPaymentSuccessMessage:
-                    "Payment successful. Your EduHub purchase has been completed."
+                    )}`
             };
 
+
             const signature =
-                await generatePaytmSignature(
-                    requestBody
+                await PaytmChecksum.generateSignature(
+                    JSON.stringify(
+                        requestBody
+                    ),
+                    PAYTM_MERCHANT_KEY
                 );
 
-            const requestPayload = {
+
+            const payload = {
 
                 head: {
 
                     tokenType:
                         "AES",
 
-                    signature:
-                        signature
+                    signature
                 },
 
                 body:
                     requestBody
             };
 
-            const response =
+
+            const paytmResponse =
                 await fetch(
                     `${PAYTM_BASE_URL}/link/create`,
                     {
@@ -1181,28 +1735,32 @@ app.post(
 
                         body:
                             JSON.stringify(
-                                requestPayload
+                                payload
                             )
                     }
                 );
 
-            const data =
-                await response.json();
+
+            const responseData =
+                await paytmResponse.json();
+
 
             console.log(
-                "Paytm Create Link Response:",
-                data
+                "Paytm response:",
+                responseData
             );
 
+
             const resultInfo =
-                data &&
-                data.body &&
-                data.body.resultInfo
-                    ? data.body.resultInfo
+                responseData &&
+                responseData.body &&
+                responseData.body.resultInfo
+                    ? responseData.body.resultInfo
                     : {};
 
+
             if (
-                !response.ok ||
+                !paytmResponse.ok ||
                 resultInfo.resultStatus !==
                     "SUCCESS"
             ) {
@@ -1211,81 +1769,92 @@ app.post(
                     .status(502)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             resultInfo.resultMessage ||
-                            "Paytm could not create the payment link."
+                            "Paytm payment link could not be created."
                     });
             }
 
-            const paymentUrl =
-                data.body.shortUrl;
 
-            if (!paymentUrl) {
+            const paymentUrl =
+                responseData.body &&
+                responseData.body.shortUrl;
+
+
+            if (
+                !paymentUrl
+            ) {
 
                 return res
                     .status(502)
                     .json({
 
-                        success: false,
+                        success:
+                            false,
 
                         message:
                             "Paytm payment URL was not returned."
                     });
             }
 
-            // ==================================================
-            // SAVE PENDING ORDER
-            // ==================================================
 
-            savePaytmOrder({
+            // ==============================================
+            // SAVE PAYMENT ORDER IN MONGODB
+            // ==============================================
 
-                orderId,
+            await paytmOrdersCollection()
+                .insertOne({
 
-                productId,
+                    orderId,
 
-                productName:
-                    product.name ||
-                    product.productName ||
-                    "",
+                    productId,
 
-                amount,
+                    productName:
+                        product.name ||
+                        product.productName ||
+                        "",
 
-                buyerEmail,
+                    amount,
 
-                buyerMobile,
+                    buyerEmail,
 
-                seller:
-                    product.seller ||
-                    product.sellerName ||
-                    "",
+                    buyerMobile,
 
-                sellerEmail:
-                    product.sellerEmail ||
-                    "",
+                    seller:
+                        product.seller ||
+                        product.sellerName ||
+                        "",
 
-                sellerPaytmMid,
+                    sellerEmail:
+                        product.sellerEmail ||
+                        "",
 
-                paymentGateway:
-                    "Paytm",
+                    sellerPaytmMid,
 
-                splitPercentage:
-                    100,
+                    paymentGateway:
+                        "Paytm",
 
-                status:
-                    "Created",
+                    splitSettlement:
+                        true,
 
-                paymentStatus:
-                    "PENDING",
+                    splitPercentage:
+                        100,
 
-                createdAt:
-                    new Date().toISOString()
-            });
+                    paymentStatus:
+                        "PENDING",
+
+                    createdAt:
+                        new Date().toISOString()
+                });
+
 
             return res.json({
 
-                success: true,
+                success:
+                    true,
 
                 orderId,
 
@@ -1295,7 +1864,7 @@ app.post(
         } catch (error) {
 
             console.error(
-                "Create Paytm payment error:",
+                "Paytm create payment error:",
                 error
             );
 
@@ -1303,11 +1872,12 @@ app.post(
                 .status(500)
                 .json({
 
-                    success: false,
+                    success:
+                        false,
 
                     message:
                         error.message ||
-                        "Could not create Paytm payment."
+                        "Could not create payment."
                 });
         }
     }
@@ -1318,758 +1888,576 @@ app.post(
 // PAYTM CALLBACK
 // ==================================================
 
-async function handlePaytmCallback(
-    req,
-    res
-) {
+app.post(
+    "/paytm/callback",
+    async (
+        req,
+        res
+    ) => {
 
-    try {
+        try {
 
-        const callbackData = {
+            if (
+                !PAYTM_MERCHANT_KEY
+            ) {
 
-            ...req.body
-        };
+                return res
+                    .status(503)
+                    .send(
+                        "Paytm is not configured."
+                    );
+            }
 
-        const checksum =
-            callbackData.CHECKSUMHASH;
 
-        delete callbackData.CHECKSUMHASH;
+            const data = {
+                ...req.body
+            };
 
-        if (
-            !checksum
-        ) {
 
-            return res
-                .status(400)
-                .send(
-                    "Invalid Paytm callback."
+            const checksum =
+                data.CHECKSUMHASH;
+
+
+            delete data.CHECKSUMHASH;
+
+
+            if (!checksum) {
+
+                return res
+                    .status(400)
+                    .send(
+                        "Checksum missing."
+                    );
+            }
+
+
+            const valid =
+                await PaytmChecksum.verifySignature(
+                    data,
+                    PAYTM_MERCHANT_KEY,
+                    checksum
                 );
-        }
 
-        const valid =
-            await PaytmChecksum.verifySignature(
-                callbackData,
-                PAYTM_MERCHANT_KEY,
-                checksum
+
+            if (!valid) {
+
+                return res
+                    .status(400)
+                    .send(
+                        "Invalid checksum."
+                    );
+            }
+
+
+            const orderId =
+                String(
+                    data.ORDERID ||
+                    ""
+                ).trim();
+
+            const status =
+                String(
+                    data.STATUS ||
+                    ""
+                ).trim();
+
+
+            if (!orderId) {
+
+                return res
+                    .status(400)
+                    .send(
+                        "Order ID missing."
+                    );
+            }
+
+
+            const paytmOrder =
+                await paytmOrdersCollection()
+                    .findOne({
+                        orderId
+                    });
+
+
+            if (!paytmOrder) {
+
+                return res
+                    .status(404)
+                    .send(
+                        "Order not found."
+                    );
+            }
+
+
+            // ==============================================
+            // PAYMENT FAILED / PENDING
+            // ==============================================
+
+            if (
+                status !==
+                "TXN_SUCCESS"
+            ) {
+
+                await paytmOrdersCollection()
+                    .updateOne(
+                        {
+                            orderId
+                        },
+                        {
+                            $set: {
+
+                                paymentStatus:
+                                    status ||
+                                    "PENDING",
+
+                                paytmTxnId:
+                                    data.TXNID ||
+                                    "",
+
+                                updatedAt:
+                                    new Date().toISOString()
+                            }
+                        }
+                    );
+
+
+                return res
+                    .status(200)
+                    .send(
+                        "Payment status received."
+                    );
+            }
+
+
+            // ==============================================
+            // VERIFY AMOUNT
+            // ==============================================
+
+            const paidAmount =
+                Number(
+                    data.TXNAMOUNT
+                );
+
+            const expectedAmount =
+                Number(
+                    paytmOrder.amount
+                );
+
+
+            if (
+                Math.abs(
+                    paidAmount -
+                    expectedAmount
+                ) > 0.001
+            ) {
+
+                return res
+                    .status(400)
+                    .send(
+                        "Amount mismatch."
+                    );
+            }
+
+
+            // ==============================================
+            // CHECK IF TRANSACTION ALREADY EXISTS
+            // ==============================================
+
+            const existingTransaction =
+                await db
+                    .collection(
+                        "transactions"
+                    )
+                    .findOne({
+
+                        paytmOrderId:
+                            orderId
+                    });
+
+
+            if (
+                existingTransaction
+            ) {
+
+                return res
+                    .status(200)
+                    .send(
+                        "Payment already processed."
+                    );
+            }
+
+
+            // ==============================================
+            // MARK PRODUCT SOLD
+            // ==============================================
+
+            const productResult =
+                await db
+                    .collection(
+                        "products"
+                    )
+                    .findOneAndUpdate(
+                        {
+                            id:
+                                Number(
+                                    paytmOrder.productId
+                                ),
+
+                            available:
+                                true
+                        },
+                        {
+                            $set: {
+
+                                available:
+                                    false,
+
+                                status:
+                                    "Sold"
+                            }
+                        },
+                        {
+                            returnDocument:
+                                "after"
+                        }
+                    );
+
+
+            if (
+                !productResult.value
+            ) {
+
+                return res
+                    .status(409)
+                    .send(
+                        "Product is already sold or unavailable."
+                    );
+            }
+
+
+            // ==============================================
+            // CREATE TRANSACTION
+            // ==============================================
+
+            const transactionId =
+                await nextId(
+                    "transactions"
+                );
+
+
+            const transaction = {
+
+                id:
+                    transactionId,
+
+                productName:
+                    paytmOrder.productName,
+
+                productId:
+                    paytmOrder.productId,
+
+                amount:
+                    paytmOrder.amount,
+
+                buyer:
+                    paytmOrder.buyerEmail,
+
+                buyerMobile:
+                    paytmOrder.buyerMobile,
+
+                seller:
+                    paytmOrder.seller,
+
+                sellerEmail:
+                    paytmOrder.sellerEmail,
+
+                sellerPaytmMid:
+                    paytmOrder.sellerPaytmMid,
+
+                paymentGateway:
+                    "Paytm",
+
+                splitSettlement:
+                    true,
+
+                sellerSettlementPercentage:
+                    100,
+
+                paymentStatus:
+                    "TXN_SUCCESS",
+
+                status:
+                    "Completed",
+
+                paytmOrderId:
+                    orderId,
+
+                paytmTxnId:
+                    data.TXNID ||
+                    "",
+
+                bankTxnId:
+                    data.BANKTXNID ||
+                    "",
+
+                paymentMode:
+                    data.PAYMENTMODE ||
+                    "",
+
+                date:
+                    new Date().toISOString()
+            };
+
+
+            await db
+                .collection(
+                    "transactions"
+                )
+                .insertOne(
+                    transaction
+                );
+
+
+            // ==============================================
+            // UPDATE PAYTM ORDER
+            // ==============================================
+
+            await paytmOrdersCollection()
+                .updateOne(
+                    {
+                        orderId
+                    },
+                    {
+                        $set: {
+
+                            paymentStatus:
+                                "TXN_SUCCESS",
+
+                            status:
+                                "Completed",
+
+                            paytmTxnId:
+                                data.TXNID ||
+                                "",
+
+                            completedAt:
+                                new Date().toISOString()
+                        }
+                    }
+                );
+
+
+            // ==============================================
+            // REDIRECT USER BACK TO WEBSITE
+            // ==============================================
+
+            const redirectUrl =
+                new URL(
+                    FRONTEND_URL
+                );
+
+
+            redirectUrl.searchParams.set(
+                "paytm_status",
+                "TXN_SUCCESS"
             );
 
-        if (!valid) {
 
-            return res
-                .status(400)
-                .send(
-                    "Invalid Paytm checksum."
-                );
-        }
-
-        const orderId =
-            String(
-                callbackData.ORDERID ||
-                ""
-            ).trim();
-
-        const status =
-            String(
-                callbackData.STATUS ||
-                ""
-            ).trim();
-
-        const txnAmount =
-            Number(
-                callbackData.TXNAMOUNT ||
-                0
-            );
-
-        if (!orderId) {
-
-            return res
-                .status(400)
-                .send(
-                    "Order ID missing."
-                );
-        }
-
-        const pendingOrder =
-            getPaytmOrder(
+            redirectUrl.searchParams.set(
+                "orderId",
                 orderId
             );
 
-        if (!pendingOrder) {
 
-            return res
-                .status(404)
-                .send(
-                    "EduHub payment order not found."
-                );
-        }
-
-        // ==================================================
-        // FAILURE / PENDING
-        // ==================================================
-
-        if (
-            status !==
-            "TXN_SUCCESS"
-        ) {
-
-            savePaytmOrder({
-
-                ...pendingOrder,
-
-                paymentStatus:
-                    status ||
-                    "PENDING",
-
-                paytmTxnId:
-                    callbackData.TXNID ||
-                    "",
-
-                callbackUpdatedAt:
-                    new Date().toISOString()
-            });
-
-            return redirectAfterPayment(
-                res,
-                orderId,
-                status ||
-                    "PENDING"
-            );
-        }
-
-        // ==================================================
-        // AMOUNT VERIFICATION
-        // ==================================================
-
-        if (
-            Math.abs(
-                Number(
-                    pendingOrder.amount
-                ) -
-                txnAmount
-            ) > 0.001
-        ) {
-
-            savePaytmOrder({
-
-                ...pendingOrder,
-
-                paymentStatus:
-                    "AMOUNT_MISMATCH"
-            });
-
-            return res
-                .status(400)
-                .send(
-                    "Payment amount mismatch."
-                );
-        }
-
-        // ==================================================
-        // PRODUCT
-        // ==================================================
-
-        const products =
-            readData(
-                productsFile
+            return res.redirect(
+                303,
+                redirectUrl.toString()
             );
 
-        const productIndex =
-            products.findIndex(
-                product =>
-                    Number(
-                        product.id
-                    ) ===
-                    Number(
-                        pendingOrder.productId
-                    )
+        } catch (error) {
+
+            console.error(
+                "Paytm callback error:",
+                error
             );
-
-        if (
-            productIndex ===
-            -1
-        ) {
-
-            return res
-                .status(404)
-                .send(
-                    "Product not found."
-                );
-        }
-
-        // ==================================================
-        // DUPLICATE SUCCESS PROTECTION
-        // ==================================================
-
-        const transactions =
-            readData(
-                transactionsFile
-            );
-
-        const existing =
-            transactions.find(
-                transaction =>
-                    String(
-                        transaction.paytmOrderId
-                    ) ===
-                    String(
-                        orderId
-                    )
-            );
-
-        if (existing) {
-
-            return redirectAfterPayment(
-                res,
-                orderId,
-                "TXN_SUCCESS"
-            );
-        }
-
-        // ==================================================
-        // ENSURE PRODUCT IS STILL AVAILABLE
-        // ==================================================
-
-        if (
-            products[
-                productIndex
-            ].available ===
-            false
-        ) {
-
-            return res
-                .status(409)
-                .send(
-                    "Product was already sold."
-                );
-        }
-
-        // ==================================================
-        // MARK SOLD
-        // ==================================================
-
-        products[
-            productIndex
-        ] = {
-
-            ...products[
-                productIndex
-            ],
-
-            available:
-                false,
-
-            status:
-                "Sold"
-        };
-
-        const productsSaved =
-            writeData(
-                productsFile,
-                products
-            );
-
-        if (!productsSaved) {
 
             return res
                 .status(500)
                 .send(
-                    "Could not update product."
+                    "Payment callback failed."
                 );
         }
+    }
+);
 
-        // ==================================================
-        // SAVE TRANSACTION
-        // ==================================================
 
-        const transaction = {
+// ==================================================
+// PAYTM GET CALLBACK
+// ==================================================
 
-            id:
-                nextId(
-                    transactions
-                ),
+app.get(
+    "/paytm/callback",
+    async (
+        req,
+        res
+    ) => {
 
-            productName:
-                pendingOrder.productName,
+        try {
 
-            productId:
-                pendingOrder.productId,
+            return res
+                .status(200)
+                .send(
+                    "EduHub Paytm callback endpoint is active."
+                );
 
-            amount:
-                pendingOrder.amount,
-
-            buyer:
-                pendingOrder.buyerEmail,
-
-            buyerMobile:
-                pendingOrder.buyerMobile,
-
-            seller:
-                pendingOrder.seller,
-
-            sellerEmail:
-                pendingOrder.sellerEmail,
-
-            sellerPaytmMid:
-                pendingOrder.sellerPaytmMid,
-
-            paymentGateway:
-                "Paytm",
-
-            paymentStatus:
-                "TXN_SUCCESS",
-
-            status:
-                "Completed",
-
-            splitSettlement:
-                true,
-
-            sellerSettlementPercentage:
-                100,
-
-            paytmOrderId:
-                orderId,
-
-            paytmTxnId:
-                callbackData.TXNID ||
-                "",
-
-            bankTxnId:
-                callbackData.BANKTXNID ||
-                "",
-
-            paymentMode:
-                callbackData.PAYMENTMODE ||
-                "",
-
-            gatewayName:
-                callbackData.GATEWAYNAME ||
-                "",
-
-            transactionDate:
-                callbackData.TXNDATE ||
-                "",
-
-            date:
-                new Date().toISOString()
-        };
-
-        transactions.push(
-            transaction
-        );
-
-        const transactionSaved =
-            writeData(
-                transactionsFile,
-                transactions
-            );
-
-        if (!transactionSaved) {
+        } catch (error) {
 
             return res
                 .status(500)
                 .send(
-                    "Could not save transaction."
+                    "Callback error."
                 );
         }
+    }
+);
 
-        // ==================================================
-        // SAVE COMPLETED PAYTM ORDER
-        // ==================================================
 
-        savePaytmOrder({
+// ==================================================
+// PAYTM ORDER STATUS
+// ==================================================
 
-            ...pendingOrder,
+app.get(
+    "/api/paytm/order/:orderId",
+    async (
+        req,
+        res
+    ) => {
 
-            status:
-                "Completed",
+        try {
 
-            paymentStatus:
-                "TXN_SUCCESS",
+            const order =
+                await paytmOrdersCollection()
+                    .findOne({
 
-            paytmTxnId:
-                callbackData.TXNID ||
-                "",
+                        orderId:
+                            req.params.orderId
+                    });
 
-            completedAt:
-                new Date().toISOString()
-        });
 
-        return redirectAfterPayment(
-            res,
-            orderId,
-            "TXN_SUCCESS"
+            if (!order) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Payment order not found."
+                    });
+            }
+
+
+            return res.json({
+
+                success:
+                    true,
+
+                order
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Paytm status error:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Could not load payment status."
+                });
+        }
+    }
+);
+
+
+// ==================================================
+// START SERVER ONLY AFTER MONGODB CONNECTS
+// ==================================================
+
+async function startServer() {
+
+    try {
+
+        await connectMongoDB();
+
+        await migrateOldJsonData();
+
+
+        app.listen(
+            PORT,
+            "0.0.0.0",
+            () => {
+
+                console.log(
+                    "========================================"
+                );
+
+                console.log(
+                    "EduHub Backend Started"
+                );
+
+                console.log(
+                    "Port:",
+                    PORT
+                );
+
+                console.log(
+                    "Database:",
+                    DB_NAME
+                );
+
+                console.log(
+                    "MongoDB:",
+                    "Connected"
+                );
+
+                console.log(
+                    "Paytm:",
+                    paytmConfigured()
+                        ? "Configured"
+                        : "Waiting for credentials"
+                );
+
+                console.log(
+                    "========================================"
+                );
+            }
         );
 
     } catch (error) {
 
         console.error(
-            "Paytm callback error:",
+            "❌ Server startup failed:"
+        );
+
+        console.error(
             error
         );
 
-        return res
-            .status(500)
-            .send(
-                "Payment callback failed."
-            );
+        process.exit(
+            1
+        );
     }
 }
 
 
-// ==================================================
-// REDIRECT AFTER PAYMENT
-// ==================================================
-
-function redirectAfterPayment(
-    res,
-    orderId,
-    status
-) {
-
-    const url =
-        new URL(
-            FRONTEND_URL
-        );
-
-    url.searchParams.set(
-        "paytm_status",
-        status
-    );
-
-    url.searchParams.set(
-        "orderId",
-        orderId
-    );
-
-    return res.redirect(
-        303,
-        url.toString()
-    );
-}
-
-
-app.post(
-    "/paytm/callback",
-    handlePaytmCallback
-);
-
-app.get(
-    "/paytm/callback",
-    handlePaytmCallback
-);
-
-
-// ==================================================
-// CHECK PAYMENT RESULT FROM EDUHUB
-// ==================================================
-
-app.get(
-    "/api/paytm/order/:orderId",
-    (req, res) => {
-
-        const order =
-            getPaytmOrder(
-                req.params.orderId
-            );
-
-        if (!order) {
-
-            return res
-                .status(404)
-                .json({
-
-                    success: false,
-
-                    message:
-                        "Payment order not found."
-                });
-        }
-
-        return res.json({
-
-            success: true,
-
-            order
-        });
-    }
-);
-
-
-// ==================================================
-// USERS
-// ==================================================
-
-app.get(
-    "/api/users",
-    (req, res) => {
-
-        res.json(
-            readData(
-                usersFile
-            )
-        );
-    }
-);
-
-
-app.post(
-    "/api/users",
-    (req, res) => {
-
-        const users =
-            readData(
-                usersFile
-            );
-
-        const user = {
-
-            id:
-                nextId(
-                    users
-                ),
-
-            name:
-                req.body.name ||
-                "",
-
-            email:
-                req.body.email ||
-                "",
-
-            password:
-                req.body.password ||
-                "",
-
-            date:
-                new Date().toISOString()
-        };
-
-        users.push(
-            user
-        );
-
-        if (
-            !writeData(
-                usersFile,
-                users
-            )
-        ) {
-
-            return res
-                .status(500)
-                .json({
-
-                    success: false,
-
-                    message:
-                        "Could not save user."
-                });
-        }
-
-        return res
-            .status(201)
-            .json({
-
-                success: true,
-
-                user
-            });
-    }
-);
-
-
-// ==================================================
-// MESSAGES
-// ==================================================
-
-app.get(
-    "/api/messages",
-    (req, res) => {
-
-        res.json(
-            readData(
-                messagesFile
-            )
-        );
-    }
-);
-
-
-app.post(
-    "/api/messages",
-    (req, res) => {
-
-        const messages =
-            readData(
-                messagesFile
-            );
-
-        if (
-            !req.body.sender ||
-            !req.body.receiver ||
-            !req.body.message
-        ) {
-
-            return res
-                .status(400)
-                .json({
-
-                    success: false,
-
-                    message:
-                        "Sender, receiver and message are required."
-                });
-        }
-
-        const message = {
-
-            id:
-                nextId(
-                    messages
-                ),
-
-            sender:
-                req.body.sender,
-
-            receiver:
-                req.body.receiver,
-
-            productName:
-                req.body.productName ||
-                "",
-
-            product:
-                req.body.product ||
-                req.body.productName ||
-                "",
-
-            productId:
-                req.body.productId ||
-                null,
-
-            message:
-                req.body.message,
-
-            replyTo:
-                req.body.replyTo ||
-                null,
-
-            date:
-                new Date().toLocaleString(
-                    "en-IN"
-                )
-        };
-
-        messages.push(
-            message
-        );
-
-        if (
-            !writeData(
-                messagesFile,
-                messages
-            )
-        ) {
-
-            return res
-                .status(500)
-                .json({
-
-                    success: false,
-
-                    message:
-                        "Could not save message."
-                });
-        }
-
-        return res
-            .status(201)
-            .json({
-
-                success: true,
-
-                message:
-                    "Message sent successfully.",
-
-                data:
-                    message
-            });
-    }
-);
-
-
-// ==================================================
-// TRANSACTIONS
-// ==================================================
-
-app.get(
-    "/api/transactions",
-    (req, res) => {
-
-        res.json(
-            readData(
-                transactionsFile
-            )
-        );
-    }
-);
-
-
-// Direct transaction creation is NOT allowed.
-// It must come from successful Paytm callback.
-
-app.post(
-    "/api/transactions",
-    (req, res) => {
-
-        return res
-            .status(403)
-            .json({
-
-                success: false,
-
-                message:
-                    "Transactions are created only after successful Paytm payment verification."
-            });
-    }
-);
-
-
-// ==================================================
-// SERVER
-// ==================================================
-
-app.listen(
-    PORT,
-    "0.0.0.0",
-    () => {
-
-        console.log(
-            "========================================"
-        );
-
-        console.log(
-            "EduHub Backend Started"
-        );
-
-        console.log(
-            "Port:",
-            PORT
-        );
-
-        console.log(
-            "Paytm Environment:",
-            PAYTM_ENVIRONMENT
-        );
-
-        console.log(
-            "Split Settlement:",
-            "Enabled in code"
-        );
-
-        console.log(
-            "========================================"
-        );
-    }
-);
+startServer();
