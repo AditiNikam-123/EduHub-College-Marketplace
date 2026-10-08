@@ -4,75 +4,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EduHub - College Marketplace</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- ================= TOP RIGHT LOGOUT ================= -->
+
+<!-- ==================================================
+     TOP RIGHT LOGOUT
+================================================== -->
 
 <div style="
-    position: fixed;
-    top: 15px;
-    right: 20px;
-    z-index: 9999;
+    position:fixed;
+    top:15px;
+    right:20px;
+    z-index:9999;
 ">
+
     <button
         onclick="logoutUser()"
         style="
-            background: #4f46e5;
-            color: white;
-            border: none;
-            padding: 11px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-        ">
+            background:#4f46e5;
+            color:white;
+            border:none;
+            padding:11px 20px;
+            border-radius:8px;
+            font-size:14px;
+            font-weight:bold;
+            cursor:pointer;
+            box-shadow:0 3px 10px rgba(0,0,0,0.15);
+        "
+    >
         🚪 Logout
     </button>
+
 </div>
 
 
-<!-- ================= SIDEBAR ================= -->
+<!-- ==================================================
+     SIDEBAR
+================================================== -->
 
 <div class="sidebar">
 
-    <div class="logo">🎓 EduHub</div>
+    <div class="logo">
+        🎓 EduHub
+    </div>
 
     <div class="sidebar-subtitle">
         College Marketplace
     </div>
 
+
     <nav>
 
-        <button class="nav-btn active" onclick="showSection('home')">
+        <button
+            class="nav-btn active"
+            onclick="showSection('home')"
+        >
             🏠 Home
         </button>
 
-        <button class="nav-btn" onclick="showSection('products')">
+
+        <button
+            class="nav-btn"
+            onclick="showSection('products')"
+        >
             🛍️ Available Products
         </button>
 
-        <a href="messages.html" class="nav-btn">
+
+        <a
+            href="messages.html"
+            class="nav-btn"
+        >
             💬 Messages
         </a>
 
-        <button class="nav-btn" onclick="showSection('sell')">
+
+        <button
+            class="nav-btn"
+            onclick="showSection('sell')"
+        >
             ➕ Sell Your Product
         </button>
 
-        <a href="history.html" class="nav-btn">
+
+        <a
+            href="history.html"
+            class="nav-btn"
+        >
             🧾 Transaction History
         </a>
 
-        <a href="profile.html" class="nav-btn">
+
+        <a
+            href="profile.html"
+            class="nav-btn"
+        >
             👤 My Profile
         </a>
 
-        <a href="login.html" class="nav-btn">
+
+        <a
+            href="login.html"
+            class="nav-btn"
+        >
             🔐 Login
         </a>
 
@@ -81,123 +121,273 @@
 </div>
 
 
-<!-- ================= MAIN CONTENT ================= -->
+<!-- ==================================================
+     MAIN CONTENT
+================================================== -->
 
 <div class="main-content">
 
 
-    <!-- ================= HOME ================= -->
+<!-- ==================================================
+     HOME
+================================================== -->
 
-    <section id="home" class="section active">
+<section
+    id="home"
+    class="section active"
+>
 
-        <div class="page-section">
+    <div class="page-section">
 
-            <div class="hero">
 
-                <div class="welcome">
-                    Welcome to EduHub 🎓
-                </div>
+        <div class="hero">
 
-                <h1>Your College Marketplace</h1>
-
-                <p>
-                    Buy and sell useful college products
-                    easily and affordably.
-                </p>
-
-                <button
-                    class="primary-btn"
-                    onclick="showSection('products')">
-
-                    🛍️ Explore Products
-
-                </button>
-
+            <div class="welcome">
+                Welcome to EduHub 🎓
             </div>
 
 
-            <div class="feature-grid">
-
-                <div class="feature-card">
-
-                    <div class="feature-icon">🛍️</div>
-
-                    <h3>Buy</h3>
-
-                    <p>
-                        Find affordable books, notes,
-                        calculators and other college products.
-                    </p>
-
-                </div>
+            <h1>
+                Your College Marketplace
+            </h1>
 
 
-                <div class="feature-card">
-
-                    <div class="feature-icon">💰</div>
-
-                    <h3>Sell</h3>
-
-                    <p>
-                        Sell your unused college products
-                        to other students.
-                    </p>
-
-                </div>
+            <p>
+                Buy and sell useful college products
+                easily and affordably.
+            </p>
 
 
-                <div class="feature-card">
-
-                    <div class="feature-icon">💬</div>
-
-                    <h3>Connect</h3>
-
-                    <p>
-                        Contact sellers directly through
-                        EduHub messaging.
-                    </p>
-
-                </div>
-
-            </div>
+            <button
+                class="primary-btn"
+                onclick="showSection('products')"
+            >
+                🛍️ Explore Products
+            </button>
 
         </div>
 
-    </section>
 
 
-    <!-- ================= PRODUCTS ================= -->
+        <div class="feature-grid">
 
-    <section id="products" class="section">
 
-        <div class="page-section">
+            <div class="feature-card">
 
-            <div class="section-heading">
+                <div class="feature-icon">
+                    🛍️
+                </div>
 
-                <h2>🛍️ Available Products</h2>
+                <h3>
+                    Buy
+                </h3>
 
                 <p>
-                    Find useful products from other college students.
+                    Find affordable books, notes,
+                    calculators and other college products.
                 </p>
 
             </div>
 
 
-            <div class="search-area">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    💰
+                </div>
+
+                <h3>
+                    Sell
+                </h3>
+
+                <p>
+                    Sell your unused college products
+                    to other students.
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    💬
+                </div>
+
+                <h3>
+                    Connect
+                </h3>
+
+                <p>
+                    Contact sellers directly through
+                    EduHub messaging.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     PRODUCTS
+================================================== -->
+
+<section
+    id="products"
+    class="section"
+>
+
+    <div class="page-section">
+
+
+        <div class="section-heading">
+
+            <h2>
+                🛍️ Available Products
+            </h2>
+
+            <p>
+                Find useful products from other
+                college students.
+            </p>
+
+        </div>
+
+
+
+        <div class="search-area">
+
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="🔎 Search products..."
+                onkeyup="searchProducts()"
+            >
+
+
+            <select
+                id="categoryFilter"
+                onchange="filterCategory()"
+            >
+
+                <option value="all">
+                    All Categories
+                </option>
+
+                <option value="Books">
+                    Books
+                </option>
+
+                <option value="Notes">
+                    Notes
+                </option>
+
+                <option value="Electronics">
+                    Electronics
+                </option>
+
+                <option value="Stationery">
+                    Stationery
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <div
+            id="productContainer"
+            class="product-grid"
+        >
+            Loading products...
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     SELL PRODUCT
+     CHILD MID REMOVED
+================================================== -->
+
+<section
+    id="sell"
+    class="section"
+>
+
+    <div class="page-section">
+
+
+        <div class="sell-card">
+
+
+            <h2>
+                ➕ Sell Your Product
+            </h2>
+
+
+            <p>
+                List your college product for
+                other students.
+            </p>
+
+
+
+            <form id="productForm">
+
+
+                <!-- PRODUCT NAME -->
 
                 <input
                     type="text"
-                    id="searchInput"
-                    placeholder="🔎 Search products..."
-                    onkeyup="searchProducts">
+                    id="productName"
+                    placeholder="Product Name"
+                    required
+                >
 
+
+                <!-- MARKET PRICE -->
+
+                <input
+                    type="number"
+                    id="marketPrice"
+                    placeholder="Original Market Price"
+                    min="1"
+                    required
+                >
+
+
+                <!-- SELLING PRICE -->
+
+                <input
+                    type="number"
+                    id="sellingPrice"
+                    placeholder="Your Selling Price"
+                    min="1"
+                    required
+                >
+
+
+                <!-- CATEGORY -->
 
                 <select
-                    id="categoryFilter"
-                    onchange="filterCategory()">
+                    id="category"
+                    required
+                >
 
-                    <option value="all">
-                        All Categories
+                    <option value="">
+                        Select Category
                     </option>
 
                     <option value="Books">
@@ -218,147 +408,64 @@
 
                 </select>
 
-            </div>
+
+                <!-- SELLER NAME -->
+
+                <input
+                    type="text"
+                    id="sellerName"
+                    placeholder="Your Name"
+                    required
+                >
 
 
-            <div
-                id="productContainer"
-                class="product-grid">
+                <!-- SELLER EMAIL -->
 
-                Loading products...
-
-            </div>
-
-        </div>
-
-    </section>
+                <input
+                    type="email"
+                    id="sellerEmail"
+                    placeholder="Your College Email"
+                    required
+                >
 
 
-    <!-- ================= SELL PRODUCT ================= -->
+                <!-- SUBMIT -->
 
-    <section id="sell" class="section">
+                <button
+                    type="submit"
+                    class="sell-btn"
+                >
+                    ➕ List Product
+                </button>
 
-        <div class="page-section">
-
-            <div class="sell-card">
-
-                <h2>➕ Sell Your Product</h2>
-
-                <p>
-                    List your college product for other students.
-                </p>
-
-
-                <form id="productForm">
-
-
-                    <input
-                        type="text"
-                        id="productName"
-                        placeholder="Product Name"
-                        required>
-
-
-                    <input
-                        type="number"
-                        id="marketPrice"
-                        placeholder="Original Market Price"
-                        min="1"
-                        required>
-
-
-                    <input
-                        type="number"
-                        id="sellingPrice"
-                        placeholder="Your Selling Price"
-                        min="1"
-                        required>
-
-
-                    <select
-                        id="category"
-                        required>
-
-                        <option value="">
-                            Select Category
-                        </option>
-
-                        <option value="Books">
-                            Books
-                        </option>
-
-                        <option value="Notes">
-                            Notes
-                        </option>
-
-                        <option value="Electronics">
-                            Electronics
-                        </option>
-
-                        <option value="Stationery">
-                            Stationery
-                        </option>
-
-                    </select>
-
-
-                    <input
-                        type="text"
-                        id="sellerName"
-                        placeholder="Your Name"
-                        required>
-
-
-                    <input
-                        type="email"
-                        id="sellerEmail"
-                        placeholder="Your College Email"
-                        required>
-
-
-                    <!-- PAYTM CHILD MID IS OPTIONAL -->
-
-                    <input
-                        type="text"
-                        id="sellerPaytmMid"
-                        placeholder="Paytm Seller Child MID (Optional)">
-
-
-                    <button
-                        type="submit"
-                        class="sell-btn">
-
-                        ➕ List Product
-
-                    </button>
-
-                </form>
-
-            </div>
+            </form>
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 </div>
 
 
-
-<!-- ================= PRODUCT DETAILS MODAL ================= -->
+<!-- ==================================================
+     PRODUCT DETAILS MODAL
+================================================== -->
 
 <div
     id="detailsModal"
-    class="modal hidden">
+    class="modal hidden"
+>
 
     <div class="modal-box">
 
 
         <button
             class="close-modal"
-            onclick="closeDetailsModal()">
-
+            onclick="closeDetailsModal()"
+        >
             ✕
-
         </button>
 
 
@@ -382,35 +489,35 @@
         </p>
 
 
+
         <div class="price-box">
+
 
             <p
                 id="detailsMarketPrice"
-                class="old-price">
-
+                class="old-price"
+            >
                 Original Price
-
             </p>
 
 
             <p
                 id="detailsSellingPrice"
-                class="big-price">
-
+                class="big-price"
+            >
                 Selling Price
-
             </p>
 
 
             <p
                 id="detailsSaving"
-                class="saving-text">
-
+                class="saving-text"
+            >
                 You Save
-
             </p>
 
         </div>
+
 
 
         <div class="modal-buttons">
@@ -418,19 +525,17 @@
 
             <button
                 id="detailsBuyButton"
-                class="buy-btn large-btn">
-
+                class="buy-btn large-btn"
+            >
                 🛒 Buy Now
-
             </button>
 
 
             <button
                 onclick="closeDetailsModal()"
-                class="cancel-btn">
-
+                class="cancel-btn"
+            >
                 Close
-
             </button>
 
         </div>
@@ -440,12 +545,14 @@
 </div>
 
 
-
-<!-- ================= BUY MODAL ================= -->
+<!-- ==================================================
+     BUY MODAL
+================================================== -->
 
 <div
     id="buyModal"
-    class="modal hidden">
+    class="modal hidden"
+>
 
     <div class="modal-box buy-confirm-box">
 
@@ -465,6 +572,7 @@
         </p>
 
 
+
         <div class="purchase-summary">
 
             <h3 id="buyProductName">
@@ -482,24 +590,23 @@
         </div>
 
 
+
         <div class="modal-buttons">
 
 
             <button
                 id="confirmBuyButton"
-                class="buy-btn large-btn">
-
+                class="buy-btn large-btn"
+            >
                 ✅ Confirm Purchase
-
             </button>
 
 
             <button
                 onclick="closeBuyModal()"
-                class="cancel-btn">
-
+                class="cancel-btn"
+            >
                 Cancel
-
             </button>
 
         </div>
@@ -509,12 +616,14 @@
 </div>
 
 
-
-<!-- ================= SUCCESS MODAL ================= -->
+<!-- ==================================================
+     SUCCESS MODAL
+================================================== -->
 
 <div
     id="successModal"
-    class="modal hidden">
+    class="modal hidden"
+>
 
     <div class="modal-box success-box">
 
@@ -534,53 +643,42 @@
         </p>
 
 
+
         <div class="transaction-summary">
 
 
             <p>
-
                 <strong>Product:</strong>
-
                 <span id="successProduct"></span>
-
             </p>
 
 
             <p>
-
                 <strong>Amount:</strong>
-
                 ₹<span id="successAmount"></span>
-
             </p>
 
 
             <p>
-
                 <strong>Seller:</strong>
-
                 <span id="successSeller"></span>
-
             </p>
 
 
             <p>
-
                 <strong>Transaction ID:</strong>
-
                 <span id="successTransactionId"></span>
-
             </p>
 
         </div>
 
 
+
         <button
             onclick="closeSuccessModal()"
-            class="buy-btn large-btn">
-
+            class="buy-btn large-btn"
+        >
             Done
-
         </button>
 
     </div>
@@ -588,22 +686,23 @@
 </div>
 
 
-
-<!-- ================= MESSAGE MODAL ================= -->
+<!-- ==================================================
+     MESSAGE MODAL
+================================================== -->
 
 <div
     id="messageModal"
-    class="modal hidden">
+    class="modal hidden"
+>
 
     <div class="modal-box">
 
 
         <button
             class="close-modal"
-            onclick="closeMessageBox()">
-
+            onclick="closeMessageBox()"
+        >
             ✕
-
         </button>
 
 
@@ -629,8 +728,9 @@
 
         <textarea
             id="sellerMessage"
-            placeholder="Write your message to the seller...">
-        </textarea>
+            placeholder="Write your message to the seller..."
+        ></textarea>
+
 
 
         <div class="modal-buttons">
@@ -638,19 +738,17 @@
 
             <button
                 onclick="sendMessage()"
-                class="send-message-btn">
-
+                class="send-message-btn"
+            >
                 📤 Send Message
-
             </button>
 
 
             <button
                 onclick="closeMessageBox()"
-                class="cancel-btn">
-
+                class="cancel-btn"
+            >
                 Cancel
-
             </button>
 
         </div>
@@ -660,8 +758,9 @@
 </div>
 
 
-
-<!-- ================= SCRIPT ================= -->
+<!-- ==================================================
+     SCRIPT
+================================================== -->
 
 <script src="script.js"></script>
 
