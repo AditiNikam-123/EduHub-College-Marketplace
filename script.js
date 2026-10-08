@@ -20,6 +20,7 @@ let paytmHandledOrders = new Set();
 // ==================================================
 
 function escapeHTML(value) {
+
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -30,6 +31,7 @@ function escapeHTML(value) {
 
 
 function escapeJS(value) {
+
     return String(value ?? "")
         .replace(/\\/g, "\\\\")
         .replace(/'/g, "\\'")
@@ -39,6 +41,7 @@ function escapeJS(value) {
 
 
 function getCurrentUserEmail() {
+
     return (
         localStorage.getItem("userEmail") ||
         ""
@@ -52,24 +55,38 @@ function getCurrentUserEmail() {
 
 function showSection(sectionId) {
 
-    document.querySelectorAll(".section").forEach(section => {
-        section.classList.remove("active");
-    });
+    document.querySelectorAll(".section")
+        .forEach(section => {
+
+            section.classList.remove("active");
+
+        });
+
 
     const section =
         document.getElementById(sectionId);
 
+
     if (section) {
+
         section.classList.add("active");
+
     }
+
 
     if (sectionId === "products") {
+
         loadProducts();
+
     }
 
+
     if (sectionId === "messages") {
+
         loadMessages();
+
     }
+
 }
 
 
@@ -80,17 +97,27 @@ function showSection(sectionId) {
 async function loadProducts() {
 
     const container =
-        document.getElementById("productContainer");
+        document.getElementById(
+            "productContainer"
+        );
+
 
     if (!container) {
+
         return;
+
     }
 
+
     container.innerHTML = `
-        <div style="padding:30px;text-align:center;">
+        <div style="
+            padding:30px;
+            text-align:center;
+        ">
             ⏳ Loading products...
         </div>
     `;
+
 
     try {
 
@@ -99,22 +126,29 @@ async function loadProducts() {
                 `${API}/api/products`
             );
 
+
         const responseText =
             await response.text();
 
+
         let data;
+
 
         try {
 
             data =
-                JSON.parse(responseText);
+                responseText
+                    ? JSON.parse(responseText)
+                    : {};
 
         } catch {
 
             throw new Error(
                 "Backend returned an invalid response."
             );
+
         }
+
 
         if (!response.ok) {
 
@@ -122,7 +156,9 @@ async function loadProducts() {
                 data.message ||
                 `Could not load products. (${response.status})`
             );
+
         }
+
 
         allProducts =
             Array.isArray(data)
@@ -133,9 +169,11 @@ async function loadProducts() {
                         : []
                 );
 
+
         displayProducts(
             allProducts
         );
+
 
     } catch (error) {
 
@@ -144,6 +182,7 @@ async function loadProducts() {
             error
         );
 
+
         container.innerHTML = `
             <div style="
                 padding:30px;
@@ -151,11 +190,17 @@ async function loadProducts() {
                 color:#dc2626;
             ">
                 ❌ Could not load products.
+
                 <br><br>
-                ${escapeHTML(error.message)}
+
+                ${escapeHTML(
+                    error.message
+                )}
             </div>
         `;
+
     }
+
 }
 
 
@@ -170,9 +215,13 @@ function displayProducts(products) {
             "productContainer"
         );
 
+
     if (!container) {
+
         return;
+
     }
+
 
     if (
         !Array.isArray(products) ||
@@ -189,31 +238,38 @@ function displayProducts(products) {
         `;
 
         return;
+
     }
+
 
     container.innerHTML =
         products
             .map(product => {
+
 
                 const name =
                     product.name ||
                     product.productName ||
                     "Unnamed Product";
 
+
                 const seller =
                     product.seller ||
                     product.sellerName ||
                     "Unknown Seller";
+
 
                 const marketPrice =
                     Number(
                         product.marketPrice || 0
                     );
 
+
                 const sellingPrice =
                     Number(
                         product.sellingPrice || 0
                     );
+
 
                 const saving =
                     Math.max(
@@ -222,9 +278,15 @@ function displayProducts(products) {
                         sellingPrice
                     );
 
+
                 const isSold =
                     product.available === false ||
                     product.status === "Sold";
+
+
+                const id =
+                    Number(product.id);
+
 
                 return `
 
@@ -232,13 +294,19 @@ function displayProducts(products) {
                         class="product-card"
                         style="
                             position:relative;
-                            ${isSold ? "opacity:0.75;" : ""}
+                            ${
+                                isSold
+                                    ? "opacity:0.75;"
+                                    : ""
+                            }
                         "
                     >
+
 
                         ${
                             isSold
                                 ? `
+
                                     <span style="
                                         position:absolute;
                                         top:12px;
@@ -252,6 +320,7 @@ function displayProducts(products) {
                                     ">
                                         SOLD
                                     </span>
+
                                   `
                                 : ""
                         }
@@ -300,11 +369,13 @@ function displayProducts(products) {
                         ${
                             saving > 0
                                 ? `
+
                                     <p style="
                                         color:#15803d;
                                     ">
                                         💰 Save ₹${saving}
                                     </p>
+
                                   `
                                 : ""
                         }
@@ -320,6 +391,7 @@ function displayProducts(products) {
                             ${
                                 isSold
                                     ? `
+
                                         <button
                                             disabled
                                             style="
@@ -333,13 +405,13 @@ function displayProducts(products) {
                                         >
                                             🔴 Sold Out
                                         </button>
+
                                       `
                                     : `
+
                                         <button
                                             onclick="
-                                                buyProduct(
-                                                    ${Number(product.id)}
-                                                )
+                                                buyProduct(${id})
                                             "
                                             style="
                                                 flex:1;
@@ -354,6 +426,7 @@ function displayProducts(products) {
                                         >
                                             🛒 Buy Now
                                         </button>
+
                                       `
                             }
 
@@ -363,7 +436,7 @@ function displayProducts(products) {
                                     openMessageBox(
                                         '${escapeJS(seller)}',
                                         '${escapeJS(name)}',
-                                        ${Number(product.id)}
+                                        ${id}
                                     )
                                 "
                                 style="
@@ -389,6 +462,7 @@ function displayProducts(products) {
 
             })
             .join("");
+
 }
 
 
@@ -403,57 +477,70 @@ function searchProducts() {
             "searchInput"
         );
 
+
     const category =
         document.getElementById(
             "categoryFilter"
         );
 
+
     const search =
         input
-            ? input.value
-                .trim()
-                .toLowerCase()
+            ? input.value.trim().toLowerCase()
             : "";
+
 
     const selectedCategory =
         category
             ? category.value
             : "all";
 
+
     const filtered =
         allProducts.filter(
             product => {
+
 
                 const productName =
                     String(
                         product.name ||
                         product.productName ||
                         ""
-                    ).toLowerCase();
+                    )
+                    .toLowerCase();
+
 
                 const matchesSearch =
                     productName.includes(
                         search
                     );
 
+
                 const matchesCategory =
-                    selectedCategory ===
-                        "all" ||
+                    selectedCategory === "all" ||
                     product.category ===
                         selectedCategory;
+
 
                 return (
                     matchesSearch &&
                     matchesCategory
                 );
+
             }
         );
+
 
     displayProducts(
         filtered
     );
+
 }
 
+
+// ==================================================
+// CATEGORY FILTER
+// ==================================================
 
 function filterCategory() {
 
@@ -464,6 +551,7 @@ function filterCategory() {
 
 // ==================================================
 // SELL PRODUCT
+// NO CHILD MID
 // ==================================================
 
 function setupSellProductForm() {
@@ -473,16 +561,23 @@ function setupSellProductForm() {
             "productForm"
         );
 
+
     if (!productForm) {
+
         return;
+
     }
+
 
     if (
         productForm.dataset
             .listenerAttached === "true"
     ) {
+
         return;
+
     }
+
 
     productForm.dataset
         .listenerAttached = "true";
@@ -492,6 +587,7 @@ function setupSellProductForm() {
         "submit",
         async function(event) {
 
+
             event.preventDefault();
 
 
@@ -500,34 +596,34 @@ function setupSellProductForm() {
                     "productName"
                 );
 
+
             const marketPriceInput =
                 document.getElementById(
                     "marketPrice"
                 );
+
 
             const sellingPriceInput =
                 document.getElementById(
                     "sellingPrice"
                 );
 
+
             const categoryInput =
                 document.getElementById(
                     "category"
                 );
+
 
             const sellerNameInput =
                 document.getElementById(
                     "sellerName"
                 );
 
+
             const sellerEmailInput =
                 document.getElementById(
                     "sellerEmail"
-                );
-
-            const sellerUPIInput =
-                document.getElementById(
-                    "sellerUPI"
                 );
 
 
@@ -536,12 +632,14 @@ function setupSellProductForm() {
                     ? productNameInput.value.trim()
                     : "";
 
+
             const marketPrice =
                 marketPriceInput
                     ? Number(
                         marketPriceInput.value
                     )
                     : 0;
+
 
             const sellingPrice =
                 sellingPriceInput
@@ -550,30 +648,28 @@ function setupSellProductForm() {
                     )
                     : 0;
 
+
             const category =
                 categoryInput
-                    ? categoryInput.value.trim()
+                    ? categoryInput.value
                     : "";
+
 
             const sellerName =
                 sellerNameInput
                     ? sellerNameInput.value.trim()
                     : "";
 
+
             const sellerEmail =
                 sellerEmailInput
                     ? sellerEmailInput.value.trim()
                     : "";
 
-            const sellerUPI =
-                sellerUPIInput
-                    ? sellerUPIInput.value.trim()
-                    : "";
 
-
-            // ------------------------------------------
+            // ======================================
             // VALIDATION
-            // ------------------------------------------
+            // ======================================
 
             if (
                 !productName ||
@@ -589,6 +685,7 @@ function setupSellProductForm() {
                 );
 
                 return;
+
             }
 
 
@@ -604,6 +701,7 @@ function setupSellProductForm() {
                 );
 
                 return;
+
             }
 
 
@@ -619,6 +717,7 @@ function setupSellProductForm() {
                 );
 
                 return;
+
             }
 
 
@@ -632,6 +731,7 @@ function setupSellProductForm() {
                 );
 
                 return;
+
             }
 
 
@@ -650,20 +750,21 @@ function setupSellProductForm() {
 
                     submitButton.textContent =
                         "⏳ Listing Product...";
+
                 }
 
 
-                // ------------------------------------------
+                // ==================================
                 // SEND PRODUCT TO BACKEND
-                // ------------------------------------------
+                // ==================================
 
                 const response =
                     await fetch(
                         `${API}/api/products`,
                         {
-                            method: "POST",
+                            method:"POST",
 
-                            headers: {
+                            headers:{
                                 "Content-Type":
                                     "application/json"
                             },
@@ -671,32 +772,24 @@ function setupSellProductForm() {
                             body:
                                 JSON.stringify({
 
-                                    productName:
-                                        productName,
+                                    productName,
 
                                     name:
                                         productName,
 
-                                    marketPrice:
-                                        marketPrice,
+                                    marketPrice,
 
-                                    sellingPrice:
-                                        sellingPrice,
+                                    sellingPrice,
 
-                                    category:
-                                        category,
+                                    category,
 
-                                    sellerName:
-                                        sellerName,
+                                    sellerName,
 
                                     seller:
                                         sellerName,
 
-                                    sellerEmail:
-                                        sellerEmail,
+                                    sellerEmail
 
-                                    sellerUPI:
-                                        sellerUPI
                                 })
                         }
                     );
@@ -723,6 +816,7 @@ function setupSellProductForm() {
                     throw new Error(
                         "Backend returned an invalid response."
                     );
+
                 }
 
 
@@ -735,12 +829,13 @@ function setupSellProductForm() {
                         data.message ||
                         `Product could not be added. (${response.status})`
                     );
+
                 }
 
 
-                // ------------------------------------------
+                // ==================================
                 // SUCCESS
-                // ------------------------------------------
+                // ==================================
 
                 alert(
                     "✅ Product listed successfully!"
@@ -750,11 +845,13 @@ function setupSellProductForm() {
                 productForm.reset();
 
 
-                // Get fresh products
+                // Reload products
+
                 await loadProducts();
 
 
                 // Open Available Products
+
                 showSection(
                     "products"
                 );
@@ -786,10 +883,14 @@ function setupSellProductForm() {
 
                     submitButton.textContent =
                         "➕ List Product";
+
                 }
+
             }
+
         }
     );
+
 }
 
 
@@ -814,14 +915,13 @@ function buyProduct(productId) {
         );
 
         return;
+
     }
 
 
     if (
-        selectedProduct.available ===
-            false ||
-        selectedProduct.status ===
-            "Sold"
+        selectedProduct.available === false ||
+        selectedProduct.status === "Sold"
     ) {
 
         alert(
@@ -829,10 +929,12 @@ function buyProduct(productId) {
         );
 
         return;
+
     }
 
 
     showPurchaseModal();
+
 }
 
 
@@ -842,13 +944,16 @@ function buyProduct(productId) {
 
 function showPurchaseModal() {
 
-    const old =
+    const oldModal =
         document.getElementById(
             "purchaseModal"
         );
 
-    if (old) {
-        old.remove();
+
+    if (oldModal) {
+
+        oldModal.remove();
+
     }
 
 
@@ -856,6 +961,7 @@ function showPurchaseModal() {
         document.createElement(
             "div"
         );
+
 
     modal.id =
         "purchaseModal";
@@ -883,6 +989,7 @@ function showPurchaseModal() {
             padding:28px;
         ">
 
+
             <h2 style="
                 margin-top:0;
                 color:#312e81;
@@ -892,22 +999,32 @@ function showPurchaseModal() {
 
 
             <p>
-                <strong>Product:</strong>
+
+                <strong>
+                    Product:
+                </strong>
+
                 ${escapeHTML(
                     selectedProduct.name ||
                     selectedProduct.productName ||
                     ""
                 )}
+
             </p>
 
 
             <p>
-                <strong>Seller:</strong>
+
+                <strong>
+                    Seller:
+                </strong>
+
                 ${escapeHTML(
                     selectedProduct.seller ||
                     selectedProduct.sellerName ||
                     ""
                 )}
+
             </p>
 
 
@@ -916,10 +1033,12 @@ function showPurchaseModal() {
                 color:#4f46e5;
                 font-weight:bold;
             ">
+
                 ₹${Number(
                     selectedProduct.sellingPrice ||
                     0
                 ).toFixed(2)}
+
             </p>
 
 
@@ -994,7 +1113,6 @@ function showPurchaseModal() {
                     Cancel
                 </button>
 
-
             </div>
 
         </div>
@@ -1005,8 +1123,13 @@ function showPurchaseModal() {
     document.body.appendChild(
         modal
     );
+
 }
 
+
+// ==================================================
+// CLOSE PURCHASE MODAL
+// ==================================================
 
 function closePurchaseModal() {
 
@@ -1015,9 +1138,13 @@ function closePurchaseModal() {
             "purchaseModal"
         );
 
+
     if (modal) {
+
         modal.remove();
+
     }
+
 }
 
 
@@ -1035,12 +1162,14 @@ function loadPaytmCheckoutScript(
     ) {
 
         return Promise.resolve();
+
     }
 
 
     if (paytmScriptPromise) {
 
         return paytmScriptPromise;
+
     }
 
 
@@ -1051,12 +1180,17 @@ function loadPaytmCheckoutScript(
                 "Paytm Checkout URL is missing."
             )
         );
+
     }
 
 
     paytmScriptPromise =
         new Promise(
-            (resolve, reject) => {
+            (
+                resolve,
+                reject
+            ) => {
+
 
                 const script =
                     document.createElement(
@@ -1067,15 +1201,19 @@ function loadPaytmCheckoutScript(
                 script.src =
                     checkoutJsUrl;
 
+
                 script.async =
                     true;
 
-                script.dataset.paytmCheckout =
-                    "true";
+
+                script.dataset
+                    .paytmCheckout =
+                        "true";
 
 
                 script.onload =
                     function() {
+
 
                         if (
                             !window.Paytm ||
@@ -1089,14 +1227,19 @@ function loadPaytmCheckoutScript(
                             );
 
                             return;
+
                         }
 
 
-                        window.Paytm.CheckoutJS.onLoad(
-                            function() {
-                                resolve();
-                            }
-                        );
+                        window.Paytm.CheckoutJS
+                            .onLoad(
+                                function() {
+
+                                    resolve();
+
+                                }
+                            );
+
                     };
 
 
@@ -1108,22 +1251,26 @@ function loadPaytmCheckoutScript(
                                 "Paytm CheckoutJS could not be loaded."
                             )
                         );
+
                     };
 
 
                 document.head.appendChild(
                     script
                 );
+
             }
         );
 
 
     return paytmScriptPromise;
+
 }
 
 
 // ==================================================
 // CONFIRM PURCHASE
+// CREATE PAYTM ORDER
 // ==================================================
 
 async function confirmPurchase() {
@@ -1135,6 +1282,7 @@ async function confirmPurchase() {
         );
 
         return;
+
     }
 
 
@@ -1178,6 +1326,7 @@ async function confirmPurchase() {
         );
 
         return;
+
     }
 
 
@@ -1192,6 +1341,7 @@ async function confirmPurchase() {
         );
 
         return;
+
     }
 
 
@@ -1204,6 +1354,7 @@ async function confirmPurchase() {
 
             payButton.textContent =
                 "⏳ Opening Paytm...";
+
         }
 
 
@@ -1211,9 +1362,10 @@ async function confirmPurchase() {
             await fetch(
                 `${API}/api/paytm/create-order`,
                 {
-                    method: "POST",
 
-                    headers: {
+                    method:"POST",
+
+                    headers:{
                         "Content-Type":
                             "application/json"
                     },
@@ -1224,12 +1376,12 @@ async function confirmPurchase() {
                             productId:
                                 selectedProduct.id,
 
-                            buyer:
-                                buyer,
+                            buyer,
 
-                            mobile:
-                                mobile
+                            mobile
+
                         })
+
                 }
             );
 
@@ -1253,6 +1405,7 @@ async function confirmPurchase() {
             throw new Error(
                 `Server returned an invalid response. Status ${response.status}`
             );
+
         }
 
 
@@ -1265,6 +1418,7 @@ async function confirmPurchase() {
                 data.message ||
                 "Could not create Paytm order."
             );
+
         }
 
 
@@ -1275,13 +1429,12 @@ async function confirmPurchase() {
 
         const config = {
 
-            root:
-                "",
+            root:"",
 
-            flow:
-                "DEFAULT",
+            flow:"DEFAULT",
 
-            data: {
+
+            data:{
 
                 orderId:
                     data.orderId,
@@ -1294,15 +1447,18 @@ async function confirmPurchase() {
 
                 amount:
                     data.amount
+
             },
 
-            merchant: {
 
-                redirect:
-                    true
+            merchant:{
+
+                redirect:true
+
             },
 
-            handler: {
+
+            handler:{
 
                 notifyMerchant:
                     function(
@@ -1325,18 +1481,9 @@ async function confirmPurchase() {
                             alert(
                                 "Payment cancelled."
                             );
+
                         }
 
-
-                        if (
-                            eventName ===
-                            "SESSION_EXPIRED"
-                        ) {
-
-                            alert(
-                                "Payment session expired. Please try again."
-                            );
-                        }
                     },
 
 
@@ -1344,6 +1491,7 @@ async function confirmPurchase() {
                     function(
                         paymentData
                     ) {
+
 
                         console.log(
                             "Paytm transaction response:",
@@ -1361,15 +1509,18 @@ async function confirmPurchase() {
                         if (
                             paymentData &&
                             paymentData.STATUS ===
-                            "TXN_SUCCESS"
+                                "TXN_SUCCESS"
                         ) {
+
 
                             if (
                                 window.Paytm &&
                                 window.Paytm.CheckoutJS
                             ) {
 
-                                window.Paytm.CheckoutJS.close();
+                                window.Paytm.CheckoutJS
+                                    .close();
+
                             }
 
 
@@ -1384,21 +1535,25 @@ async function confirmPurchase() {
 
 
                             return;
+
                         }
 
 
                         if (
                             paymentData &&
                             paymentData.STATUS ===
-                            "PENDING"
+                                "PENDING"
                         ) {
+
 
                             if (
                                 window.Paytm &&
                                 window.Paytm.CheckoutJS
                             ) {
 
-                                window.Paytm.CheckoutJS.close();
+                                window.Paytm.CheckoutJS
+                                    .close();
+
                             }
 
 
@@ -1413,6 +1568,7 @@ async function confirmPurchase() {
 
 
                             return;
+
                         }
 
 
@@ -1421,24 +1577,31 @@ async function confirmPurchase() {
                             window.Paytm.CheckoutJS
                         ) {
 
-                            window.Paytm.CheckoutJS.close();
+                            window.Paytm.CheckoutJS
+                                .close();
+
                         }
 
 
                         alert(
                             "❌ Payment failed or was cancelled."
                         );
+
                     }
+
             }
+
         };
 
 
-        await window.Paytm.CheckoutJS.init(
-            config
-        );
+        await window.Paytm.CheckoutJS
+            .init(
+                config
+            );
 
 
-        window.Paytm.CheckoutJS.invoke();
+        window.Paytm.CheckoutJS
+            .invoke();
 
 
     } catch (error) {
@@ -1465,8 +1628,11 @@ async function confirmPurchase() {
 
             payButton.textContent =
                 "💳 Continue to Paytm";
+
         }
+
     }
+
 }
 
 
@@ -1479,7 +1645,9 @@ async function reconcilePaytmOrder(
 ) {
 
     if (!orderId) {
+
         return;
+
     }
 
 
@@ -1490,6 +1658,7 @@ async function reconcilePaytmOrder(
     ) {
 
         return;
+
     }
 
 
@@ -1499,9 +1668,10 @@ async function reconcilePaytmOrder(
             await fetch(
                 `${API}/api/paytm/verify`,
                 {
-                    method: "POST",
 
-                    headers: {
+                    method:"POST",
+
+                    headers:{
                         "Content-Type":
                             "application/json"
                     },
@@ -1510,6 +1680,7 @@ async function reconcilePaytmOrder(
                         JSON.stringify({
                             orderId
                         })
+
                 }
             );
 
@@ -1533,6 +1704,7 @@ async function reconcilePaytmOrder(
             throw new Error(
                 "Backend returned an invalid verification response."
             );
+
         }
 
 
@@ -1540,6 +1712,7 @@ async function reconcilePaytmOrder(
             data.success &&
             data.transaction
         ) {
+
 
             paytmHandledOrders.add(
                 orderId
@@ -1553,6 +1726,7 @@ async function reconcilePaytmOrder(
 
                 selectedProduct.status =
                     "Sold";
+
             }
 
 
@@ -1568,12 +1742,13 @@ async function reconcilePaytmOrder(
 
 
             return;
+
         }
 
 
         if (
             data.paymentStatus ===
-            "PENDING"
+                "PENDING"
         ) {
 
             alert(
@@ -1581,6 +1756,7 @@ async function reconcilePaytmOrder(
             );
 
             return;
+
         }
 
 
@@ -1605,7 +1781,9 @@ async function reconcilePaytmOrder(
                 "Payment verification failed."
             )
         );
+
     }
+
 }
 
 
@@ -1624,7 +1802,9 @@ function showPurchaseSuccess(
 
 
     if (old) {
+
         old.remove();
+
     }
 
 
@@ -1660,6 +1840,7 @@ function showPurchaseSuccess(
             padding:30px;
         ">
 
+
             <div style="
                 text-align:center;
                 font-size:50px;
@@ -1680,52 +1861,86 @@ function showPurchaseSuccess(
 
 
             <p>
+
                 📚
-                <strong>Product:</strong>
+                <strong>
+                    Product:
+                </strong>
+
                 ${escapeHTML(
-                    transaction.productName
+                    transaction.productName ||
+                    ""
                 )}
+
             </p>
 
 
             <p>
+
                 💰
-                <strong>Amount:</strong>
+                <strong>
+                    Amount:
+                </strong>
+
                 ₹${escapeHTML(
-                    transaction.amount
+                    transaction.amount ??
+                    ""
                 )}
+
             </p>
 
 
             <p>
+
                 👤
-                <strong>Seller:</strong>
+                <strong>
+                    Seller:
+                </strong>
+
                 ${escapeHTML(
-                    transaction.seller
+                    transaction.seller ||
+                    ""
                 )}
+
             </p>
 
 
             <p>
+
                 🆔
-                <strong>Transaction ID:</strong>
+                <strong>
+                    Transaction ID:
+                </strong>
+
                 #${escapeHTML(
-                    transaction.id
+                    transaction.id ??
+                    ""
                 )}
+
             </p>
 
 
             <p>
+
                 💳
-                <strong>Payment:</strong>
+                <strong>
+                    Payment:
+                </strong>
+
                 Paytm
+
             </p>
 
 
             <p>
+
                 ✅
-                <strong>Status:</strong>
+                <strong>
+                    Status:
+                </strong>
+
                 Completed
+
             </p>
 
 
@@ -1754,8 +1969,13 @@ function showPurchaseSuccess(
     document.body.appendChild(
         modal
     );
+
 }
 
+
+// ==================================================
+// CLOSE SUCCESS
+// ==================================================
 
 function closeSuccess() {
 
@@ -1766,8 +1986,34 @@ function closeSuccess() {
 
 
     if (modal) {
+
         modal.remove();
+
     }
+
+}
+
+
+// ==================================================
+// CLOSE DETAILS MODAL
+// ==================================================
+
+function closeDetailsModal() {
+
+    const modal =
+        document.getElementById(
+            "detailsModal"
+        );
+
+
+    if (modal) {
+
+        modal.classList.add(
+            "hidden"
+        );
+
+    }
+
 }
 
 
@@ -1784,8 +2030,10 @@ function openMessageBox(
     selectedSeller =
         seller;
 
+
     selectedProductName =
         productName;
+
 
     selectedProductId =
         productId;
@@ -1798,7 +2046,9 @@ function openMessageBox(
 
 
     if (old) {
+
         old.remove();
+
     }
 
 
@@ -1833,6 +2083,7 @@ function openMessageBox(
             border-radius:18px;
             padding:28px;
         ">
+
 
             <h2 style="
                 color:#312e81;
@@ -1932,7 +2183,6 @@ function openMessageBox(
                     Cancel
                 </button>
 
-
             </div>
 
         </div>
@@ -1943,8 +2193,13 @@ function openMessageBox(
     document.body.appendChild(
         modal
     );
+
 }
 
+
+// ==================================================
+// CLOSE MESSAGE MODAL
+// ==================================================
 
 function closeMessageModal() {
 
@@ -1955,8 +2210,11 @@ function closeMessageModal() {
 
 
     if (modal) {
+
         modal.remove();
+
     }
+
 }
 
 
@@ -2000,6 +2258,7 @@ async function sendMessage() {
         );
 
         return;
+
     }
 
 
@@ -2010,6 +2269,7 @@ async function sendMessage() {
         );
 
         return;
+
     }
 
 
@@ -2019,9 +2279,10 @@ async function sendMessage() {
             await fetch(
                 `${API}/api/messages`,
                 {
-                    method: "POST",
 
-                    headers: {
+                    method:"POST",
+
+                    headers:{
                         "Content-Type":
                             "application/json"
                     },
@@ -2029,8 +2290,7 @@ async function sendMessage() {
                     body:
                         JSON.stringify({
 
-                            sender:
-                                sender,
+                            sender,
 
                             receiver:
                                 selectedSeller,
@@ -2041,12 +2301,13 @@ async function sendMessage() {
                             productName:
                                 selectedProductName,
 
-                            message:
-                                message,
+                            message,
 
                             replyTo:
                                 null
+
                         })
+
                 }
             );
 
@@ -2072,6 +2333,7 @@ async function sendMessage() {
             throw new Error(
                 "Backend returned an invalid response."
             );
+
         }
 
 
@@ -2081,6 +2343,7 @@ async function sendMessage() {
                 data.message ||
                 "Message could not be sent."
             );
+
         }
 
 
@@ -2110,7 +2373,9 @@ async function sendMessage() {
                 "Message could not be sent."
             )
         );
+
     }
+
 }
 
 
@@ -2127,17 +2392,21 @@ async function loadMessages() {
 
 
     if (!container) {
+
         return;
+
     }
 
 
     container.innerHTML = `
+
         <div style="
             padding:30px;
             text-align:center;
         ">
             ⏳ Loading messages...
         </div>
+
     `;
 
 
@@ -2170,6 +2439,7 @@ async function loadMessages() {
             throw new Error(
                 "Backend returned an invalid message response."
             );
+
         }
 
 
@@ -2179,6 +2449,7 @@ async function loadMessages() {
                 messages.message ||
                 "Messages could not be loaded."
             );
+
         }
 
 
@@ -2188,17 +2459,22 @@ async function loadMessages() {
         ) {
 
             container.innerHTML = `
+
                 <div style="
                     background:white;
                     padding:30px;
                     text-align:center;
                     border-radius:15px;
                 ">
+
                     💬 No messages yet.
+
                 </div>
+
             `;
 
             return;
+
         }
 
 
@@ -2222,30 +2498,44 @@ async function loadMessages() {
                             <h3 style="
                                 color:#312e81;
                             ">
+
                                 📚
                                 ${escapeHTML(
                                     msg.productName ||
                                     msg.product ||
                                     "Product"
                                 )}
+
                             </h3>
 
 
                             <p>
+
                                 📤
-                                <strong>From:</strong>
+                                <strong>
+                                    From:
+                                </strong>
+
                                 ${escapeHTML(
-                                    msg.sender || ""
+                                    msg.sender ||
+                                    ""
                                 )}
+
                             </p>
 
 
                             <p>
+
                                 📥
-                                <strong>To:</strong>
+                                <strong>
+                                    To:
+                                </strong>
+
                                 ${escapeHTML(
-                                    msg.receiver || ""
+                                    msg.receiver ||
+                                    ""
                                 )}
+
                             </p>
 
 
@@ -2255,18 +2545,24 @@ async function loadMessages() {
                                 border-radius:10px;
                                 margin:12px 0;
                             ">
+
                                 ${escapeHTML(
-                                    msg.message || ""
+                                    msg.message ||
+                                    ""
                                 )}
+
                             </div>
 
 
                             <small style="
                                 color:#6b7280;
                             ">
+
                                 ${escapeHTML(
-                                    msg.date || ""
+                                    msg.date ||
+                                    ""
                                 )}
+
                             </small>
 
 
@@ -2318,19 +2614,27 @@ async function loadMessages() {
 
 
         container.innerHTML = `
+
             <div style="
                 padding:30px;
                 text-align:center;
                 color:#dc2626;
             ">
+
                 ❌ Could not load messages.
+
                 <br><br>
+
                 ${escapeHTML(
                     error.message
                 )}
+
             </div>
+
         `;
+
     }
+
 }
 
 
@@ -2348,8 +2652,10 @@ function replyMessage(
     selectedSeller =
         receiver;
 
+
     selectedProductName =
         productName;
+
 
     selectedProductId =
         productId;
@@ -2360,6 +2666,24 @@ function replyMessage(
         productName,
         productId
     );
+
+
+    const input =
+        document.getElementById(
+            "senderEmail"
+        );
+
+
+    if (
+        input &&
+        !input.value
+    ) {
+
+        input.value =
+            getCurrentUserEmail();
+
+    }
+
 }
 
 
@@ -2376,7 +2700,9 @@ function logoutUser() {
 
 
     if (!confirmation) {
+
         return;
+
     }
 
 
@@ -2384,9 +2710,11 @@ function logoutUser() {
         "userName"
     );
 
+
     localStorage.removeItem(
         "userEmail"
     );
+
 
     localStorage.removeItem(
         "user"
@@ -2395,6 +2723,7 @@ function logoutUser() {
 
     window.location.href =
         "login.html";
+
 }
 
 
@@ -2417,7 +2746,9 @@ async function handlePaytmReturn() {
 
 
     if (!orderId) {
+
         return;
+
     }
 
 
@@ -2431,6 +2762,7 @@ async function handlePaytmReturn() {
     await reconcilePaytmOrder(
         orderId
     );
+
 }
 
 
@@ -2449,5 +2781,6 @@ document.addEventListener(
         loadMessages();
 
         handlePaytmReturn();
+
     }
 );
