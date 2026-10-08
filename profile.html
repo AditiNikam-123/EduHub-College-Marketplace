@@ -2,10 +2,18 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EduHub - My Profile</title>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        EduHub - My Profile
+    </title>
+
 
     <style>
 
@@ -13,406 +21,888 @@
             box-sizing: border-box;
         }
 
+
         body {
+
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f7fb;
-            color: #222;
+
+            font-family:
+                Arial,
+                sans-serif;
+
+            background:
+                #f5f7fb;
+
+            color:
+                #222;
         }
+
+
+        /* ==========================================
+           SIDEBAR
+        ========================================== */
 
         .sidebar {
+
             position: fixed;
+
             left: 0;
             top: 0;
+
             width: 250px;
             height: 100vh;
-            background: linear-gradient(180deg, #312e81, #4f46e5);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #312e81,
+                    #4f46e5
+                );
+
             color: white;
-            padding: 25px 15px;
+
+            padding:
+                25px 15px;
         }
+
 
         .logo {
+
             font-size: 24px;
+
             font-weight: bold;
-            padding: 10px 15px 30px;
+
+            padding:
+                10px 15px 30px;
         }
+
 
         .sidebar a {
+
             display: block;
+
             color: white;
+
             text-decoration: none;
-            padding: 13px 15px;
-            margin: 6px 0;
-            border-radius: 9px;
-            transition: 0.2s;
+
+            padding:
+                13px 15px;
+
+            margin:
+                6px 0;
+
+            border-radius:
+                9px;
+
+            transition:
+                0.2s;
         }
+
 
         .sidebar a:hover {
-            background: rgba(255,255,255,0.15);
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.15
+                );
         }
+
 
         .sidebar .active {
-            background: rgba(255,255,255,0.2);
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.2
+                );
         }
+
+
+        /* ==========================================
+           MAIN CONTENT
+        ========================================== */
 
         .main-content {
-            margin-left: 250px;
-            padding: 40px;
+
+            margin-left:
+                250px;
+
+            padding:
+                40px;
         }
+
 
         .profile-page {
-            max-width: 1000px;
-            margin: auto;
+
+            max-width:
+                1000px;
+
+            margin:
+                auto;
         }
+
+
+        /* ==========================================
+           BACK BUTTON
+        ========================================== */
 
         .back-btn {
-            display: inline-block;
-            background: #4f46e5;
-            color: white;
-            text-decoration: none;
-            padding: 11px 18px;
-            border-radius: 8px;
-            font-weight: bold;
-            margin-bottom: 25px;
+
+            display:
+                inline-block;
+
+            background:
+                #4f46e5;
+
+            color:
+                white;
+
+            text-decoration:
+                none;
+
+            padding:
+                11px 18px;
+
+            border-radius:
+                8px;
+
+            font-weight:
+                bold;
+
+            margin-bottom:
+                25px;
         }
+
+
+        /* ==========================================
+           PROFILE CARD
+        ========================================== */
 
         .profile-card {
-            background: white;
-            border-radius: 20px;
-            padding: 35px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
+
+            background:
+                white;
+
+            border-radius:
+                20px;
+
+            padding:
+                35px;
+
+            box-shadow:
+                0 8px 30px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
+
+            margin-bottom:
+                25px;
         }
+
 
         .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            margin-bottom: 30px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                25px;
+
+            margin-bottom:
+                30px;
         }
+
 
         .profile-avatar {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
+
+            width:
+                90px;
+
+            height:
+                90px;
+
+            border-radius:
+                50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            color:
+                white;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            font-size:
+                40px;
         }
+
 
         .profile-header h1 {
-            margin: 0 0 8px;
-            color: #312e81;
+
+            margin:
+                0 0 8px;
+
+            color:
+                #312e81;
         }
+
 
         .profile-header p {
-            margin: 0;
-            color: #666;
+
+            margin:
+                0;
+
+            color:
+                #666;
         }
+
+
+        /* ==========================================
+           PROFILE INFO
+        ========================================== */
 
         .profile-info {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    1fr
+                );
+
+            gap:
+                18px;
         }
+
 
         .info-box {
-            background: #f5f7fb;
-            padding: 18px;
-            border-radius: 12px;
+
+            background:
+                #f5f7fb;
+
+            padding:
+                18px;
+
+            border-radius:
+                12px;
         }
+
 
         .info-box span {
-            display: block;
-            color: #777;
-            font-size: 13px;
-            margin-bottom: 6px;
+
+            display:
+                block;
+
+            color:
+                #777;
+
+            font-size:
+                13px;
+
+            margin-bottom:
+                6px;
         }
+
 
         .info-box strong {
-            font-size: 16px;
+
+            font-size:
+                16px;
         }
+
+
+        /* ==========================================
+           STATS
+        ========================================== */
 
         .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    3,
+                    1fr
+                );
+
+            gap:
+                20px;
         }
+
 
         .stat-card {
-            background: white;
-            padding: 25px;
-            text-align: center;
-            border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+
+            background:
+                white;
+
+            padding:
+                25px;
+
+            text-align:
+                center;
+
+            border-radius:
+                16px;
+
+            box-shadow:
+                0 5px 20px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.06
+                );
         }
+
 
         .stat-icon {
-            font-size: 30px;
+
+            font-size:
+                30px;
         }
+
 
         .stat-card h2 {
-            color: #4f46e5;
-            margin: 8px 0;
-            font-size: 32px;
+
+            color:
+                #4f46e5;
+
+            margin:
+                8px 0;
+
+            font-size:
+                32px;
         }
 
+
         .stat-card p {
-            color: #666;
-            margin: 0;
+
+            color:
+                #666;
+
+            margin:
+                0;
         }
+
+
+        /* ==========================================
+           MOBILE
+        ========================================== */
 
         @media (max-width: 700px) {
 
             .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
+
+                position:
+                    relative;
+
+                width:
+                    100%;
+
+                height:
+                    auto;
             }
+
 
             .sidebar a {
-                display: inline-block;
-                margin: 3px;
+
+                display:
+                    inline-block;
+
+                margin:
+                    3px;
             }
+
 
             .main-content {
-                margin-left: 0;
-                padding: 20px;
+
+                margin-left:
+                    0;
+
+                padding:
+                    20px;
             }
+
 
             .profile-info {
-                grid-template-columns: 1fr;
+
+                grid-template-columns:
+                    1fr;
             }
+
 
             .stats {
-                grid-template-columns: 1fr;
+
+                grid-template-columns:
+                    1fr;
             }
 
+
             .profile-header {
-                flex-direction: column;
-                text-align: center;
+
+                flex-direction:
+                    column;
+
+                text-align:
+                    center;
             }
+
         }
 
     </style>
 
 </head>
 
+
 <body>
+
+
+    <!-- ==========================================
+         SIDEBAR
+    ========================================== -->
 
     <div class="sidebar">
 
+
         <div class="logo">
+
             🎓 EduHub
+
         </div>
 
-        <a href="index.html">
-            🏠 Home
-        </a>
 
         <a href="index.html">
-            🛍️ Available Products
+
+            🏠 Home
+
         </a>
+
+
+        <a href="index.html">
+
+            🛍️ Available Products
+
+        </a>
+
 
         <a href="messages.html">
+
             💬 Messages
+
         </a>
+
 
         <a href="index.html">
+
             ➕ Sell Your Product
+
         </a>
+
 
         <a href="history.html">
+
             🧾 Transaction History
+
         </a>
 
-        <a href="profile.html" class="active">
+
+        <a
+            href="profile.html"
+            class="active"
+        >
+
             👤 My Profile
+
         </a>
+
 
         <a href="login.html">
+
             🔐 Login
+
         </a>
+
 
     </div>
 
+
+
+    <!-- ==========================================
+         MAIN CONTENT
+    ========================================== -->
 
     <div class="main-content">
 
+
         <div class="profile-page">
 
-            <a href="index.html" class="back-btn">
+
+            <!-- BACK BUTTON -->
+
+            <a
+                href="index.html"
+                class="back-btn"
+            >
+
                 ← Back to EduHub
+
             </a>
 
 
+
+            <!-- ======================================
+                 PROFILE CARD
+            ====================================== -->
+
             <div class="profile-card">
+
 
                 <div class="profile-header">
 
+
                     <div class="profile-avatar">
+
                         👤
+
                     </div>
+
 
                     <div>
 
+
                         <h1 id="profileName">
+
                             Student
+
                         </h1>
 
+
                         <p id="profileEmail">
+
                             Loading...
+
                         </p>
+
 
                     </div>
 
+
                 </div>
 
+
+
+                <!-- ==================================
+                     PROFILE INFORMATION
+                ================================== -->
 
                 <div class="profile-info">
 
+
+                    <!-- FULL NAME -->
+
                     <div class="info-box">
 
+
                         <span>
+
                             Full Name
+
                         </span>
+
 
                         <strong id="infoName">
+
                             -
+
                         </strong>
+
 
                     </div>
 
 
+
+                    <!-- EMAIL -->
+
                     <div class="info-box">
 
+
                         <span>
+
                             Email
+
                         </span>
+
 
                         <strong id="infoEmail">
+
                             -
+
                         </strong>
+
 
                     </div>
 
 
+
+                    <!-- ACCOUNT TYPE -->
+
                     <div class="info-box">
 
+
                         <span>
+
                             Account Type
+
                         </span>
 
+
                         <strong>
+
                             EduHub Student
+
                         </strong>
+
 
                     </div>
 
+
+
+                    <!-- PLATFORM -->
 
                     <div class="info-box">
 
+
                         <span>
+
                             Platform
+
                         </span>
 
+
                         <strong>
+
                             College Marketplace
+
                         </strong>
 
+
                     </div>
+
 
                 </div>
 
+
             </div>
 
+
+
+            <!-- ======================================
+                 STATISTICS
+            ====================================== -->
 
             <div class="stats">
 
+
+                <!-- PRODUCTS LISTED -->
+
                 <div class="stat-card">
 
+
                     <div class="stat-icon">
+
                         📦
+
                     </div>
+
 
                     <h2 id="productCount">
+
                         0
+
                     </h2>
 
+
                     <p>
+
                         Products Listed
+
                     </p>
+
 
                 </div>
 
 
+
+                <!-- TRANSACTIONS -->
+
                 <div class="stat-card">
 
+
                     <div class="stat-icon">
+
                         🧾
+
                     </div>
+
 
                     <h2 id="transactionCount">
+
                         0
+
                     </h2>
 
+
                     <p>
+
                         Transactions
+
                     </p>
+
 
                 </div>
 
+
+
+                <!-- MESSAGES -->
 
                 <div class="stat-card">
 
+
                     <div class="stat-icon">
+
                         💬
+
                     </div>
 
+
                     <h2 id="messageCount">
+
                         0
+
                     </h2>
 
+
                     <p>
+
                         Messages
+
                     </p>
 
+
                 </div>
+
 
             </div>
 
+
         </div>
+
 
     </div>
 
 
+
+    <!-- ==========================================
+         PROFILE SCRIPT
+    ========================================== -->
+
     <script>
+
 
         const API =
             "https://eduhub-backend-llwi.onrender.com";
 
 
+        // ==========================================
+        // NORMALIZE EMAIL
+        // ==========================================
+
+        function normalizeEmail(value) {
+
+            return String(
+                value || ""
+            )
+                .trim()
+                .toLowerCase();
+
+        }
+
+
+        // ==========================================
+        // NORMALIZE NAME
+        // ==========================================
+
+        function normalizeName(value) {
+
+            return String(
+                value || ""
+            )
+                .trim()
+                .toLowerCase();
+
+        }
+
+
+        // ==========================================
+        // LOAD PROFILE
+        // ==========================================
+
         async function loadProfile() {
 
+
             const email =
-                localStorage.getItem("userEmail");
+                localStorage.getItem(
+                    "userEmail"
+                ) || "";
+
 
             const name =
-                localStorage.getItem("userName");
+                localStorage.getItem(
+                    "userName"
+                ) || "";
 
+
+            // ======================================
+            // DISPLAY PROFILE DETAILS
+            // ======================================
 
             if (email) {
 
                 document.getElementById(
                     "profileEmail"
-                ).innerText = email;
+                ).innerText =
+                    email;
+
 
                 document.getElementById(
                     "infoEmail"
-                ).innerText = email;
+                ).innerText =
+                    email;
 
             } else {
 
@@ -421,6 +911,7 @@
                 ).innerText =
                     "Not logged in";
 
+
                 document.getElementById(
                     "infoEmail"
                 ).innerText =
@@ -429,15 +920,19 @@
             }
 
 
+
             if (name) {
 
                 document.getElementById(
                     "profileName"
-                ).innerText = name;
+                ).innerText =
+                    name;
+
 
                 document.getElementById(
                     "infoName"
-                ).innerText = name;
+                ).innerText =
+                    name;
 
             } else {
 
@@ -445,6 +940,7 @@
                     "profileName"
                 ).innerText =
                     "EduHub Student";
+
 
                 document.getElementById(
                     "infoName"
@@ -454,126 +950,350 @@
             }
 
 
+
+            // ======================================
+            // RESET COUNTS
+            // ======================================
+
+            document.getElementById(
+                "productCount"
+            ).innerText = "0";
+
+
+            document.getElementById(
+                "transactionCount"
+            ).innerText = "0";
+
+
+            document.getElementById(
+                "messageCount"
+            ).innerText = "0";
+
+
+
+            // ======================================
+            // LOGIN REQUIRED
+            // ======================================
+
             if (!email) {
+
                 return;
+
             }
 
 
+
+            const currentEmail =
+                normalizeEmail(
+                    email
+                );
+
+
+            const currentName =
+                normalizeName(
+                    name
+                );
+
+
+
             try {
+
+
+                // ==================================
+                // PRODUCTS
+                // ==================================
 
                 const productsResponse =
                     await fetch(
                         `${API}/api/products`
                     );
 
-                if (productsResponse.ok) {
+
+                if (
+                    productsResponse.ok
+                ) {
+
 
                     const products =
                         await productsResponse.json();
 
+
+                    const safeProducts =
+                        Array.isArray(
+                            products
+                        )
+                            ? products
+                            : [];
+
+
+
                     const myProducts =
-                        products.filter(
-                            product =>
-                                String(
-                                    product.seller || ""
-                                ).toLowerCase()
-                                ===
-                                email.toLowerCase()
+                        safeProducts.filter(
+                            product => {
+
+
+                                const sellerEmail =
+                                    normalizeEmail(
+                                        product.sellerEmail
+                                    );
+
+
+                                const sellerName =
+                                    normalizeName(
+                                        product.sellerName ||
+                                        product.seller
+                                    );
+
+
+
+                                /*
+                                 * New products are matched
+                                 * using seller email.
+                                 *
+                                 * Older products that may not
+                                 * have sellerEmail are matched
+                                 * using seller name.
+                                 */
+
+                                if (
+                                    sellerEmail &&
+                                    sellerEmail ===
+                                    currentEmail
+                                ) {
+
+                                    return true;
+
+                                }
+
+
+                                if (
+                                    currentName &&
+                                    sellerName ===
+                                    currentName
+                                ) {
+
+                                    return true;
+
+                                }
+
+
+                                return false;
+
+                            }
                         );
+
+
 
                     document.getElementById(
                         "productCount"
                     ).innerText =
                         myProducts.length;
+
                 }
 
+
+
+                // ==================================
+                // TRANSACTIONS
+                // ==================================
 
                 const transactionResponse =
                     await fetch(
                         `${API}/api/transactions`
                     );
 
-                if (transactionResponse.ok) {
+
+                if (
+                    transactionResponse.ok
+                ) {
+
 
                     const transactions =
                         await transactionResponse.json();
 
+
+                    const safeTransactions =
+                        Array.isArray(
+                            transactions
+                        )
+                            ? transactions
+                            : [];
+
+
+
                     const myTransactions =
-                        transactions.filter(
-                            transaction =>
-                                String(
-                                    transaction.buyer || ""
-                                ).toLowerCase()
-                                ===
-                                email.toLowerCase()
+                        safeTransactions.filter(
+                            transaction => {
+
+
+                                const buyer =
+                                    normalizeEmail(
+                                        transaction.buyer
+                                    );
+
+
+                                const sellerEmail =
+                                    normalizeEmail(
+                                        transaction.sellerEmail
+                                    );
+
+
+                                const seller =
+                                    normalizeName(
+                                        transaction.seller
+                                    );
+
+
+                                /*
+                                 * Count transaction when
+                                 * user is the buyer OR seller.
+                                 */
+
+                                if (
+                                    buyer &&
+                                    buyer ===
+                                    currentEmail
+                                ) {
+
+                                    return true;
+
+                                }
+
+
+                                if (
+                                    sellerEmail &&
+                                    sellerEmail ===
+                                    currentEmail
+                                ) {
+
+                                    return true;
+
+                                }
+
+
+                                if (
+                                    currentName &&
+                                    seller ===
+                                    currentName
+                                ) {
+
+                                    return true;
+
+                                }
+
+
+                                return false;
+
+                            }
                         );
+
+
 
                     document.getElementById(
                         "transactionCount"
                     ).innerText =
                         myTransactions.length;
+
                 }
 
+
+
+                // ==================================
+                // MESSAGES SENT
+                // ==================================
 
                 const messageResponse =
                     await fetch(
                         `${API}/api/messages`
                     );
 
-                if (messageResponse.ok) {
+
+                if (
+                    messageResponse.ok
+                ) {
+
 
                     const messages =
                         await messageResponse.json();
 
-                    const myMessages =
-                        messages.filter(
+
+                    const safeMessages =
+                        Array.isArray(
+                            messages
+                        )
+                            ? messages
+                            : [];
+
+
+
+                    /*
+                     * ONLY SENT MESSAGES
+                     *
+                     * Received messages are not
+                     * counted in this card.
+                     */
+
+                    const mySentMessages =
+                        safeMessages.filter(
                             message => {
 
+
                                 const sender =
-                                    String(
-                                        message.sender || ""
-                                    ).toLowerCase();
+                                    normalizeEmail(
+                                        message.sender
+                                    );
 
-                                const receiver =
-                                    String(
-                                        message.receiver || ""
-                                    ).toLowerCase();
-
-                                const currentUser =
-                                    email.toLowerCase();
 
                                 return (
-                                    sender === currentUser ||
-                                    receiver === currentUser
+                                    sender ===
+                                    currentEmail
                                 );
+
                             }
                         );
+
+
 
                     document.getElementById(
                         "messageCount"
                     ).innerText =
-                        myMessages.length;
+                        mySentMessages.length;
+
                 }
 
 
             } catch (error) {
+
 
                 console.error(
                     "Profile loading error:",
                     error
                 );
 
+
+                /*
+                 * Keep the profile page working
+                 * even if backend is unavailable.
+                 */
+
             }
 
         }
 
+
+
+        // ==========================================
+        // START
+        // ==========================================
 
         document.addEventListener(
             "DOMContentLoaded",
             loadProfile
         );
 
+
     </script>
+
 
 </body>
 
